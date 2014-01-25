@@ -22,6 +22,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>
  * 
  */
+namespace cuonic\PHPAuth2;
+
 abstract class trackingDB
 {
     private $geoXML;
@@ -176,7 +178,12 @@ abstract class trackingDB
             $hostName = (gethostbyaddr($this->getIP()) == '') ? 'Unknown Host' :
                 gethostbyaddr($this->getIP());
 
-            $cookies = serialize($_SERVER['HTTP_COOKIE']);
+            if (isset($_SERVER['HTTP_COOKIE'])) {
+                $cookies = serialize($_SERVER['HTTP_COOKIE']);
+            } else {
+                $cookies = "";
+            }
+
 
             $landingPage = $_SERVER['REQUEST_URI'];
 
@@ -195,7 +202,7 @@ abstract class trackingDB
 
             return array(
                 'IP' => $this->getIP(),
-                'uid' => $_COOKIE['uID'],
+                'uid' => $uid,
                 'DNT' => $DNT,
                 'Continent' => $this->continentName,
                 'Region' => $this->regionName,
