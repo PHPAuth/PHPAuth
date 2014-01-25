@@ -1,7 +1,7 @@
 <?php
-/** PHPAuth-2.0
+/** PHPAuth
  * @author PHPAuth
- * @version 2.0
+ * @version 2.1
  * @website http://phpauth.cuonic.com/
  * @copyright 2014 - 2014 - PHPAuth
  * @license LICENSE.md
