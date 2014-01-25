@@ -1,15 +1,44 @@
-# PHPAuth
+PHPAuth
+====================
 
 PHPAuth is a secure authentication class for PHP. 
 It features improved passwordhashing using the hash_pbkdf2 function and 3 different salts, as well as improved coding layout, the use of private and public functions, seperating the most decisive functions from the frontend. 
 There is also enhanced logging functionality, logging all attempts at logging in, creating accounts etc, including an IP and a timestamp.
 With PHPAuth, you'll also get a tracking system with it, so you'll be able to track your visitors and do site analytics
 
+Release Information
+---------------
+This repo contains in-development code for future releases. To download the
+latest stable release please visit the [release](https://github.com/PHPAuth/PHPAuth/releases) page.
+
+Features
+---------------
+
+* Uses prepared statements everywhere to mitigate SQL injection
+* User possibilites : Login, register, activate account, resend activation email, reset password, change password, change email address, logout
+* Thorough activity logging meaning all attempts at using the functions above are logged (including IP and timestamp) to check for hacking attempts, bugs in the system etc...
+* Uses the hash_pbkdf2 function, with 3 different salts, resulting in extremely secure password storage
+* Never sends a plaintext password, anywhere (Which is very bad practice BTW)
+* Page protection (from non logged-in users) requires 5 lines of code, and that's with generous spacing
+* Locks an IP out of system for 30 minutes after 5 failed attempts at any of the functions of the PHPAuth class
+* No way for an attacker to "block" accounts by forcing them to be locked out
+* All main functions (login, register, activate...) send back a return code ($return['code']), each one has a specific meaning so you can set custom error / success messages.
+* Tracking system
+
 A full feature list is available here at the wiki: https://github.com/PHPAuth/PHPAuth/wiki/Feature-list
 
+Documentation
+---------------
 There is also full usage documentation, function descriptions and an FAQ available at the Wiki: https://github.com/PHPAuth/PHPAuth/wiki
 
-Please, if you do find any bugs/problems with the class, don't hesitate to report them using the "Issues" feature of GitHub, also if you feel like improving the class, fixing bugs or anything, go ahead, fork it, do your modification and create a pull request.
+Contributing
+---------------
+
+You can contribute to this project in different ways:
+
+* Report outstanding issues and bugs by creating an [Issue](https://github.com/PHPAuth/PHPAuth/issues/new)
+* Fork the project, create a branch and file a pull request to improve the code itself
+
 
 LICENSE
 ---------------
