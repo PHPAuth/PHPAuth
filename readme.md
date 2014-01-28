@@ -24,6 +24,8 @@ Features
 * No way for an attacker to "block" accounts by forcing them to be locked out
 * All main functions (login, register, activate...) send back a return code ($return['code']), each one has a specific meaning so you can set custom error / success messages.
 * Tracking system
+* OTP (One-Time Auth)
+
 
 A full feature list is available here at the wiki: https://github.com/PHPAuth/PHPAuth/wiki/Feature-list
 
@@ -34,6 +36,7 @@ There is also full usage documentation, function descriptions and an FAQ availab
 Todo
 ---------------
 add TOS -cookie use, include tos.txt- - Optimal option
+add documentation & function descriptions for OTP
 
 Contributing
 ---------------

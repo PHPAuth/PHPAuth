@@ -49,6 +49,7 @@ class Config
     private $table_users = 'users';
     private $table_tracking = 'tracking';
     private $session_duration = "+1 month";
+    private $table_otp = 'OTP';
 
     public function __get($name)
     {

@@ -15,6 +15,15 @@ CREATE TABLE IF NOT EXISTS `activations` (
   KEY `uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `OTP` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uid` int(11) NOT NULL,
+  `secret` varchar(56) NOT NULL,
+  `backupkey` varchar(128) NOT NULL,
+  `qr` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ;
+
 CREATE TABLE IF NOT EXISTS `attempts` (
   `ip` varchar(39) NOT NULL,
   `count` int(11) NOT NULL,
@@ -57,15 +66,17 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(30) NOT NULL,
   `password` varchar(128) NOT NULL,
+  `otp` int(11) NOT NULL DEFAULT '0',
   `email` varchar(100) NOT NULL,
   `salt` varchar(20) NOT NULL,
   `lang` char(2) NOT NULL DEFAULT 'en',
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
-  `level` int(11) NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `pin` int(4) NOT NULL COMMENT 'User''s PIN code for modifications',
   PRIMARY KEY (`id`),
   KEY `email` (`email`),
   KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `tracking` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
