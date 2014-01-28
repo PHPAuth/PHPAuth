@@ -36,7 +36,8 @@ There is also full usage documentation, function descriptions and an FAQ availab
 Todo
 ---------------
 add TOS -cookie use, include tos.txt- - Optimal option
-add documentation & function descriptions for OTP
+add documentation and function descriptions for OTP
+add OTP cookie
 
 Contributing
 ---------------
