@@ -31,6 +31,10 @@ Documentation
 ---------------
 There is also full usage documentation, function descriptions and an FAQ available at the Wiki: https://github.com/PHPAuth/PHPAuth/wiki
 
+Todo
+---------------
+add 
+
 Contributing
 ---------------
 
