@@ -33,7 +33,7 @@ There is also full usage documentation, function descriptions and an FAQ availab
 
 Todo
 ---------------
-add 
+add TOS -cookie use, include tos.txt- - Optimal option
 
 Contributing
 ---------------
