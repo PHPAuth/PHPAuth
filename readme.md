@@ -41,7 +41,7 @@ add documentation and function descriptions for OTP
 
 add OTP cookie
 
-convert to framework
+convert to framework (under discussion - check issues)
 
 Contributing
 ---------------
