@@ -699,6 +699,49 @@ class Auth
             return false;
         }
     }
+    
+    /**
+     * Check username and password strength
+     * @param string $pw
+     * @param string $pw2
+     * @param string $username
+     * @return array
+     * NOTE: Work in progress
+     */
+    public function Check($pwd, $pwd2, $username)
+    {
+        if (!$this->isUsernameTaken($username)) {
+            $errors[] = "username is taken";
+        }
+        if ($pwd != $pwd2) {
+            $errors[] = "No match";
+        }
+        if (strlen($pwd) < 8) {
+            $errors[] = "Password too short!";
+        }
+
+        if (!preg_match("#[0-9]+#", $pwd)) {
+            $errors[] = "Password must include at least one number!";
+        }
+
+        if (!preg_match("#[a-zA-Z]+#", $pwd)) {
+            $errors[] = "Password must include at least one letter!"; 
+        }
+        if (strlen($pwd) > 20) {
+            $errors[] = "Password too long!";
+        }
+        if (!preg_match("#[A-Z]+#", $pwd)) {
+            $errors[] = "Password must include at least one CAPS!";
+        }
+        if (!preg_match("#\W+#", $pwd)) {
+            $errors[] = "Password must include at least one symbol!";
+        }
+        if (count(@$errors) != 0) {
+            return array("return" => 0, "errors" => $errors);
+        } else {
+            return array("return" => 1);
+        }
+    }
 
     /**
      * Adds a new user to database
