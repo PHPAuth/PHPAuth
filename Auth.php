@@ -677,9 +677,9 @@ class Auth
         $query->execute(array($email));
 
         if ($query->rowCount() == 0) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -694,9 +694,9 @@ class Auth
         $query->execute(array($username));
 
         if ($query->rowCount() == 0) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
