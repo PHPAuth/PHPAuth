@@ -15,14 +15,6 @@ CREATE TABLE IF NOT EXISTS `activations` (
   KEY `uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `OTP` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uid` int(11) NOT NULL,
-  `secret` varchar(56) NOT NULL,
-  `backupkey` varchar(128) NOT NULL,
-  `qr` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `attempts` (
   `ip` varchar(39) NOT NULL,
