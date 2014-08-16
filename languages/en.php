@@ -1,7 +1,5 @@
 <?php
 
-$lang = array();
-
 // Auth class return messages :
 
 $lang = array();
