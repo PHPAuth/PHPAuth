@@ -898,6 +898,8 @@ class Auth
         } else {
             $return['error'] = 0;
         }
+        
+        return $return; // missing this part
     }
 
     /*
