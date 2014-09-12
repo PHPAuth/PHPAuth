@@ -888,18 +888,15 @@ class Auth
 
         if (strlen($username) < 3) {
             $return['message'] = "username_short";
-            $this->addNewLog(0, "USERNAME_SHORT", "Username : {$username}");
         } elseif (strlen($username) > 30) {
             $return['message'] = "username_long";
-            $this->addNewLog(0, "USERNAME_LONG", "Username : {$username}");
         } elseif (!ctype_alnum($username)) {
             $return['message'] = "username_invalid";
-            $this->addNewLog(0, "USERNAME_INVALID", "Username : {$username}");
         } else {
             $return['error'] = 0;
         }
         
-        return $return; // missing this part
+        return $return;
     }
 
     /*
@@ -914,13 +911,10 @@ class Auth
 
         if (strlen($password) < 6) {
             $return['message'] = "password_short";
-            $this->addNewLog(0, "PASSWORD_SHORT", "");
         } elseif (strlen($password) > 72) {
             $return['message'] = "password_long";
-            $this->addNewLog(0, "PASSWORD_LONG", "");
         } elseif (!preg_match('@[A-Z]@', $password) || !preg_match('@[a-z]@', $password) || !preg_match('@[0-9]@', $password)) {
             $return['message'] = "password_invalid";
-            $this->addNewLog(0, "PASSWORD_INVALID", "");
         } else {
             $return['error'] = 0;
         }
@@ -940,13 +934,10 @@ class Auth
 
         if (strlen($email) < 5) {
             $return['message'] = "email_short";
-            $this->addNewLog(0, "EMAIL_SHORT", "Email : {$email}");
         } elseif (strlen($email) > 100) {
             $return['message'] = "email_long";
-            $this->addNewLog(0, "EMAIL_LONG", "Email : {$email}");
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $return['message'] = "email_invalid";
-            $this->addNewLog(0, "EMAIL_INVALID", "Email : {$email}");
         } else {
             $return['error'] = 0;
         }
