@@ -2,7 +2,7 @@
 
 /*
 * Auth class
-* Functions with PHP 5.3.7 and above.
+* Works with PHP 5.3.7 and above.
 */
 
 class Auth
@@ -34,7 +34,6 @@ class Auth
 
     public function login($username, $password, $remember = 0)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -128,7 +127,6 @@ class Auth
 
     public function register($email, $username, $password, $repeatpassword)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -192,7 +190,6 @@ class Auth
 
     public function activate($key)
     {
-        $return = array();
         $return['code'] = 400;
 
         if($this->isBlocked()) {
@@ -245,7 +242,6 @@ class Auth
 
     public function requestReset($email)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -305,13 +301,11 @@ class Auth
             return false;
         }
 
-        $return = $this->deleteSession($hash);
-
-        return $return;
+        return $this->deleteSession($hash);
     }
 
     /*
-    * Hashes string using multiple hashing methods, for enhanced security
+    * Hashes provided string with Bcrypt
     * @param string $string
     * @param string $salt
     * @return string $hash
@@ -323,9 +317,9 @@ class Auth
     }
 
     /*
-    * Gets user data for a given username and returns an array
+    * Gets UID for a given username and returns an array
     * @param string $username
-    * @return array $data
+    * @return array $uid
     */
 
     public function getUID($username)
@@ -415,9 +409,9 @@ class Auth
     }
 
     /*
-    * Returns username based on session hash
+    * Returns UID based on session hash
     * @param string $hash
-    * @return string $username
+    * @return string $uid
     */
 
     public function getSessionUID($hash)
@@ -605,7 +599,6 @@ class Auth
 
     private function addUser($email, $username, $password)
     {
-        $return = array();
         $return['error'] = 1;
 
         $query = $this->dbh->prepare("INSERT INTO {$this->config->table_users} VALUES ()");
@@ -661,8 +654,6 @@ class Auth
 
     public function getUser($uid)
     {
-        $data = array();
-
         $query = $this->dbh->prepare("SELECT username, password, email, salt, isactive FROM {$this->config->table_users} WHERE id = ?");
         $query->execute(array($uid));
 
@@ -690,7 +681,6 @@ class Auth
 
     public function deleteUser($uid, $password) 
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -753,7 +743,6 @@ class Auth
 
     private function addRequest($uid, $email, $type)
     {
-        $return = array();
         $return['error'] = 1;
 
         if($type != "activation" && $type != "reset") {
@@ -831,7 +820,6 @@ class Auth
 
     private function getRequest($key, $type)
     {
-        $return = array();
         $return['error'] = 1;
 
         $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE rkey = ? AND type = ?");
@@ -883,7 +871,6 @@ class Auth
     */
 
     public function validateUsername($username) {
-        $return = array();
         $return['error'] = 1;
 
         if (strlen($username) < 3) {
@@ -906,7 +893,6 @@ class Auth
     */
 
     private function validatePassword($password) {
-        $return = array();
         $return['error'] = 1;
 
         if (strlen($password) < 6) {
@@ -929,7 +915,6 @@ class Auth
     */
 
     private function validateEmail($email) {
-        $return = array();
         $return['error'] = 1;
 
         if (strlen($email) < 5) {
@@ -955,7 +940,6 @@ class Auth
 
     public function resetPass($key, $password, $repeatpassword)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -1039,7 +1023,6 @@ class Auth
 
     public function resendActivation($email)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -1112,8 +1095,7 @@ class Auth
             if($query->rowCount() == 0) {
                 return false;
             } else {
-                $row = $query->fetch(\PDO::FETCH_ASSOC);
-                return $row['uid'];
+                return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
             }
         }
     }
@@ -1128,7 +1110,6 @@ class Auth
 
     public function changePassword($uid, $currpass, $newpass, $repeatnewpass)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -1227,7 +1208,6 @@ class Auth
 
     public function changeEmail($uid, $email, $password)
     {
-        $return = array();
         $return['code'] = 400;
 
         if ($this->isBlocked()) {
@@ -1297,7 +1277,6 @@ class Auth
 
     /*
     * Informs if a user is locked out
-    * @param string $ip
     * @return boolean
     */
 
@@ -1333,19 +1312,6 @@ class Auth
         }
     }
 
-    public function getUsernameFromUID($uid)
-    {
-        $query = $this->dbh->prepare("SELECT username FROM users WHERE id = ?");
-        $query->execute(array($uid));
-
-        if ($query->rowCount() == 0) {
-            return false;
-        } else {
-            $return = $query->fetch();
-            return $return['username'];
-        }
-    }
-
     /*
     * Adds an attempt to database
     * @return boolean
@@ -1365,23 +1331,13 @@ class Auth
             $attempt_count = 1;
 
             $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, count, expiredate) VALUES (?, ?, ?)");
-            $return = $query->execute(array(
-                $ip,
-                $attempt_count,
-                $attempt_expiredate));
-
-            return $return;
+            return $query->execute(array($ip, $attempt_count, $attempt_expiredate));
         } else {
             $attempt_expiredate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
             $attempt_count = $row['count'] + 1;
 
             $query = $this->dbh->prepare("UPDATE {$this->config->table_attempts} SET count=?, expiredate=? WHERE ip=?");
-            $return = $query->execute(array(
-                $attempt_count,
-                $attempt_expiredate,
-                $ip));
-
-            return $return;
+            return $query->execute(array($attempt_count, $attempt_expiredate, $ip));
         }
     }
 
@@ -1394,9 +1350,7 @@ class Auth
     private function deleteAttempts($ip)
     {
         $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
-        $return = $query->execute(array($ip));
-
-        return $return;
+        return $query->execute(array($ip));
     }
 
     /*
