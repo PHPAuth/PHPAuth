@@ -102,4 +102,8 @@ Anyone can contribute to improve or fix PHPAuth, to do so you can either report 
 Credits
 ---------------
 
-* [password_compat](https://github.com/ircmaxell/password_compat) - ircmaxell
+* [password_compat](https://github.com/ircmaxell/password_compat) - @ircmaxell
+
+Donating
+---------------
+You can donate to this project via [tip4commit](https://tip4commit.com/github/PHPAuth/PHPAuth) 
