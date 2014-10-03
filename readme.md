@@ -1,9 +1,15 @@
-# PHPAuth
-### What is it
+PHPAuth
+=======
+
+[![tip for next commit](https://tip4commit.com/projects/1003.svg)](https://tip4commit.com/github/PHPAuth/PHPAuth)
+
+What is it
+---------------
 
 PHPAuth is a secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.
 
-### Features
+Features
+---------------
 * Uses [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) to hash passwords, a secure algorithm that uses an expensive key setup phase
 * Uses an individual 128 bit salt for each user, pulled from /dev/urandom, making rainbow tables useless
 * Uses PHP's [PDO](http://php.net/manual/en/book.pdo.php) database interface and uses prepared statements meaning an efficient system, resilient against SQL injection
@@ -13,7 +19,8 @@ PHPAuth is a secure user authentication class for PHP websites, using a powerful
 * Integrates easily into most existing websites, and can be a great starting point for new projects
 * Easy configuration of multiple system parameters
 
-### User actions
+User actions
+---------------
 * Login
 * Register
 * Activate account
@@ -24,10 +31,12 @@ PHPAuth is a secure user authentication class for PHP websites, using a powerful
 * Delete account
 * Logout
 
-### Requirements
+Requirements
+---------------
 PHPAuth requires  PHP 5.3.7 and above, a MySQL database and PHP sendmail needs setting up correctly so that account activation emails get sent correctly.
 
-### Configuration
+Configuration
+---------------
 
 The configuration file (config.class.php) contains multiple parameters allowing you to configure certain functions of the class.
 
@@ -50,30 +59,32 @@ The configuration file (config.class.php) contains multiple parameters allowing 
 
 The rest of the parameters generally do not need changing.
 
-### How to secure a page
+How to secure a page
+---------------
 
-Making a page accessible only to authenticated users is quick and easy, requiring only a few lines of code at the top of the page :
+Making a page accessible only to authenticated users is quick and easy, requiring only a few lines of code at the top of the page:
 
-    <?php
+```php
+<?php
+include("config.class.php");
+include("auth.class.php");
 
-    include("config.class.php");
-    include("auth.class.php");
-
-    $config = new Config;
+$config = new Config;
     
-    $dbh = new PDO("mysql:host={$config->dbhost};dbname={$config->dbname}", $config->dbuser, $config->dbpass);
-    $auth = new Auth($dbh, $config);
+$dbh = new PDO("mysql:host={$config->dbhost};dbname={$config->dbname}", $config->dbuser, $config->dbpass);
+$auth = new Auth($dbh, $config);
     
-    if(isset($_COOKIE[$config->cookiename]) && !$auth->checkSession($_COOKIE[$config->cookiename]) {
-	    header('HTTP/1.0 403 Forbidden');
-	    echo "Forbidden";
+if(isset($_COOKIE[$config->cookiename]) && !$auth->checkSession($_COOKIE[$config->cookiename]) {
+    header('HTTP/1.0 403 Forbidden');
+    echo "Forbidden";
 	    
-	    exit();
-    }
+    exit();
+}
+?>
+```
 
-    ?>
-
-### License
+License
+---------------
 
 Copyright (C) 2014 - 2014 PHPAuth
 
@@ -83,10 +94,12 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/
 
-### Contributing
+Contributing
+---------------
 
 Anyone can contribute to improve or fix PHPAuth, to do so you can either report an issue (a bug, an idea...) or fork the repository, perform modifications to your fork then request a merge.
 
-### Credits
+Credits
+---------------
 
 * [password_compat](https://github.com/ircmaxell/password_compat) - ircmaxell
