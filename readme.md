@@ -37,12 +37,12 @@ How to use
 ---------------
 
 Restricting a page to a user from a group is really simple. 
-You need to have properly set Auth identification 
+You need to have properly set Auth identification and class.
 $gid is the group ID. 
 the page:
 
 ```php
-if(checkAuthGroup($gid)===true) { // logged in user is in group, he can access }
+if($auth->checkAuthGroup($gid)===true) { // logged in user is in group, he can access }
 ?>
 ```
 
