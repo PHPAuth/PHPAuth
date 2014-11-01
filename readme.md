@@ -13,7 +13,6 @@ Features
 * Uses [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) to hash passwords, a secure algorithm that uses an expensive key setup phase
 * Uses an individual 128 bit salt for each user, pulled from /dev/urandom, making rainbow tables useless
 * Uses PHP's [PDO](http://php.net/manual/en/book.pdo.php) database interface and uses prepared statements meaning an efficient system, resilient against SQL injection
-* Logs user actions on  the site for various security reasons
 * Blocks attackers by IP for any defined time after any amount of failed actions on the portal
 * No plain text passwords are sent or stored by the system
 * Integrates easily into most existing websites, and can be a great starting point for new projects
@@ -38,24 +37,20 @@ PHPAuth requires  PHP 5.3.7 and above, a MySQL database and PHP sendmail needs s
 Configuration
 ---------------
 
-The configuration file (config.class.php) contains multiple parameters allowing you to configure certain functions of the class.
+The database table `config` contains multiple parameters allowing you to configure certain functions of the class.
 
-* `$dbhost` : the database host
-* `$dbuser` : the database user
-* `$dbpass` : the database user's password
-* `$dbname` : the database name
-* `$sitename` : the name of the website to display in the activation and password reset emails
-* `$authurl`: the URL of the Auth root, where you installed the system, without the trailing slash, also used for emails.
-* `$fromemail` : the email address from which to send activation and password reset emails
-* `$cookiename` : the name of the cookie that contains session information, do not change unless necessary
-* `$cookiepath` : the path of the session cookie, do not change unless necessary
-* `$cookiedomain` : the domain of the session cookie, do not change unless necessary
-* `$cookiesecure` : the HTTPS only setting of the session cookie, do not change unless necessary
-* `$cookiehttp` : the HTTP only protocol setting of the session cookie, do not change unless necessary
-* `$sitekey` : a random string that you should modify used to validate cookies to ensure they are not tampered with
-* `$duration_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
-* `$duration_non_remember` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
-* `$bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
+* `site_name` : the name of the website to display in the activation and password reset emails
+* `site_url`: the URL of the Auth root, where you installed the system, without the trailing slash, used for emails.
+* `site_email` : the email address from which to send activation and password reset emails
+* `cookie_name` : the name of the cookie that contains session information, do not change unless necessary
+* `cookie_path` : the path of the session cookie, do not change unless necessary
+* `cookie_domain` : the domain of the session cookie, do not change unless necessary
+* `cookie_secure` : the HTTPS only setting of the session cookie, do not change unless necessary
+* `cookie_http` : the HTTP only protocol setting of the session cookie, do not change unless necessary
+* `site_key` : a random string that you should modify used to validate cookies to ensure they are not tampered with
+* `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
+* `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
+* `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
 
 The rest of the parameters generally do not need changing.
 
@@ -66,7 +61,7 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 
 ```php
 <?php
-include("config.class.php");
+include("auth.config.class.php");
 include("auth.class.php");
 
 $config = new Config;
@@ -74,7 +69,7 @@ $config = new Config;
 $dbh = new PDO("mysql:host={$config->dbhost};dbname={$config->dbname}", $config->dbuser, $config->dbpass);
 $auth = new Auth($dbh, $config);
     
-if(isset($_COOKIE[$config->cookiename]) && !$auth->checkSession($_COOKIE[$config->cookiename]) {
+if(isset($_COOKIE[$config->cookiename]) || !$auth->checkSession($_COOKIE[$config->cookiename])) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 	    
