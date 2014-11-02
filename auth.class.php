@@ -14,10 +14,10 @@ class Auth
 	* Initiates database connection
 	*/
 
-	public function __construct(\PDO $dbh, $authConfig)
+	public function __construct(\PDO $dbh, $config)
 	{
 		$this->dbh = $dbh;
-		$this->config = new Config($this->dbh);
+		$this->config = $config;
 
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
