@@ -1,0 +1,11 @@
+admin
+administrator
+root
+webmaster
+webadmin
+mod
+moderator
+server
+owner
+vip
+sudo

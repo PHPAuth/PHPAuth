@@ -28,3 +28,8 @@ CREATE TABLE IF NOT EXISTS `usergroups` (
   `level` smallint(2) NOT NULL,
   KEY `gid` (`gid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+INSERT INTO `config` (`setting`, `value`) VALUES
+('table_groups', 'groups'),
+('table_usergroups', 'usergroups');

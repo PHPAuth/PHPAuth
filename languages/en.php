@@ -10,6 +10,7 @@ $lang['username_short'] = "Username is too short.";
 $lang['username_long'] = "Username is too long.";
 $lang['username_incorrect'] = "Username is incorrect.";
 $lang['username_invalid'] = "Username is invalid.";
+$lang['username_banned'] = "This username is not allowed.";
 
 $lang['password_short'] = "Password is too short.";
 $lang['password_long'] = "Password is too long.";
@@ -33,6 +34,7 @@ $lang['email_short'] = "Email address is too short.";
 $lang['email_long'] = "Email address is too long.";
 $lang['email_invalid'] = "Email address is invalid.";
 $lang['email_incorrect'] = "Email address is incorrect.";
+$lang['email_banned'] = "This email address is not allowed.";
 $lang['email_changed'] = "Email address changed successfully.";
 
 $lang['newemail_match'] = "New email matches previous email.";
