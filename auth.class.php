@@ -773,7 +773,7 @@ class Auth
 			return $return;
 		}
 		
-		$bannedUsernames = file("files/banned-usernames.txt", FILE_IGNORE_NEW_LINES);
+		$bannedUsernames = file(__DIR__ . "/files/banned-usernames.txt", FILE_IGNORE_NEW_LINES);
 		
 		if(0 < count(array_intersect(array(strtolower($username)), $bannedUsernames))) {
 			$return['message'] = "username_banned";
@@ -828,7 +828,7 @@ class Auth
 			return $return;
 		}
 		
-		$bannedEmails = file("files/banned-emails.txt", FILE_IGNORE_NEW_LINES);
+		$bannedEmails = file(__DIR__ . "/files/banned-emails.txt", FILE_IGNORE_NEW_LINES);
 		
 		if(0 < count(array_intersect(array(strtolower($email)), $bannedEmails))) {
 			$return['message'] = "email_banned";
