@@ -64,9 +64,10 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 include("config.class.php");
 include("auth.class.php");
 
-$config = new Config;
     
-$dbh = new PDO("mysql:host={$config->dbhost};dbname={$config->dbname}", $config->dbuser, $config->dbpass);
+$dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
+
+$config = new Config($dbh);
 $auth = new Auth($dbh, $config);
     
 if(isset($_COOKIE[$config->cookiename]) || !$auth->checkSession($_COOKIE[$config->cookiename])) {
