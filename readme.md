@@ -61,7 +61,7 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 
 ```php
 <?php
-include("auth.config.class.php");
+include("config.class.php");
 include("auth.class.php");
 
 $config = new Config;
