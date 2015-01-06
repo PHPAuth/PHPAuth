@@ -70,7 +70,7 @@ $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 $config = new Config($dbh);
 $auth = new Auth($dbh, $config);
     
-if(isset($_COOKIE[$config->cookiename]) || !$auth->checkSession($_COOKIE[$config->cookiename])) {
+if(isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 	    
