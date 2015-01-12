@@ -1,8 +1,6 @@
 PHPAuth
 =======
 
-[![tip for next commit](https://tip4commit.com/projects/1003.svg)](https://tip4commit.com/github/PHPAuth/PHPAuth)
-
 What is it
 ---------------
 
@@ -70,7 +68,7 @@ $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 $config = new Config($dbh);
 $auth = new Auth($dbh, $config);
     
-if(isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
+if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 	    
@@ -102,4 +100,4 @@ Credits
 
 Donating
 ---------------
-You can donate to this project via [tip4commit](https://tip4commit.com/github/PHPAuth/PHPAuth) 
+You can donate to this project via 12DQRmtzXv3KuHWDX59DfTKvVpFvgXiEa9
