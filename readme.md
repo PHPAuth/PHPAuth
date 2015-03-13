@@ -68,7 +68,7 @@ $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 $config = new Config($dbh);
 $auth = new Auth($dbh, $config);
     
-if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
+if(!isset($_COOKIE[$config->cookie_name]) && !$auth->checkSession($_COOKIE[$config->cookie_name])) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 	    
@@ -80,7 +80,7 @@ if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$conf
 License
 ---------------
 
-Copyright (C) 2014 - 2014 PHPAuth
+Copyright (C) 2014 - 2015 PHPAuth
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -97,7 +97,3 @@ Credits
 ---------------
 
 * [password_compat](https://github.com/ircmaxell/password_compat) - @ircmaxell
-
-Donating
----------------
-You can donate to this project via 12DQRmtzXv3KuHWDX59DfTKvVpFvgXiEa9
