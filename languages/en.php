@@ -1,16 +1,12 @@
 <?php
 
-// Auth class return messages :
-
 $lang = array();
 
 $lang['user_blocked'] = "You are currently locked out of the system.";
 
-$lang['username_short'] = "Username is too short.";
-$lang['username_long'] = "Username is too long.";
-$lang['username_incorrect'] = "Username is incorrect.";
-$lang['username_invalid'] = "Username is invalid.";
-$lang['username_banned'] = "This username is not allowed.";
+$lang['email_password_invalid'] = "Email address / password are invalid.";
+$lang['email_password_incorrect'] = "Email address / password are incorrect.";
+$lang['remember_me_invalid'] = "The remember me field is invalid.";
 
 $lang['password_short'] = "Password is too short.";
 $lang['password_long'] = "Password is too long.";
@@ -25,10 +21,6 @@ $lang['newpassword_long'] = "New password is too long.";
 $lang['newpassword_invalid'] = "New password must contain at least one uppercase and lowercase character, and at least one digit.";
 $lang['newpassword_nomatch'] = "New passwords do not match.";
 $lang['newpassword_match'] = "New password matches previous password.";
-
-$lang['username_password_invalid'] = "Username / Password are invalid.";
-$lang['username_password_incorrect'] = "Username / Password are incorrect.";
-$lang['remember_me_invalid'] = "The remember me field is invalid.";
 
 $lang['email_short'] = "Email address is too short.";
 $lang['email_long'] = "Email address is too long.";
@@ -48,7 +40,6 @@ $lang['logged_out'] = "You are now logged out.";
 $lang['system_error'] = "A system error has been encountered. Please try again.";
 
 $lang['register_success'] = "Account created. Activation email sent to email.";
-$lang['username_taken'] = "The username is already taken.";
 $lang['email_taken'] = "The email address is already in use.";
 
 $lang['authentication_required'] = "Authentication required.";

@@ -1,92 +1,82 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+-- Adminer 4.2.1 MySQL dump
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-CREATE TABLE IF NOT EXISTS `attempts` (
-`id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `attempts`;
+CREATE TABLE `attempts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` varchar(39) NOT NULL,
   `count` int(11) NOT NULL,
-  `expiredate` datetime NOT NULL
+  `expiredate` datetime NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE IF NOT EXISTS `config` (
-`id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `config`;
+CREATE TABLE `config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `setting` varchar(100) NOT NULL,
-  `value` varchar(100) DEFAULT NULL
+  `value` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `config`
---
-
 INSERT INTO `config` (`id`, `setting`, `value`) VALUES
-(1, 'site_name', 'The Lab'),
-(2, 'site_url', 'http://auth.lab.cuonic.com'),
-(3, 'site_email', 'no-reply@lab.cuonic.com'),
-(4, 'cookie_name', 'authID'),
-(5, 'cookie_path', '/'),
-(6, 'cookie_domain', NULL),
-(7, 'cookie_secure', '0'),
-(8, 'cookie_http', '0'),
-(9, 'site_key', 'fghuior.)/%dgdhjUyhdbv7867HVHG7777ghg'),
-(10, 'cookie_remember', '+1 month'),
-(11, 'cookie_forget', '+30 minutes'),
-(12, 'bcrypt_cost', '10'),
-(13, 'table_attempts', 'attempts'),
-(14, 'table_requests', 'requests'),
-(15, 'table_sessions', 'sessions'),
-(16, 'table_users', 'users'),
-(17, 'site_timezone', 'Europe/Paris');
+(1,	'site_name',	'PHPAuth'),
+(2,	'site_url',	'https://github.com/PHPAuth/PHPAuth'),
+(3,	'site_email',	'no-reply@phpauth.cuonic.com'),
+(4,	'cookie_name',	'authID'),
+(5,	'cookie_path',	'/'),
+(6,	'cookie_domain',	NULL),
+(7,	'cookie_secure',	'0'),
+(8,	'cookie_http',	'0'),
+(9,	'site_key',	'fghuior.)/!/jdUkd8s2!7HVHG7777ghg'),
+(10,	'cookie_remember',	'+1 month'),
+(11,	'cookie_forget',	'+30 minutes'),
+(12,	'bcrypt_cost',	'10'),
+(13,	'table_attempts',	'attempts'),
+(14,	'table_requests',	'requests'),
+(15,	'table_sessions',	'sessions'),
+(16,	'table_users',	'users'),
+(17,	'site_timezone',	'Europe/Paris');
 
-CREATE TABLE IF NOT EXISTS `requests` (
-`id` int(11) NOT NULL,
+DROP TABLE IF EXISTS `requests`;
+CREATE TABLE `requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `rkey` varchar(20) NOT NULL,
   `expire` datetime NOT NULL,
-  `type` varchar(20) NOT NULL
+  `type` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `sessions` (
-`id` int(11) NOT NULL,
+
+DROP TABLE IF EXISTS `sessions`;
+CREATE TABLE `sessions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
   `hash` varchar(40) NOT NULL,
   `expiredate` datetime NOT NULL,
   `ip` varchar(39) NOT NULL,
   `agent` varchar(200) NOT NULL,
-  `cookie_crc` varchar(40) NOT NULL
+  `cookie_crc` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `users` (
-`id` int(11) NOT NULL,
-  `username` varchar(30) DEFAULT NULL,
-  `password` varchar(60) DEFAULT NULL,
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
-  `salt` varchar(22) DEFAULT NULL,
+  `password` varchar(60) DEFAULT NULL,
+  `salt` varchar(120) DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
-  `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
-ALTER TABLE `attempts`
- ADD PRIMARY KEY (`id`);
+-- 2015-05-07 05:20:39
 
-ALTER TABLE `config`
- ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `requests`
- ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `sessions`
- ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `users`
- ADD PRIMARY KEY (`id`);
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

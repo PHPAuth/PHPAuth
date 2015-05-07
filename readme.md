@@ -8,6 +8,7 @@ PHPAuth is a secure user authentication class for PHP websites, using a powerful
 
 Features
 ---------------
+* Authentication by email and password combination
 * Uses [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) to hash passwords, a secure algorithm that uses an expensive key setup phase
 * Uses an individual 128 bit salt for each user, pulled from /dev/urandom, making rainbow tables useless
 * Uses PHP's [PDO](http://php.net/manual/en/book.pdo.php) database interface and uses prepared statements meaning an efficient system, resilient against SQL injection
@@ -59,6 +60,7 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 
 ```php
 <?php
+include("languages/en.php");
 include("config.class.php");
 include("auth.class.php");
 
@@ -66,7 +68,7 @@ include("auth.class.php");
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
 $config = new Config($dbh);
-$auth = new Auth($dbh, $config);
+$auth = new Auth($dbh, $config, $lang);
     
 if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
     header('HTTP/1.0 403 Forbidden');
