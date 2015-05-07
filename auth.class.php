@@ -644,7 +644,7 @@ class Auth
 		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 		$headers .= "From: {$this->config->site_email}" . "\r\n";
 
-		if(mail($email, $subject, $message, $headers)) {
+		if(!mail($email, $subject, $message, $headers)) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
