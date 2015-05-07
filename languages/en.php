@@ -42,9 +42,6 @@ $lang['system_error'] = "A system error has been encountered. Please try again."
 $lang['register_success'] = "Account created. Activation email sent to email.";
 $lang['email_taken'] = "The email address is already in use.";
 
-$lang['authentication_required'] = "Authentication required.";
-$lang['already_authenticated'] = "You are already authenticated.";
-
 $lang['resetkey_invalid'] = "Reset key is invalid.";
 $lang['resetkey_incorrect'] = "Reset key is incorrect.";
 $lang['resetkey_expired'] = "Reset key has expired.";
@@ -53,7 +50,6 @@ $lang['password_reset'] = "Password reset successfully.";
 $lang['activekey_invalid'] = "Activation key is invalid.";
 $lang['activekey_incorrect'] = "Activation key is incorrect.";
 $lang['activekey_expired'] = "Activation key has expired.";
-$lang['account_activated'] = "Account has been activated. You can now log in.";
 
 $lang['reset_requested'] = "Password reset request sent to email address.";
 $lang['reset_exists'] = "A reset request already exists.";

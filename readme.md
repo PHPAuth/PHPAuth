@@ -31,7 +31,7 @@ User actions
 
 Requirements
 ---------------
-PHPAuth requires  PHP 5.3.7 and above, a MySQL database and PHP sendmail needs setting up correctly so that account activation emails get sent correctly.
+PHPAuth requires PHP 5.4 and above, a MySQL database and PHP sendmail needs setting up correctly so that account activation emails get sent correctly.
 
 Configuration
 ---------------
@@ -78,6 +78,11 @@ if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$conf
 }
 ?>
 ```
+
+Documentation
+---------------
+
+All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)
 
 License
 ---------------

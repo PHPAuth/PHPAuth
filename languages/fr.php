@@ -1,0 +1,61 @@
+<?php
+
+$lang = array();
+
+$lang['user_blocked'] = "Vous &ecirc;tes actuellement bloqu&eacute;s du syst&egrave;me.";
+
+$lang['email_password_invalid'] = "Adresse email / mot de passe invalide.";
+$lang['email_password_incorrect'] = "Adresse email / mot de passe incorrect.";
+$lang['remember_me_invalid'] = "Le champ se souvenir de moi est invalide.";
+
+$lang['password_short'] = "Le mot de passe est trop court.";
+$lang['password_long'] = "Le mot de passe est trop long.";
+$lang['password_invalid'] = "Le mot de passe doit contenir au moins un caractère en miniscule et en majuscule, et au moins un chiffre.";
+$lang['password_nomatch'] = "Les mots de passe ne sont pas identiques.";
+$lang['password_changed'] = "Le mot de passe a bien &eacute;t&eacute; chang&eacute;.";
+$lang['password_incorrect'] = "Le mot de passe actuel est incorrect.";
+$lang['password_notvalid'] = "Le mot de passe est invalide.";
+
+$lang['newpassword_short'] = "Le nouveau mot de passe est trop court.";
+$lang['newpassword_long'] = "Le nouveau mot de passe est trop long.";
+$lang['newpassword_invalid'] = "Le nouveau mot de passe doit contenir au moins un caractère en miniscule et en majuscule, et au moins un chiffre.";
+$lang['newpassword_nomatch'] = "Les nouveaux mots de passe ne sont pas identiques.";
+$lang['newpassword_match'] = "Le nouveau mot de passe est identique au mot de passe actuel.";
+
+$lang['email_short'] = "L'adresse email est trop courte.";
+$lang['email_long'] = "L'adresse email est trop longue.";
+$lang['email_invalid'] = "L'adresse email est invalide.";
+$lang['email_incorrect'] = "L'adresse email est incorrecte.";
+$lang['email_banned'] = "Cette adresse email est interdite.";
+$lang['email_changed'] = "L'adresse email a bien &eacute;t&eacute; chang&eacute;e.";
+
+$lang['newemail_match'] = "La nouvelle adresse email est identique à l'adresse email actuelle.";
+
+$lang['account_inactive'] = "Le compte n'a pas encore &eacute;t&eacute; activ&eacute;.";
+$lang['account_activated'] = "Le compte est desormais activ&eacute;.";
+
+$lang['logged_in'] = "Vous &ecirc;tes maintenant connect&eacute;s.";
+$lang['logged_out'] = "Vous avez &eacute;t&eacute; deconnect&eacute;s.";
+
+$lang['system_error'] = "Une erreur syst&egrave;me a &eacute;t&eacute; rencontr&eacute;e. Veuillez r&eacute;essayer.";
+
+$lang['register_success'] = "Le compte a bien &eacute;t&eacute; cr&eacute;e. L'email d'activation vous a &eacute;t&eacute; envoy&eacute;.";
+$lang['email_taken'] = "L'adresse email est d&eacute;j&agrave; utilis&eacute;e.";
+
+$lang['resetkey_invalid'] = "La cl&eacute; de r&eacute;initialisation est invalide.";
+$lang['resetkey_incorrect'] = "La cl&eacute; de r&eacute;initialisation est incorrecte.";
+$lang['resetkey_expired'] = "La cl&eacute; de r&eacute;initialisation est expir&eacute;e.";
+$lang['password_reset'] = "Le mot de passe a bien &eacute;t&eacute; r&eacute;initialis&eacute;.";
+
+$lang['activekey_invalid'] = "La cl&eacute; d'activation est invalide.";
+$lang['activekey_incorrect'] = "La cl&eacute; d'activation est incorrecte.";
+$lang['activekey_expired'] = "La cl&eacute; d'activation est expir&eacute;e.";
+
+$lang['reset_requested'] = "Une demande de r&eacute;initialisation de votre mot de passe a &eacute;t&eacute; envoy&eacute;.";
+$lang['reset_exists'] = "Une demande de r&eacute;initialisation de votre mot de passe existe d&eacute;j&agrave;.";
+
+$lang['already_activated'] = "Le compte est d&eacute;j&agrave; activ&eacute;.";
+$lang['activation_sent'] = "L'email d'activation a bien &eacute;t&eacute; envoy&eacute;.";
+$lang['activation_exists'] = "L'email d'activation a d&eacute;j&agrave; &eacute;t&eacute; envoy&eacute;.";
+
+?>

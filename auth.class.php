@@ -362,24 +362,6 @@ class Auth
 	}
 
 	/*
-	* Returns UID based on session hash
-	* @param string $hash
-	* @return string $uid
-	*/
-
-	public function getSessionUID($hash)
-	{
-		$query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
-		$query->execute(array($hash));
-
-		if ($query->rowCount() == 0) {
-			return false;
-		}
-
-		return $query->fetch(PDO::FETCH_ASSOC)['uid'];
-	}
-
-	/*
 	* Function to check if a session is valid
 	* @param string $hash
 	* @return boolean
@@ -421,13 +403,7 @@ class Auth
 		}
 		
 		if ($ip != $db_ip) {
-			if ($_SERVER['HTTP_USER_AGENT'] != $db_agent) {
-				$this->deleteExistingSessions($uid);
-
-				return false;
-			}
-			
-			return $this->updateSessionIp($sid, $ip);
+			return false;
 		}
 		
 		if ($db_cookie == sha1($hash . $this->config->site_key)) {
@@ -436,18 +412,23 @@ class Auth
 		
 		return false;
 	}
-
+	
 	/*
-	* Updates the IP of a session (used if IP has changed, but agent has remained unchanged)
-	* @param int $sid
-	* @param string $ip
-	* @return boolean
+	* Retrieves the UID associated with a given session hash
+	* @param string $hash
+	* @return int $uid
 	*/
-
-	private function updateSessionIp($sid, $ip)
+	
+	public function getSessionUID($hash)
 	{
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_sessions} SET ip = ? WHERE id = ?");
-		return $query->execute(array($ip, $sid));
+		$query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
+		$query->execute(array($hash));
+
+		if ($query->rowCount() == 0) {
+			return false;
+		}
+
+		return $query->fetch(PDO::FETCH_ASSOC)['uid'];
 	}
 
 	/*
@@ -783,7 +764,7 @@ class Auth
 	
 
 	/*
-	* Allows a user to reset there password after requesting a reset key.
+	* Allows a user to reset their password after requesting a reset key.
 	* @param string $key
 	* @param string $password
 	* @param string $repeatpassword
@@ -916,28 +897,6 @@ class Auth
 	}
 
 	/*
-	* Gets UID from Session hash
-	* @param string $hash
-	* @return int $uid
-	*/
-
-	public function sessionUID($hash)
-	{
-		if (strlen($hash) != 40) {
-			return false;
-		}
-		
-		$query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
-		$query->execute(array($hash));
-		
-		if($query->rowCount() == 0) {
-			return false;
-		}
-		
-		return $query->fetch(PDO::FETCH_ASSOC)['uid'];
-	}
-
-	/*
 	* Changes a user's password
 	* @param int $uid
 	* @param string $currpass
@@ -1002,25 +961,6 @@ class Auth
 		$return['error'] = false;
 		$return['message'] = $this->lang["password_changed"];
 		return $return;
-	}
-
-	/*
-	* Gets a user's email address by UID
-	* @param int $uid
-	* @return string $email
-	*/
-
-	public function getEmail($uid)
-	{
-		$query = $this->dbh->prepare("SELECT email FROM {$this->config->table_users} WHERE id = ?");
-		$query->execute(array($uid));
-		$row = $query->fetch(PDO::FETCH_ASSOC);
-
-		if (!$row) {
-			return false;
-		} 
-			
-		return $row['email'];
 	}
 
 	/*
