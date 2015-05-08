@@ -20,7 +20,7 @@ class Auth
 		$this->dbh = $dbh;
 		$this->config = $config;
 		$this->lang = $lang;
-		
+
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
@@ -43,27 +43,27 @@ class Auth
 
 			return $return;
 		}
-			
+
 		$validateEmail = $this->validateEmail($email);
 		$validatePassword = $this->validatePassword($password);
 
 		if ($validateEmail['error'] == 1) {
 			$this->addAttempt();
-			
+
 			$return['message'] = $this->lang["email_password_invalid"];
 			return $return;
 		} elseif($validatePassword['error'] == 1) {
 			$this->addAttempt();
-			
+
 			$return['message'] = $this->lang["email_password_invalid"];
 			return $return;
 		} elseif($remember != 0 && $remember != 1) {
 			$this->addAttempt();
-			
+
 			$return['message'] = $this->lang["remember_me_invalid"];
 			return $return;
 		}
-		
+
 		$uid = $this->getUID(strtolower($email));
 
 		if(!$uid) {
@@ -72,30 +72,30 @@ class Auth
 			$return['message'] = $this->lang["email_password_incorrect"];
 			return $return;
 		}
-		
+
 		$user = $this->getUser($uid);
-		
+
 		if (!password_verify($password, $user['password'])) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["email_password_incorrect"];
 			return $return;
 		}
-		
+
 		if ($user['isactive'] != 1) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["account_inactive"];
 			return $return;
 		}
-				
+
 		$sessiondata = $this->addSession($user['uid'], $remember);
 
 		if($sessiondata == false) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		$return['message'] = $this->lang["logged_in"];
 
@@ -120,8 +120,8 @@ class Auth
 		if ($this->isBlocked()) {
 			$return['message'] = $this->lang["user_blocked"];
 			return $return;
-		} 
-		
+		}
+
 		$validateEmail = $this->validateEmail($email);
 		$validatePassword = $this->validatePassword($password);
 
@@ -135,24 +135,24 @@ class Auth
 			$return['message'] = $this->lang["password_nomatch"];
 			return $return;
 		}
-		
+
 		if ($this->isEmailTaken($email)) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["email_taken"];
 			return $return;
 		}
-		
+
 		$addUser = $this->addUser($email, $password);
 
 		if($addUser['error'] != 0) {
 			$return['message'] = $addUser['message'];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		$return['message'] = $this->lang["register_success"];
-		
+
 		return $return;
 	}
 
@@ -170,21 +170,21 @@ class Auth
 			$return['message'] = $this->lang["user_blocked"];
 			return $return;
 		}
-			
+
 		if(strlen($key) !== 20) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["key_invalid"];
 			return $return;
 		}
-		
+
 		$getRequest = $this->getRequest($key, "activation");
 
 		if($getRequest['error'] == 1) {
 			$return['message'] = $getRequest['message'];
 			return $return;
 		}
-		
+
 		if($this->getUser($getRequest['uid'])['isactive'] == 1) {
 			$this->addAttempt();
 			$this->deleteRequest($getRequest['id']);
@@ -200,7 +200,7 @@ class Auth
 
 		$return['error'] = false;
 		$return['message'] = $this->lang["account_activated"];
-		
+
 		return $return;
 	}
 
@@ -225,7 +225,7 @@ class Auth
 			$return['message'] = $this->lang["email_invalid"];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
 
@@ -268,7 +268,7 @@ class Auth
     * Provides a randomly generated salt for hashing the password
     * @return string
     */
-    
+
     public function getSalt()
     {
         return substr(strtr(base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)), '+', '.'), 0, 22);
@@ -300,7 +300,7 @@ class Auth
 		if($query->rowCount() == 0) {
 			return false;
 		}
-		
+
 		return $query->fetch(PDO::FETCH_ASSOC)['id'];
 	}
 
@@ -315,7 +315,7 @@ class Auth
 	{
 		$ip = $this->getIp();
 		$user = $this->getUser($uid);
-		
+
 		if(!$user) {
 			return false;
 		}
@@ -336,11 +336,11 @@ class Auth
 		$data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
 		$query = $this->dbh->prepare("INSERT INTO {$this->config->table_sessions} (uid, hash, expiredate, ip, agent, cookie_crc) VALUES (?, ?, ?, ?, ?, ?)");
-		
+
 		if(!$query->execute(array($uid, $data['hash'], $data['expire'], $ip, $agent, $data['cookie_crc']))) {
 			return false;
 		}
-		
+
 		$data['expire'] = strtotime($data['expire']);
 		return $data;
 	}
@@ -384,7 +384,7 @@ class Auth
 		if ($this->isBlocked()) {
 			return false;
 		}
-		
+
 		if (strlen($hash) != 40) {
 			return false;
 		}
@@ -395,7 +395,7 @@ class Auth
 		if ($query->rowCount() == 0) {
 			return false;
 		}
-		
+
 		$row = $query->fetch(PDO::FETCH_ASSOC);
 
 		$sid = $row['id'];
@@ -405,30 +405,30 @@ class Auth
 		$db_ip = $row['ip'];
 		$db_agent = $row['agent'];
 		$db_cookie = $row['cookie_crc'];
-		
+
 		if ($currentdate > $expiredate) {
 			$this->deleteExistingSessions($uid);
 
 			return false;
 		}
-		
+
 		if ($ip != $db_ip) {
 			return false;
 		}
-		
+
 		if ($db_cookie == sha1($hash . $this->config->site_key)) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/*
 	* Retrieves the UID associated with a given session hash
 	* @param string $hash
 	* @return int $uid
 	*/
-	
+
 	public function getSessionUID($hash)
 	{
 		$query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
@@ -455,7 +455,7 @@ class Auth
 		if ($query->rowCount() == 0) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -476,7 +476,7 @@ class Auth
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$uid = $this->dbh->lastInsertId();
 		$email = htmlentities(strtolower($email));
 
@@ -493,7 +493,7 @@ class Auth
 		$password = $this->getHash($password);
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? WHERE id = ?");
-		
+
 		if(!$query->execute(array($email, $password, $uid))) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
@@ -520,13 +520,13 @@ class Auth
 		if ($query->rowCount() == 0) {
 			return false;
 		}
-		
+
 		$data = $query->fetch(PDO::FETCH_ASSOC);
 
 		if (!$data) {
 			return false;
 		}
-		
+
 		$data['uid'] = $uid;
 		return $data;
 	}
@@ -538,17 +538,17 @@ class Auth
 	* @return array $return
 	*/
 
-	public function deleteUser($uid, $password) 
+	public function deleteUser($uid, $password)
 	{
 		$return['error'] = true;
 
 		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];		
+			$return['message'] = $this->lang["user_blocked"];
 			return $return;
 		}
-		
+
 		$validatePassword = $this->validatePassword($password);
-		
+
 		if($validatePassword['error'] == 1) {
 			$this->addAttempt();
 
@@ -564,28 +564,28 @@ class Auth
 			$return['message'] = $this->lang["password_incorrect"];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
-		
+
 		if(!$query->execute(array($uid))) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
-		
+
 		if(!$query->execute(array($uid))) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = ?");
-		
+
 		if(!$query->execute(array($uid))) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		$return['message'] = $this->lang["account_deleted"];
 
@@ -601,6 +601,10 @@ class Auth
 
 	private function addRequest($uid, $email, $type)
 	{
+		require 'PHPMailer/PHPMailerAutoload.php';
+
+		$mail = new PHPMailer;
+
 		$return['error'] = true;
 
 		if($type != "activation" && $type != "reset") {
@@ -621,7 +625,7 @@ class Auth
 				$return['message'] = $this->lang["request_exists"];
 				return $return;
 			}
-			
+
 			$this->deleteRequest($row['id']);
 		}
 
@@ -640,23 +644,61 @@ class Auth
 			return $return;
 		}
 
-		if($type == "activation") {
-			$message = "Account activation required: <strong><a href=\"{$this->config->site_url}/activate\">Activate my account</a></strong><br/>Activation key: <strong>{$key}</strong>";
-			$subject = "{$this->config->site_name} - Account Activation";
-		} else {
-			$message = "Password reset request : <strong><a href=\"{$this->config->site_url}/reset\">Reset my password</a></strong><br/>Password reset key: <strong>{$key}</strong>";		
-			$subject = "{$this->config->site_name} - Password reset request";
-		}
-		
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
-		$headers .= "From: {$this->config->site_email}" . "\r\n";
+		// Check configuration for SMTP parameters
 
-		if(!mail($email, $subject, $message, $headers)) {
+		if($this->config->smtp) {
+			$mail->isSMTP();
+			$mail->Host = $this->config->smtp_host;
+			$mail->SMTPAuth = $this->config->smtp_auth;
+			$mail->Username = $this->config->smtp_username;
+			$mail->Password = $this->config->smtp_password;
+			$mail->Port = $this->config->smtp_port;
+
+			if($this->config->smtp_security != NULL) {
+				$mail->SMTPSecure = $this->config->smtp_security;
+			}
+		}
+
+		$mail->From = $this->config->site_email;
+		$mail->FromName = $this->config->site_name;
+		$mail->addAddress($email);
+		$mail->isHTML(true);
+
+		if($type == "activation") {
+			$mail->Subject = "{$this->config->site_name} - Activate account";
+
+			$mail->Body = "Hello,<br/><br/>";
+			$mail->Body .= "To be able to log in to your account you first need to activate your account by clicking on the following link :<br/>";
+			$mail->Body .= "<strong><a href=\"{$this->config->site_url}/{$this->config->site_activation_page}\">{$this->config->site_url}/{$this->config->site_activation_page}</a></strong><br/><br/>";
+			$mail->Body .= "You then need to use the following activation key: <strong>{$key}</strong><br/><br/>";
+			$mail->Body .= "If you did not sign up on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+
+			$mail->AltBody = "Hello, \n\n";
+			$mail->AltBody .= "To be able to log in to your account you first need to activate your account by visiting the following link :\n";
+			$mail->AltBody .= "{$this->config->site_url}/{$this->config->site_activation_page}\n\n";
+			$mail->AltBody .= "You then need to use the following activation key: {$key}\n\n";
+			$mail->AltBody .= "If you did not sign up on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+		} else {
+			$mail->Subject = "{$this->config->site_name} - Password reset request";
+
+			$mail->Body = "Hello,<br/><br/>";
+			$mail->Body .= "To reset your password click the following link :<br/><br/>";
+			$mail->Body .= "<strong><a href=\"{$this->config->site_url}/{$this->config->site_password_reset_page}\">{$this->config->site_url}/{$this->config->site_password_reset_page}</a></strong><br/><br/>";
+			$mail->Body .= "You then need to use the following password reset key: <strong>{$key}</strong><br/><br/>";
+			$mail->Body .= "If you did not request a password reset key on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+
+			$mail->AltBody = "Hello, \n\n";
+			$mail->AltBody .= "To reset your password please visiting the following link :\n";
+			$mail->AltBody .= "{$this->config->site_url}/{$this->config->site_password_reset_page}\n\n";
+			$mail->AltBody .= "You then need to use the following password reset key: {$key}\n\n";
+			$mail->AltBody .= "If you did not request a password reset key on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+		}
+
+		if(!$mail->send()) {
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		return $return;
 	}
@@ -695,11 +737,11 @@ class Auth
 			$return['message'] = $this->lang["key_expired"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		$return['id'] = $row['id'];
 		$return['uid'] = $row['uid'];
-		
+
 		return $return;
 	}
 
@@ -734,7 +776,7 @@ class Auth
 			$return['message'] = $this->lang["password_invalid"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		return $return;
 	}
@@ -758,18 +800,18 @@ class Auth
 			$return['message'] = $this->lang["email_invalid"];
 			return $return;
 		}
-		
-		$bannedEmails = file(__DIR__ . "/files/banned-emails.txt", FILE_IGNORE_NEW_LINES);
-		
-		if(0 < count(array_intersect(array(strtolower($email)), $bannedEmails))) {
+
+		$bannedEmails = json_decode(file_get_contents(__DIR__ . "/files/domains.json"));
+
+		if(in_array(strtolower($email), $bannedEmails)) {
 			$return['message'] = $this->lang["email_banned"];
 			return $return;
 		}
-		
+
 		$return['error'] = false;
 		return $return;
 	}
-	
+
 
 	/*
 	* Allows a user to reset their password after requesting a reset key.
@@ -812,9 +854,9 @@ class Auth
 			$return['message'] = $data['message'];
 			return $return;
 		}
-		
+
 		$user = $this->getUser($data['uid']);
-		
+
 		if(!$user) {
 			$this->addAttempt();
 			$this->deleteRequest($data['id']);
@@ -822,7 +864,7 @@ class Auth
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		if(password_verify($password, $user['password'])) {
 			$this->addAttempt();
 			$this->deleteRequest($data['id']);
@@ -830,7 +872,7 @@ class Auth
 			$return['message'] = $this->lang["newpassword_match"];
 			return $return;
 		}
-		
+
 		$password = $this->getHash($password);
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
@@ -840,12 +882,12 @@ class Auth
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		$this->deleteRequest($data['id']);
 
 		$return['error'] = false;
 		$return['message'] = $this->lang["password_reset"];
-		
+
 		return $return;
 	}
 
@@ -863,14 +905,14 @@ class Auth
 			$return['message'] = $this->lang["user_blocked"];
 			return $return;
 		}
-		
+
 		$validateEmail = $this->validateEmail($email);
 
 		if($validateEmail['error'] == 1) {
 			$return['message'] = $validateEmail['message'];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
 
@@ -880,7 +922,7 @@ class Auth
 			$return['message'] = $this->lang["email_incorrect"];
 			return $return;
 		}
-		
+
 		$row = $query->fetch(PDO::FETCH_ASSOC);
 
 		if ($this->getUser($row['id'])['isactive'] == 1) {
@@ -889,7 +931,7 @@ class Auth
 			$return['message'] = $this->lang["already_activated"];
 			return $return;
 		}
-		
+
 		$addRequest = $this->addRequest($row['id'], $email, "activation");
 
 		if ($addRequest['error'] == 1) {
@@ -920,9 +962,9 @@ class Auth
 			$return['message'] = $this->lang["user_blocked"];
 			return $return;
 		}
-		
+
 		$validatePassword = $this->validatePassword($currpass);
-		
+
 		if($validatePassword['error'] == 1) {
 			$this->addAttempt();
 
@@ -941,14 +983,14 @@ class Auth
 		}
 
 		$user = $this->getUser($uid);
-		
+
 		if(!$user) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-		
+
 		if(!password_verify($currpass, $user['password'])) {
 			$this->addAttempt();
 
@@ -982,7 +1024,7 @@ class Auth
 			$return['message'] = $this->lang["user_blocked"];
 			return $return;
 		}
-		
+
 		$validateEmail = $this->validateEmail($email);
 
 		if($validateEmail['error'] == 1)
@@ -990,16 +1032,16 @@ class Auth
 			$return['message'] = $validateEmail['message'];
 			return $return;
 		}
-		
+
 		$validatePassword = $this->validatePassword($password);
-		
+
 		if ($validatePassword['error'] == 1) {
 			$return['message'] = $this->lang["password_notvalid"];
 			return $return;
 		}
 
 		$user = $this->getUser($uid);
-		
+
 		if(!$user) {
 			$this->addAttempt();
 
@@ -1020,7 +1062,7 @@ class Auth
 			$return['message'] = $this->lang["newemail_match"];
 			return $return;
 		}
-		
+
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ? WHERE id = ?");
 		$query->execute(array($email, $uid));
 
@@ -1063,7 +1105,7 @@ class Auth
 			$this->deleteAttempts($ip);
 			return false;
 		}
-			
+
 		if ($currentdate > $expiredate) {
 			$this->deleteAttempts($ip);
 		}
@@ -1084,16 +1126,16 @@ class Auth
 		$query->execute(array($ip));
 
 		$row = $query->fetch(PDO::FETCH_ASSOC);
-		
+
 		$attempt_expiredate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
-		
+
 		if (!$row) {
 			$attempt_count = 1;
 
 			$query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, count, expiredate) VALUES (?, ?, ?)");
 			return $query->execute(array($ip, $attempt_count, $attempt_expiredate));
 		}
-		
+
 		$attempt_count = $row['count'] + 1;
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_attempts} SET count=?, expiredate=? WHERE ip=?");

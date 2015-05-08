@@ -16,6 +16,7 @@ Features
 * No plain text passwords are sent or stored by the system
 * Integrates easily into most existing websites, and can be a great starting point for new projects
 * Easy configuration of multiple system parameters
+* Blocks
 
 User actions
 ---------------
@@ -50,6 +51,16 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
+* `site_timezone` : the timezone for correct datetime values
+* `site_activation_page` : the activation page name appended to the `site_url` in the activation email
+* `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
+* `smtp` : `0` to use sendmail for emails, `1` to use SMTP
+* `smtp_host` : hostname of the SMTP server
+* `smtp_auth` : `0` if the SMTP server doesn't require authentication, `1` if authentication is required
+* `smtp_username` : the username for the SMTP server
+* `smtp_password` : the password for the SMTP server
+* `smtp_port` : the port for the SMTP server
+* `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
 
 The rest of the parameters generally do not need changing.
 
@@ -64,16 +75,16 @@ include("languages/en.php");
 include("config.class.php");
 include("auth.class.php");
 
-    
+
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
 $config = new Config($dbh);
 $auth = new Auth($dbh, $config, $lang);
-    
+
 if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
-	    
+
     exit();
 }
 ?>
@@ -104,3 +115,5 @@ Credits
 ---------------
 
 * [password_compat](https://github.com/ircmaxell/password_compat) - @ircmaxell
+* [disposable](https://github.com/lavab/disposable) - @lavab
+* [PHPMailer](https://github.com/PHPMailer/PHPMailer) - @PHPMailer

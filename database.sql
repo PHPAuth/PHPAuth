@@ -12,7 +12,7 @@ CREATE TABLE `attempts` (
   `count` int(11) NOT NULL,
   `expiredate` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `config`;
@@ -21,7 +21,7 @@ CREATE TABLE `config` (
   `setting` varchar(100) NOT NULL,
   `value` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
 
 INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (1,	'site_name',	'PHPAuth'),
@@ -40,7 +40,16 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (14,	'table_requests',	'requests'),
 (15,	'table_sessions',	'sessions'),
 (16,	'table_users',	'users'),
-(17,	'site_timezone',	'Europe/Paris');
+(17,	'site_timezone',	'Europe/Paris'),
+(18,	'site_activation_page',	'activate'),
+(19,	'site_password_reset_page',	'reset'),
+(20,	'smtp',	'0'),
+(21,	'smtp_host',	'smtp.example.com'),
+(22,	'smtp_auth',	'1'),
+(23,	'smtp_username',	'email@example.com'),
+(24,	'smtp_password',	'password'),
+(25,	'smtp_port',	'25'),
+(26,	'smtp_security',	NULL);
 
 DROP TABLE IF EXISTS `requests`;
 CREATE TABLE `requests` (
@@ -71,11 +80,12 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(60) DEFAULT NULL,
+  `salt` varchar(120) DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
--- 2015-05-08 11:36:06
+-- 2015-05-08 20:15:43
 
