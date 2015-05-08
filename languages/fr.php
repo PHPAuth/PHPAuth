@@ -20,7 +20,6 @@ $lang['newpassword_short'] = "Le nouveau mot de passe est trop court.";
 $lang['newpassword_long'] = "Le nouveau mot de passe est trop long.";
 $lang['newpassword_invalid'] = "Le nouveau mot de passe doit contenir au moins un caractère en miniscule et en majuscule, et au moins un chiffre.";
 $lang['newpassword_nomatch'] = "Les nouveaux mots de passe ne sont pas identiques.";
-$lang['newpassword_match'] = "Le nouveau mot de passe est identique au mot de passe actuel.";
 
 $lang['email_short'] = "L'adresse email est trop courte.";
 $lang['email_long'] = "L'adresse email est trop longue.";

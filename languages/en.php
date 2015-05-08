@@ -20,7 +20,6 @@ $lang['newpassword_short'] = "New password is too short.";
 $lang['newpassword_long'] = "New password is too long.";
 $lang['newpassword_invalid'] = "New password must contain at least one uppercase and lowercase character, and at least one digit.";
 $lang['newpassword_nomatch'] = "New passwords do not match.";
-$lang['newpassword_match'] = "New password matches previous password.";
 
 $lang['email_short'] = "Email address is too short.";
 $lang['email_long'] = "Email address is too long.";

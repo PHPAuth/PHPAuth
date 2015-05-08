@@ -1,6 +1,6 @@
--- Adminer 4.2.1 MySQL dump
+-- Adminer 4.2.0 MySQL dump
 
-SET NAMES utf8;
+SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
@@ -71,12 +71,11 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(60) DEFAULT NULL,
-  `salt` varchar(120) DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
--- 2015-05-07 05:20:39
+-- 2015-05-08 11:36:06
 

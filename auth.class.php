@@ -264,16 +264,26 @@ class Auth
 		return $this->deleteSession($hash);
 	}
 
+    /*
+    * Provides a randomly generated salt for hashing the password
+    * @return string
+    */
+    
+    public function getSalt()
+    {
+        return substr(strtr(base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)), '+', '.'), 0, 22);
+    }
+
 	/*
-	* Hashes provided string with Bcrypt
-	* @param string $string
-	* @param string $salt
-	* @return string $hash
+	* Hashes provided password with Bcrypt
+	* @param string $password
+	* @param string $password
+	* @return string
 	*/
 
-	public function getHash($string, $salt)
+	public function getHash($password)
 	{
-		return password_hash($string, PASSWORD_BCRYPT, ['salt' => $salt, 'cost' => $this->config->bcrypt_cost]);
+		return password_hash($password, PASSWORD_BCRYPT, ['salt' => $this->getSalt(), 'cost' => $this->config->bcrypt_cost]);
 	}
 
 	/*
@@ -310,7 +320,7 @@ class Auth
 			return false;
 		}
 
-		$data['hash'] = sha1($user['salt'] . microtime());
+		$data['hash'] = sha1($this->config->site_key . microtime());
 		$agent = $_SERVER['HTTP_USER_AGENT'];
 
 		$this->deleteExistingSessions($uid);
@@ -480,13 +490,11 @@ class Auth
 			return $return;
 		}
 
-		$salt = substr(strtr(base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)), '+', '.'), 0, 22);
+		$password = $this->getHash($password);
 
-		$password = $this->getHash($password, $salt);
-
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?, salt = ? WHERE id = ?");
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? WHERE id = ?");
 		
-		if(!$query->execute(array($email, $password, $salt, $uid))) {
+		if(!$query->execute(array($email, $password, $uid))) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
@@ -506,7 +514,7 @@ class Auth
 
 	public function getUser($uid)
 	{
-		$query = $this->dbh->prepare("SELECT email, password, salt, isactive FROM {$this->config->table_users} WHERE id = ?");
+		$query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
 		$query->execute(array($uid));
 
 		if ($query->rowCount() == 0) {
@@ -633,10 +641,10 @@ class Auth
 		}
 
 		if($type == "activation") {
-			$message = "Account activation required : <strong><a href=\"{$this->config->site_url}/activate/{$key}\">Activate my account</a></strong>";
+			$message = "Account activation required: <strong><a href=\"{$this->config->site_url}/activate\">Activate my account</a></strong><br/>Activation key: <strong>{$key}</strong>";
 			$subject = "{$this->config->site_name} - Account Activation";
 		} else {
-			$message = "Password reset request : <strong><a href=\"{$this->config->site_url}/reset/{$key}\">Reset my password</a></strong>";		
+			$message = "Password reset request : <strong><a href=\"{$this->config->site_url}/reset\">Reset my password</a></strong><br/>Password reset key: <strong>{$key}</strong>";		
 			$subject = "{$this->config->site_name} - Password reset request";
 		}
 		
@@ -823,7 +831,7 @@ class Auth
 			return $return;
 		}
 		
-		$password = $this->getHash($password, $user['salt']);
+		$password = $this->getHash($password);
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
 		$query->execute(array($password, $data['uid']));
@@ -940,20 +948,15 @@ class Auth
 			$return['message'] = $this->lang["system_error"];
 			return $return;
 		}
-
-		$newpass = $this->getHash($newpass, $user['salt']);
-
-		if($currpass == $newpass) {
-			$return['message'] = $this->lang["newpassword_match"];
-			return $return;
-		}
-
+		
 		if(!password_verify($currpass, $user['password'])) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["password_incorrect"];
 			return $return;
 		}
+
+		$newpass = $this->getHash($newpass);
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
 		$query->execute(array($newpass, $uid));
