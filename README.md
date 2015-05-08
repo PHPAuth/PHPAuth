@@ -16,7 +16,8 @@ Features
 * No plain text passwords are sent or stored by the system
 * Integrates easily into most existing websites, and can be a great starting point for new projects
 * Easy configuration of multiple system parameters
-* Blocks
+* Allows sending emails via SMTP or sendmail
+* Blocks disposable email addresses from registration
 
 User actions
 ---------------
