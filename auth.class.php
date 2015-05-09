@@ -1179,7 +1179,7 @@ class Auth
 
 	private function getIp()
 	{
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARTDED_FOR'] != '') {
+		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
 		   return $_SERVER['HTTP_X_FORWARDED_FOR'];
 		} else {
 		   return $_SERVER['REMOTE_ADDR'];
