@@ -92,7 +92,7 @@ class Auth
 		$sessiondata = $this->addSession($user['uid'], $remember);
 
 		if($sessiondata == false) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #01";
 			return $return;
 		}
 
@@ -189,7 +189,7 @@ class Auth
 			$this->addAttempt();
 			$this->deleteRequest($getRequest['id']);
 
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #02";
 			return $return;
 		}
 
@@ -473,7 +473,7 @@ class Auth
 		$query = $this->dbh->prepare("INSERT INTO {$this->config->table_users} VALUES ()");
 
 		if(!$query->execute()) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #03";
 			return $return;
 		}
 
@@ -498,7 +498,7 @@ class Auth
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #04";
 			return $return;
 		}
 
@@ -568,21 +568,21 @@ class Auth
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 
 		if(!$query->execute(array($uid))) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #05";
 			return $return;
 		}
 
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
 
 		if(!$query->execute(array($uid))) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #06";
 			return $return;
 		}
 
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = ?");
 
 		if(!$query->execute(array($uid))) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #07";
 			return $return;
 		}
 
@@ -608,7 +608,7 @@ class Auth
 		$return['error'] = true;
 
 		if($type != "activation" && $type != "reset") {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #08";
 			return $return;
 		}
 
@@ -640,7 +640,7 @@ class Auth
 		$query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, rkey, expire, type) VALUES (?, ?, ?, ?)");
 
 		if(!$query->execute(array($uid, $key, $expire, $type))) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #09";
 			return $return;
 		}
 
@@ -695,7 +695,7 @@ class Auth
 		}
 
 		if(!$mail->send()) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #10";
 			return $return;
 		}
 
@@ -861,7 +861,7 @@ class Auth
 			$this->addAttempt();
 			$this->deleteRequest($data['id']);
 
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #11";
 			return $return;
 		}
 
@@ -879,7 +879,7 @@ class Auth
 		$query->execute(array($password, $data['uid']));
 
 		if ($query->rowCount() == 0) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #12";
 			return $return;
 		}
 
@@ -987,7 +987,7 @@ class Auth
 		if(!$user) {
 			$this->addAttempt();
 
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #13";
 			return $return;
 		}
 
@@ -1045,7 +1045,7 @@ class Auth
 		if(!$user) {
 			$this->addAttempt();
 
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #14";
 			return $return;
 		}
 
@@ -1067,7 +1067,7 @@ class Auth
 		$query->execute(array($email, $uid));
 
 		if ($query->rowCount() == 0) {
-			$return['message'] = $this->lang["system_error"];
+			$return['message'] = $this->lang["system_error"] . " #15";
 			return $return;
 		}
 
@@ -1100,8 +1100,7 @@ class Auth
 		if ($row['count'] == 5) {
 			if ($currentdate < $expiredate) {
 				return true;
-			}
-
+}
 			$this->deleteAttempts($ip);
 			return false;
 		}

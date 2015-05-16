@@ -72,10 +72,10 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 
 ```php
 <?php
+
 include("languages/en.php");
 include("config.class.php");
 include("auth.class.php");
-
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
@@ -88,13 +88,15 @@ if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$conf
 
     exit();
 }
+
 ?>
 ```
 
 Documentation
 ---------------
 
-All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)
+All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)  
+System error codes are listed and explained [here](https://github.com/PHPAuth/PHPAuth/wiki/System-error-codes)
 
 License
 ---------------
