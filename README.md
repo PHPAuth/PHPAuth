@@ -33,7 +33,10 @@ User actions
 
 Requirements
 ---------------
-PHPAuth requires PHP 5.4 and above, a MySQL database and PHP sendmail needs setting up correctly so that account activation emails get sent correctly.
+* PHP 5.4
+* MySQL / MariaDB database
+* SMTP server / sendmail
+* PHP Mcrypt
 
 Configuration
 ---------------

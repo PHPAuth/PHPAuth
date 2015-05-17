@@ -2,7 +2,7 @@
 
 /*
 * Auth class
-* Works with PHP 5.3.7 and above.
+* Works with PHP 5.4 and above.
 */
 
 class Auth
@@ -22,7 +22,7 @@ class Auth
 		$this->lang = $lang;
 
 		if (version_compare(phpversion(), '5.5.0', '<')) {
-			require("files/password.php");
+			require("files/password.php");m
 		}
 	}
 
