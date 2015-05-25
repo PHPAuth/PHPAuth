@@ -665,33 +665,13 @@ class Auth
 		$mail->isHTML(true);
 
 		if($type == "activation") {
-			$mail->Subject = "{$this->config->site_name} - Activate account";
-
-			$mail->Body = "Hello,<br/><br/>";
-			$mail->Body .= "To be able to log in to your account you first need to activate your account by clicking on the following link :<br/>";
-			$mail->Body .= "<strong><a href=\"{$this->config->site_url}/{$this->config->site_activation_page}\">{$this->config->site_url}/{$this->config->site_activation_page}</a></strong><br/><br/>";
-			$mail->Body .= "You then need to use the following activation key: <strong>{$key}</strong><br/><br/>";
-			$mail->Body .= "If you did not sign up on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
-
-			$mail->AltBody = "Hello, \n\n";
-			$mail->AltBody .= "To be able to log in to your account you first need to activate your account by visiting the following link :\n";
-			$mail->AltBody .= "{$this->config->site_url}/{$this->config->site_activation_page}\n\n";
-			$mail->AltBody .= "You then need to use the following activation key: {$key}\n\n";
-			$mail->AltBody .= "If you did not sign up on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+			$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
+			$mail->Body = sprintf($this->$lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
+			$mail->AltBody = sprintf($this->$lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);			
 		} else {
-			$mail->Subject = "{$this->config->site_name} - Password reset request";
-
-			$mail->Body = "Hello,<br/><br/>";
-			$mail->Body .= "To reset your password click the following link :<br/><br/>";
-			$mail->Body .= "<strong><a href=\"{$this->config->site_url}/{$this->config->site_password_reset_page}\">{$this->config->site_url}/{$this->config->site_password_reset_page}</a></strong><br/><br/>";
-			$mail->Body .= "You then need to use the following password reset key: <strong>{$key}</strong><br/><br/>";
-			$mail->Body .= "If you did not request a password reset key on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
-
-			$mail->AltBody = "Hello, \n\n";
-			$mail->AltBody .= "To reset your password please visiting the following link :\n";
-			$mail->AltBody .= "{$this->config->site_url}/{$this->config->site_password_reset_page}\n\n";
-			$mail->AltBody .= "You then need to use the following password reset key: {$key}\n\n";
-			$mail->AltBody .= "If you did not request a password reset key on {$this->config->site_url} recently then this message was sent in error, please ignore it.";
+			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
+			$mail->Body = sprintf($this->$lang['email_reset_body'], $this->config->site_url, $this->config->site_activation_page, $key);
+			$mail->AltBody = sprintf($this->$lang['email_reset_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
 		}
 
 		if(!$mail->send()) {
