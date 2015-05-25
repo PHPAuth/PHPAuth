@@ -57,4 +57,12 @@ $lang['already_activated'] = "Account is already activated.";
 $lang['activation_sent'] = "Activation email has been sent.";
 $lang['activation_exists'] = "An activation email has already been sent.";
 
+$lang['email_activation_subject'] = "%s - Activate account";
+$lang['email_activation_body'] = "Hello,<br/><br/> To be able to log in to your account you first need to activate your account by clicking on the following link :\n <strong><a href=\"%1$/%2$\">%1$/%2$</a></strong><br/><br/>\n You then need to use the following activation key: <strong>%3$</strong><br/><br/>\n If you did not sign up on %1$ recently then this message was sent in error, please ignore it.";
+$lang['email_activation_altbody'] = "Hello, \n\n To be able to log in to your account you first need to activate your account by visiting the following link :\n %1$/%2$\n\n You then need to use the following activation key: %3$\n\n If you did not sign up on %1$ recently then this message was sent in error, please ignore it.";
+
+$lang['email_reset_subject'] = "%s - Password reset request";
+$lang['email_reset_body'] = "Hello,<br/><br/>To reset your password click the following link :<br/><br/><strong><a href=\"%1$/%2$\">%1$/%2</a></strong><br/><br/>You then need to use the following password reset key: <strong>%3$</strong><br/><br/>If you did not request a password reset key on %1$ recently then this message was sent in error, please ignore it.";
+$lang['email_reset_altbody'] = "Hello, \n\n To reset your password please visiting the following link :\n %1$/%2$\n\n You then need to use the following password reset key: %3$\n\n If you did not request a password reset key on %1$ recently then this message was sent in error, please ignore it.";
+
 ?>
