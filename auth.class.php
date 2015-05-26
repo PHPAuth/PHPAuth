@@ -622,7 +622,7 @@ class Auth
 			$currentdate = strtotime(date("Y-m-d H:i:s"));
 
 			if ($currentdate < $expiredate) {
-				$return['message'] = $this->lang["request_exists"];
+				$return['message'] = $this->lang["reset_exists"];
 				return $return;
 			}
 
