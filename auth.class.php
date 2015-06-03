@@ -700,7 +700,7 @@ class Auth
 		if ($query->rowCount() === 0) {
 			$this->addAttempt();
 
-			$return['message'] = $this->lang["key_incorrect"];
+			$return['message'] = $this->lang[$type."key_incorrect"];
 			return $return;
 		}
 
@@ -714,7 +714,7 @@ class Auth
 
 			$this->deleteRequest($row['id']);
 
-			$return['message'] = $this->lang["key_expired"];
+			$return['message'] = $this->lang[$type."key_expired"];
 			return $return;
 		}
 
