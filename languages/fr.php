@@ -46,9 +46,9 @@ $lang['resetkey_incorrect'] = "La cl&eacute; de r&eacute;initialisation est inco
 $lang['resetkey_expired'] = "La cl&eacute; de r&eacute;initialisation est expir&eacute;e.";
 $lang['password_reset'] = "Le mot de passe a bien &eacute;t&eacute; r&eacute;initialis&eacute;.";
 
-$lang['activekey_invalid'] = "La cl&eacute; d'activation est invalide.";
-$lang['activekey_incorrect'] = "La cl&eacute; d'activation est incorrecte.";
-$lang['activekey_expired'] = "La cl&eacute; d'activation est expir&eacute;e.";
+$lang['activationkey_invalid'] = "La cl&eacute; d'activation est invalide.";
+$lang['activationkey_incorrect'] = "La cl&eacute; d'activation est incorrecte.";
+$lang['activationkey_expired'] = "La cl&eacute; d'activation est expir&eacute;e.";
 
 $lang['reset_requested'] = "Une demande de r&eacute;initialisation de votre mot de passe a &eacute;t&eacute; envoy&eacute;.";
 $lang['reset_exists'] = "Une demande de r&eacute;initialisation de votre mot de passe existe d&eacute;j&agrave;.";
