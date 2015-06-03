@@ -46,9 +46,9 @@ $lang['resetkey_incorrect'] = "Reset key is incorrect.";
 $lang['resetkey_expired'] = "Reset key has expired.";
 $lang['password_reset'] = "Password reset successfully.";
 
-$lang['activekey_invalid'] = "Activation key is invalid.";
-$lang['activekey_incorrect'] = "Activation key is incorrect.";
-$lang['activekey_expired'] = "Activation key has expired.";
+$lang['activationkey_invalid'] = "Activation key is invalid.";
+$lang['activationkey_incorrect'] = "Activation key is incorrect.";
+$lang['activationkey_expired'] = "Activation key has expired.";
 
 $lang['reset_requested'] = "Password reset request sent to email address.";
 $lang['reset_exists'] = "A reset request already exists.";
