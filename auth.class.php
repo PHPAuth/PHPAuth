@@ -235,8 +235,9 @@ class Auth
 			$return['message'] = $this->lang["email_incorrect"];
 			return $return;
 		}
-
-		if ($this->addRequest($query->fetch(PDO::FETCH_ASSOC)['id'], $email, "reset")['error'] == 1) {
+		
+		$addRequest = $this->addRequest($query->fetch(PDO::FETCH_ASSOC)['id'], $email, "reset");
+		if ($addRequest['error'] == 1) {
 			$this->addAttempt();
 
 			$return['message'] = $addRequest['message'];
