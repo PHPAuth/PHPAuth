@@ -671,8 +671,8 @@ class Auth
 			$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);			
 		} else {
 			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
-			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_activation_page, $key);
-			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
+			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
 		if(!$mail->send()) {
