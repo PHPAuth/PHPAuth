@@ -784,7 +784,7 @@ class Auth
 
 		$bannedEmails = json_decode(file_get_contents(__DIR__ . "/files/domains.json"));
 
-		if(in_array(strtolower($email), $bannedEmails)) {
+		if(in_array(strtolower(explode('@', $email)[1]), $bannedEmails)) {
 			$return['message'] = $this->lang["email_banned"];
 			return $return;
 		}
