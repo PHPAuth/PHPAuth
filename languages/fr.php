@@ -65,4 +65,6 @@ $lang['email_reset_subject'] = "%s - Reinitialisation de mot de passe";
 $lang['email_reset_body'] = "Bonjour,<br/><br/>Pour regénérer votre mot de passe cliquez sur le lien suivant :<br/><br/><strong><a href=\"%1$s/%2$s\">%1$s/%2$s</a></strong><br/><br/>Vous devrez utiliser cette clé pour regénérer votre mot de passe: <strong>%3$s</strong><br/><br/>Si vous n'avez pas demandé une réinitialisation de mot de passe, vous pouvez ignorer ce message.";
 $lang['email_reset_altbody'] = "Bonjour, \n\n Pour regénérer votre mot de passe cliquez sur le lien suivant :\n %1$s/%2$s\n\n Vous devrez utiliser cette clé pour regénérer votre mot de passe depuis cette adresse :  %1$s \n\n Si vous n'avez pas demandé une réinitialisation de mot de passe, vous pouvez ignorer ce message.";
 
+$lang['account_deleted'] = "Compte supprimé.";
+
 ?>
