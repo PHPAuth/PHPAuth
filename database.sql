@@ -80,7 +80,6 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `password` varchar(60) DEFAULT NULL,
-  `salt` varchar(120) DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -88,4 +87,3 @@ CREATE TABLE `users` (
 
 
 -- 2015-05-08 20:15:43
-
