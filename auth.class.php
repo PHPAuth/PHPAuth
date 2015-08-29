@@ -651,11 +651,13 @@ class Auth
 			$mail->isSMTP();
 			$mail->Host = $this->config->smtp_host;
 			$mail->SMTPAuth = $this->config->smtp_auth;
-			$mail->Username = $this->config->smtp_username;
-			$mail->Password = $this->config->smtp_password;
+			if(!is_null($this->config->smtp_auth)) {
+            			$mail->Username = $this->config->smtp_username;
+            			$mail->Password = $this->config->smtp_password;
+            		}
 			$mail->Port = $this->config->smtp_port;
 
-			if($this->config->smtp_security != NULL) {
+			if(!is_null($this->config->smtp_security)) {
 				$mail->SMTPSecure = $this->config->smtp_security;
 			}
 		}
