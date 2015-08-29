@@ -76,7 +76,7 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 ```php
 <?php
 
-include("languages/en.php");
+include("languages/en_GB.php");
 include("config.class.php");
 include("auth.class.php");
 
