@@ -113,7 +113,7 @@ class Auth
 	* @return array $return
 	*/
 
-	public function register($email, $password, $repeatpassword)
+	public function register($email, $password, $repeatpassword, $params = Array())
 	{
 		$return['error'] = true;
 
@@ -143,7 +143,7 @@ class Auth
 			return $return;
 		}
 
-		$addUser = $this->addUser($email, $password);
+		$addUser = $this->addUser($email, $password, $params);
 
 		if($addUser['error'] != 0) {
 			$return['message'] = $addUser['message'];
@@ -467,7 +467,7 @@ class Auth
 	* @return int $uid
 	*/
 
-	private function addUser($email, $password)
+	private function addUser($email, $password, $params)
 	{
 		$return['error'] = true;
 
@@ -492,10 +492,32 @@ class Auth
 		}
 
 		$password = $this->getHash($password);
+		$customParamsArray = Array();
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? WHERE id = ?");
+		foreach($params as $paramKey => $paramValue) {
+			$customParamsArray[] = array('name' => ':' . $paramKey, 'value' => $paramValue);
+		}
 
-		if(!$query->execute(array($email, $password, $uid))) {
+		$customParamsQueryArray = Array();
+
+		foreach($params as $paramKey => $paramValue) {
+			$customParamsQueryArray[] = array('value' => $paramKey . ' = ' . ':' . $paramKey);
+		}
+		$setParams = ', ' . implode(', ', array_map(function ($entry) {
+			return $entry['value'];
+		}, $cu
+
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = :email, password = :password " . $setParams . " WHERE id = :id");
+
+		$query->bindParam(':email', $email);
+		$query->bindParam(':password', $password);
+		$query->bindParam(':id', $uid);
+		
+		foreach ($customParamsArray as $param) {
+			$query->bindParam($param['name'], $param['value']);
+		}
+		
+		if(!$query->execute() {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
