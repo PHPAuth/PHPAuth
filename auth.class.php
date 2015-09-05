@@ -1193,6 +1193,21 @@ class Auth
 		   return $_SERVER['REMOTE_ADDR'];
 		}
 	}
+	
+	/*
+	* Returns is user logged in
+	* @return boolean
+	*/
+
+	public function isLogged() {
+		if(isset($_COOKIE[$config->cookie_name]) && $this->checkSession($_COOKIE[$config->cookie_name])) {
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 
 ?>
