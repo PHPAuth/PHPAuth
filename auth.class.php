@@ -517,7 +517,7 @@ class Auth
 			$query->bindParam($param['name'], $param['value']);
 		}
 		
-		if(!$query->execute() {
+		if(!$query->execute()) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
