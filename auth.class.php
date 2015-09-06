@@ -492,32 +492,22 @@ class Auth
 		}
 
 		$password = $this->getHash($password);
-		$customParamsArray = Array();
-
-		foreach($params as $paramKey => $paramValue) {
-			$customParamsArray[] = array('name' => ':' . $paramKey, 'value' => $paramValue);
-		}
 
 		$customParamsQueryArray = Array();
 
 		foreach($params as $paramKey => $paramValue) {
-			$customParamsQueryArray[] = array('value' => $paramKey . ' = ' . ':' . $paramKey);
+			$customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
 		}
+
 		$setParams = ', ' . implode(', ', array_map(function ($entry) {
 			return $entry['value'];
-		}, $cu
+		}, $customParamsQueryArray));
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = :email, password = :password " . $setParams . " WHERE id = :id");
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?" . $setParams . " WHERE id = ?");
 
-		$query->bindParam(':email', $email);
-		$query->bindParam(':password', $password);
-		$query->bindParam(':id', $uid);
-		
-		foreach ($customParamsArray as $param) {
-			$query->bindParam($param['name'], $param['value']);
-		}
-		
-		if(!$query->execute()) {
+		$bindParams = array_values(array_merge(array($email, $password), $params, array($uid)));
+
+		if(!$query->execute($bindParams)) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
@@ -1200,13 +1190,7 @@ class Auth
 	*/
 
 	public function isLogged() {
-		if(isset($_COOKIE[$config->cookie_name]) && $this->checkSession($_COOKIE[$config->cookie_name])) {
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (isset($_COOKIE[$config->cookie_name]) && $this->checkSession($_COOKIE[$config->cookie_name]));
 	}
 }
 
