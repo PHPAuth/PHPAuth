@@ -4,6 +4,7 @@ class Config
 {
     private $dbh;
     private $config;
+    private $phpauth_config_table = 'config';
 
     public function __construct(\PDO $dbh)
     {
@@ -11,7 +12,7 @@ class Config
 
         $this->config = array();
 
-        $query = $this->dbh->prepare("SELECT * FROM config");
+        $query = $this->dbh->prepare("SELECT * FROM {$this->phpauth_config_table}");
         $query->execute();
 
         while($row = $query->fetch()) {
@@ -26,7 +27,7 @@ class Config
 
     public function __set($setting, $value)
     {
-        $query = $this->dbh->prepare("UPDATE config SET value = ? WHERE setting = ?");
+        $query = $this->dbh->prepare("UPDATE {$this->phpauth_config_table} SET value = ? WHERE setting = ?");
 
         if($query->execute(array($value, $setting))) {
             $this->config[$setting] = $value;
