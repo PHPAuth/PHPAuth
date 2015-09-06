@@ -113,7 +113,7 @@ class Auth
 	* @return array $return
 	*/
 
-	public function register($email, $password, $repeatpassword)
+	public function register($email, $password, $repeatpassword, $params = Array())
 	{
 		$return['error'] = true;
 
@@ -143,7 +143,7 @@ class Auth
 			return $return;
 		}
 
-		$addUser = $this->addUser($email, $password);
+		$addUser = $this->addUser($email, $password, $params);
 
 		if($addUser['error'] != 0) {
 			$return['message'] = $addUser['message'];
@@ -467,7 +467,7 @@ class Auth
 	* @return int $uid
 	*/
 
-	private function addUser($email, $password)
+	private function addUser($email, $password, $params)
 	{
 		$return['error'] = true;
 
@@ -493,9 +493,21 @@ class Auth
 
 		$password = $this->getHash($password);
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? WHERE id = ?");
+		$customParamsQueryArray = Array();
 
-		if(!$query->execute(array($email, $password, $uid))) {
+		foreach($params as $paramKey => $paramValue) {
+			$customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+		}
+
+		$setParams = ', ' . implode(', ', array_map(function ($entry) {
+			return $entry['value'];
+		}, $customParamsQueryArray));
+
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?" . $setParams . " WHERE id = ?");
+
+		$bindParams = array_values(array_merge(array($email, $password), $params, array($uid)));
+
+		if(!$query->execute($bindParams)) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
 			$query->execute(array($uid));
 
@@ -1170,6 +1182,15 @@ class Auth
 		} else {
 		   return $_SERVER['REMOTE_ADDR'];
 		}
+	}
+	
+	/*
+	* Returns is user logged in
+	* @return boolean
+	*/
+
+	public function isLogged() {
+		return (isset($_COOKIE[$config->cookie_name]) && $this->checkSession($_COOKIE[$config->cookie_name]));
 	}
 }
 
