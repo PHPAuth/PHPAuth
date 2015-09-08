@@ -1190,8 +1190,6 @@ class Auth
 	*/
 
 	public function isLogged() {
-		return (isset($_COOKIE[$config->cookie_name]) && $this->checkSession($_COOKIE[$config->cookie_name]));
+		return (isset($_COOKIE[$this->config->cookie_name]) && $this->checkSession($_COOKIE[$this->config->cookie_name]));
 	}
 }
-
-?>
