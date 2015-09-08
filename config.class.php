@@ -1,4 +1,5 @@
 <?php
+namespace PHPAuth;
 
 /**
  * PHPAuth config class
@@ -63,5 +64,3 @@ class Config
         }
     }
 }
-
-?>
