@@ -5,16 +5,6 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-DROP TABLE IF EXISTS `attempts`;
-CREATE TABLE `attempts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip` varchar(39) NOT NULL,
-  `count` int(11) NOT NULL,
-  `expiredate` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
 DROP TABLE IF EXISTS `config`;
 CREATE TABLE `config` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -50,6 +40,15 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (24,	'smtp_password',	'password'),
 (25,	'smtp_port',	'25'),
 (26,	'smtp_security',	NULL);
+
+DROP TABLE IF EXISTS `attempts`;
+CREATE TABLE `attempts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip` varchar(39) NOT NULL,
+  `count` int(11) NOT NULL,
+  `expiredate` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `requests`;
 CREATE TABLE `requests` (
