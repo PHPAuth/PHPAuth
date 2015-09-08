@@ -1,34 +1,24 @@
 <?php
-
-/**
- * PHPAuth config class
- */
 class Config
 {
     private $dbh;
     private $config;
-    private $phpauth_config_table = 'config';
 
     /**
-     * Construct Config class, that contains all configuration values.
+     * Config::__construct()
      * 
-     * It is a little trick: we can call '$config = new Config($dbh, "config_table");' always or
-     * we can patch private $phpauth_config_table manually and calls '$config = new Config($dbh);'
-     * without any additional values!
-     * @param \PDO $dbh             -- PDO database connect handler
-     * @param string $config_table  -- config table name
+     * @param mixed $dbh
+     * @param string $config_table
+     * @return
      */
     public function __construct(\PDO $dbh, $config_table = 'config')
     {
         $this->dbh = $dbh;
+        $this->phpauth_config_table = $config_table;
         
-        if (func_num_args() > 1)
-            $this->phpauth_config_table = $config_table;
-
         $this->config = array();
 
-        $query = $this->dbh->prepare("SELECT * FROM {$this->phpauth_config_table}");
-        $query->execute();
+        $query = $this->dbh->query("SELECT * FROM {$this->phpauth_config_table}");
 
         while($row = $query->fetch()) {
             $this->config[$row['setting']] = $row['value'];
@@ -36,9 +26,10 @@ class Config
     }
 
     /**
-     * Return config value
-     * @param $setting  -- key
-     * @return mixed    -- config value
+     * Config::__get()
+     * 
+     * @param mixed $setting
+     * @return
      */
     public function __get($setting)
     {
@@ -46,10 +37,11 @@ class Config
     }
 
     /**
-     * Set config value
-     * @param $setting  -- key
-     * @param $value    -- config value
-     * @return bool     -- true if no any errors occured
+     * Config::__set()
+     * 
+     * @param mixed $setting
+     * @param mixed $value
+     * @return
      */
     public function __set($setting, $value)
     {
@@ -58,10 +50,7 @@ class Config
         if($query->execute(array($value, $setting))) {
             $this->config[$setting] = $value;
             return true;
-        } else {
-            return false;
-        }
+        } 
+        return false;
     }
 }
-
-?>
