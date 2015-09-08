@@ -3,6 +3,7 @@ class Config
 {
     private $dbh;
     private $config;
+    private $config_table;
 
     /**
      * Config::__construct()
