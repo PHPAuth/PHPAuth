@@ -467,7 +467,7 @@ class Auth
 	* @return int $uid
 	*/
 
-	private function addUser($email, $password, $params)
+	private function addUser($email, $password, $params = array())
 	{
 		$return['error'] = true;
 
@@ -503,7 +503,7 @@ class Auth
 			return $entry['value'];
 		}, $customParamsQueryArray));
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?" . $setParams . " WHERE id = ?");
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
 
 		$bindParams = array_values(array_merge(array($email, $password), $params, array($uid)));
 
