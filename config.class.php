@@ -22,7 +22,7 @@ class Config
     {
         $this->dbh = $dbh;
         
-        if (isset($config_table))
+        if (func_num_args() > 1)
             $this->phpauth_config_table = $config_table;
 
         $this->config = array();
