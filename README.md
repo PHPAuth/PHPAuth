@@ -82,10 +82,10 @@ include("auth.class.php");
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
-$config = new Config($dbh);
-$auth = new Auth($dbh, $config, $lang);
+$config = new PHPAuth\Config($dbh);
+$auth   = new PHPAuth\Auth($dbh, $config, $lang);
 
-if(!isset($_COOKIE[$config->cookie_name]) || !$auth->checkSession($_COOKIE[$config->cookie_name])) {
+if (!$auth->isLogged() {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 
