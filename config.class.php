@@ -15,11 +15,11 @@ class Config
     public function __construct(\PDO $dbh, $config_table = 'config')
     {
         $this->dbh = $dbh;
-        $this->phpauth_config_table = $config_table;
+        $this->config_table = $config_table;
         
         $this->config = array();
 
-        $query = $this->dbh->query("SELECT * FROM {$this->phpauth_config_table}");
+        $query = $this->dbh->query("SELECT * FROM {$this->config_table}");
 
         while($row = $query->fetch()) {
             $this->config[$row['setting']] = $row['value'];
