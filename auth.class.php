@@ -124,15 +124,15 @@ class Auth
 
 		$validateEmail = $this->validateEmail($email);
 		$validatePassword = $this->validatePassword($password);
-
-		if ($validateEmail['error'] == 1) {
+		
+		if ($password != $repeatpassword) {
+			return['message'] = $this->lang["password_nomatch"];
+			return $return;
+		} elseif ($validateEmail['error'] == 1) {
 			$return['message'] = $validateEmail['message'];
 			return $return;
 		} elseif ($validatePassword['error'] == 1) {
 			$return['message'] = $validatePassword['message'];
-			return $return;
-		} elseif($password !== $repeatpassword) {
-			$return['message'] = $this->lang["password_nomatch"];
 			return $return;
 		}
 
