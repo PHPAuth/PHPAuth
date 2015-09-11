@@ -43,21 +43,21 @@ Configuration
 
 The database table `config` contains multiple parameters allowing you to configure certain functions of the class.
 
-* `site_name` : the name of the website to display in the activation and password reset emails
-* `site_url`: the URL of the Auth root, where you installed the system, without the trailing slash, used for emails.
-* `site_email` : the email address from which to send activation and password reset emails
+* `site_name`   : the name of the website to display in the activation and password reset emails
+* `site_url`    : the URL of the Auth root, where you installed the system, without the trailing slash, used for emails.
+* `site_email`  : the email address from which to send activation and password reset emails
+* `site_key`    : a random string that you should modify used to validate cookies to ensure they are not tampered with
+* `site_timezone` : the timezone for correct datetime values
+* `site_activation_page` : the activation page name appended to the `site_url` in the activation email
+* `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
 * `cookie_name` : the name of the cookie that contains session information, do not change unless necessary
 * `cookie_path` : the path of the session cookie, do not change unless necessary
 * `cookie_domain` : the domain of the session cookie, do not change unless necessary
 * `cookie_secure` : the HTTPS only setting of the session cookie, do not change unless necessary
 * `cookie_http` : the HTTP only protocol setting of the session cookie, do not change unless necessary
-* `site_key` : a random string that you should modify used to validate cookies to ensure they are not tampered with
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
-* `site_timezone` : the timezone for correct datetime values
-* `site_activation_page` : the activation page name appended to the `site_url` in the activation email
-* `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
 * `smtp` : `0` to use sendmail for emails, `1` to use SMTP
 * `smtp_host` : hostname of the SMTP server
 * `smtp_auth` : `0` if the SMTP server doesn't require authentication, `1` if authentication is required
@@ -65,6 +65,12 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_password` : the password for the SMTP server
 * `smtp_port` : the port for the SMTP server
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
+* `verify_password_min_length` : minimum password length, default is `3`  
+* `verify_password_max_length` : maximum password length, default is `150`
+* `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`) 
+* `verify_email_min_length` : minimum EMail length, default is `5`
+* `verify_email_max_length` : maximum EMail length, default is `100`
+* `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`) 
 
 The rest of the parameters generally do not need changing.
 
