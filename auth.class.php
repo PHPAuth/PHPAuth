@@ -21,6 +21,10 @@ class Auth
 		$this->config = $config;
 		$this->lang = $lang;
 
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            die('PHP 5.4.0 required for PHPAuth engine!');
+        }
+
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
