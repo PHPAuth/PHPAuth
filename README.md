@@ -85,7 +85,7 @@ $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 $config = new PHPAuth\Config($dbh);
 $auth   = new PHPAuth\Auth($dbh, $config, $lang);
 
-if (!$auth->isLogged() {
+if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
     echo "Forbidden";
 
