@@ -1,4 +1,5 @@
 <?php
+namespace PHPAuth;
 
 /***
 * Auth class
