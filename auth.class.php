@@ -1,4 +1,5 @@
 <?php
+namespace PHPAuth;
 
 /***
 * Auth class
@@ -21,6 +22,10 @@ class Auth
 		$this->config = $config;
 		$this->lang = $lang;
 
+        if (version_compare(phpversion(), '5.4.0', '<')) {
+            die('PHP 5.4.0 required for PHPAuth engine!');
+        }
+
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
@@ -30,7 +35,7 @@ class Auth
 	* Logs a user in
 	* @param string $email
 	* @param string $password
-	* @param bool $remember
+	* @param int $remember
 	* @return array $return
 	*/
 
@@ -110,6 +115,7 @@ class Auth
 	* @param string $email
 	* @param string $password
 	* @param string $repeatpassword
+    * @param array  $params
 	* @return array $return
 	*/
 
@@ -122,19 +128,24 @@ class Auth
 			return $return;
 		}
 
-		$validateEmail = $this->validateEmail($email);
-		$validatePassword = $this->validatePassword($password);
-		
-		if ($password != $repeatpassword) {
-			$return['message'] = $this->lang["password_nomatch"];
-			return $return;
-		} elseif ($validateEmail['error'] == 1) {
-			$return['message'] = $validateEmail['message'];
-			return $return;
-		} elseif ($validatePassword['error'] == 1) {
-			$return['message'] = $validatePassword['message'];
-			return $return;
-		}
+        if ($password !== $repeatpassword) {
+            $return['message'] = $this->lang["password_nomatch"];
+            return $return;
+        }
+
+        // Validate email
+        $validateEmail = $this->validateEmail($email);
+        if ($validateEmail['error'] == 1) {
+            $return['message'] = $validateEmail['message'];
+            return $return;
+        }
+
+        // Validate password
+        $validatePassword = $this->validatePassword($password);
+        if ($validatePassword['error'] == 1) {
+            $return['message'] = $validatePassword['message'];
+            return $return;
+        }
 
 		if ($this->isEmailTaken($email)) {
 			$this->addAttempt();
@@ -765,16 +776,18 @@ class Auth
 	private function validatePassword($password) {
 		$return['error'] = true;
 
-		if (strlen($password) < 6) {
+		if (strlen($password) < (int)$this->config->verify_password_min_length ) {
 			$return['message'] = $this->lang["password_short"];
 			return $return;
-		} elseif (strlen($password) > 150) {
+		} elseif (strlen($password) > (int)$this->config->verify_password_max_length ) {
 			$return['message'] = $this->lang["password_long"];
 			return $return;
-		} elseif (!preg_match('@[A-Z]@', $password) || !preg_match('@[a-z]@', $password) || !preg_match('@[0-9]@', $password)) {
-			$return['message'] = $this->lang["password_invalid"];
-			return $return;
-		}
+		} elseif ( (int)$this->config->verify_password_strong_requirements ) {
+            if (!preg_match('@[A-Z]@', $password) || !preg_match('@[a-z]@', $password) || !preg_match('@[0-9]@', $password)) {
+                $return['message'] = $this->lang["password_invalid"];
+                return $return;
+            }
+        }
 
 		$return['error'] = false;
 		return $return;
@@ -789,10 +802,10 @@ class Auth
 	private function validateEmail($email) {
 		$return['error'] = true;
 
-		if (strlen($email) < 5) {
+		if (strlen($email) < (int)$this->config->verify_email_min_length ) {
 			$return['message'] = $this->lang["email_short"];
 			return $return;
-		} elseif (strlen($email) > 100) {
+		} elseif (strlen($email) > (int)$this->config->verify_email_max_length ) {
 			$return['message'] = $this->lang["email_long"];
 			return $return;
 		} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -800,12 +813,14 @@ class Auth
 			return $return;
 		}
 
-		$bannedEmails = json_decode(file_get_contents(__DIR__ . "/files/domains.json"));
+        if ( (int)$this->config->verify_email_use_banlist ) {
+            $bannedEmails = json_decode(file_get_contents(__DIR__ . "/files/domains.json"));
 
-		if(in_array(strtolower(explode('@', $email)[1]), $bannedEmails)) {
-			$return['message'] = $this->lang["email_banned"];
-			return $return;
-		}
+            if (in_array(strtolower(explode('@', $email)[1]), $bannedEmails)) {
+                $return['message'] = $this->lang["email_banned"];
+                return $return;
+            }
+        }
 
 		$return['error'] = false;
 		return $return;
