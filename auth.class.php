@@ -493,16 +493,18 @@ class Auth
 		}
 
 		$password = $this->getHash($password);
-
-		$customParamsQueryArray = Array();
-
-		foreach($params as $paramKey => $paramValue) {
-			$customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+		
+		if (is_array($params)&& count($params) > 0) {
+			$customParamsQueryArray = Array();
+	
+			foreach($params as $paramKey => $paramValue) {
+				$customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+			}
+	
+			$setParams = ', ' . implode(', ', array_map(function ($entry) {
+				return $entry['value'];
+			}, $customParamsQueryArray));
 		}
-
-		$setParams = ', ' . implode(', ', array_map(function ($entry) {
-			return $entry['value'];
-		}, $customParamsQueryArray));
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
 
