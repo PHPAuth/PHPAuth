@@ -42,7 +42,7 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (26,	'smtp_security',	NULL),
 (27,    'verify_password_min_length', '3'),
 (28,    'verify_password_max_length', '150'),
-(29,    'verify_password_strong_regidity',  '1'),
+(29,    'verify_password_strong_requirements',  '1'),
 (30,    'verify_email_min_length',  '5'),
 (31,    'verify_email_max_length',  '100'),
 (32,    'verify_email_use_banlist', '1');
