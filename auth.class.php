@@ -276,16 +276,6 @@ class Auth
 		return $this->deleteSession($hash);
 	}
 
-    /***
-    * Provides a randomly generated salt for hashing the password
-    * @return string
-    */
-
-    public function getSalt()
-    {
-        return substr(strtr(base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)), '+', '.'), 0, 22);
-    }
-
 	/***
 	* Hashes provided password with Bcrypt
 	* @param string $password
@@ -295,7 +285,7 @@ class Auth
 
 	public function getHash($password)
 	{
-		return password_hash($password, PASSWORD_BCRYPT, ['salt' => $this->getSalt(), 'cost' => $this->config->bcrypt_cost]);
+		return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
 	}
 
 	/***
