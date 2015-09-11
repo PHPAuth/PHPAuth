@@ -72,20 +72,24 @@ namespace {
                     return null;
             }
             $salt_req_encoding = false;
+            $salt = '';
             if (isset($options['salt'])) {
                 switch (gettype($options['salt'])) {
                     case 'NULL':
                     case 'boolean':
                     case 'integer':
                     case 'double':
-                    case 'string':
+                    case 'string': {
                         $salt = (string) $options['salt'];
                         break;
-                    case 'object':
+                    }
+                    case 'object': {
                         if (method_exists($options['salt'], '__tostring')) {
                             $salt = (string) $options['salt'];
-                            break;
+
                         }
+                        break;
+                    }
                     case 'array':
                     case 'resource':
                     default:

@@ -1,8 +1,8 @@
 <?php
 
-/*
+/***
 * Auth class
-* Works with PHP 5.4 and above.
+* Required PHP 5.4 and above.
 */
 
 class Auth
@@ -11,7 +11,7 @@ class Auth
 	public $config;
 	public $lang;
 
-	/*
+	/***
 	* Initiates database connection
 	*/
 
@@ -26,7 +26,7 @@ class Auth
 		}
 	}
 
-	/*
+	/***
 	* Logs a user in
 	* @param string $email
 	* @param string $password
@@ -105,7 +105,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/***
 	* Creates a new user, adds them to database
 	* @param string $email
 	* @param string $password
@@ -126,7 +126,7 @@ class Auth
 		$validatePassword = $this->validatePassword($password);
 		
 		if ($password != $repeatpassword) {
-			return['message'] = $this->lang["password_nomatch"];
+			$return['message'] = $this->lang["password_nomatch"];
 			return $return;
 		} elseif ($validateEmail['error'] == 1) {
 			$return['message'] = $validateEmail['message'];
@@ -156,7 +156,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/***
 	* Activates a user's account
 	* @param string $key
 	* @return array $return
@@ -204,7 +204,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/***
 	* Creates a reset key for an email address and sends email
 	* @param string $email
 	* @return array $return
@@ -236,7 +236,7 @@ class Auth
 			return $return;
 		}
 
-		$addRequest = $this->addRequest($query->fetch(PDO::FETCH_ASSOC)['id'], $email, "reset");
+		$addRequest = $this->addRequest($query->fetch(\PDO::FETCH_ASSOC)['id'], $email, "reset");
 		if ($addRequest['error'] == 1) {
 			$this->addAttempt();
 
@@ -250,7 +250,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/***
 	* Logs out the session, identified by hash
 	* @param string $hash
 	* @return boolean
@@ -265,7 +265,7 @@ class Auth
 		return $this->deleteSession($hash);
 	}
 
-    /*
+    /***
     * Provides a randomly generated salt for hashing the password
     * @return string
     */
@@ -275,7 +275,7 @@ class Auth
         return substr(strtr(base64_encode(mcrypt_create_iv(22, MCRYPT_DEV_URANDOM)), '+', '.'), 0, 22);
     }
 
-	/*
+	/***
 	* Hashes provided password with Bcrypt
 	* @param string $password
 	* @param string $password
@@ -287,7 +287,7 @@ class Auth
 		return password_hash($password, PASSWORD_BCRYPT, ['salt' => $this->getSalt(), 'cost' => $this->config->bcrypt_cost]);
 	}
 
-	/*
+	/***
 	* Gets UID for a given email address and returns an array
 	* @param string $email
 	* @return array $uid
@@ -302,10 +302,10 @@ class Auth
 			return false;
 		}
 
-		return $query->fetch(PDO::FETCH_ASSOC)['id'];
+		return $query->fetch(\PDO::FETCH_ASSOC)['id'];
 	}
 
-	/*
+	/***
 	* Creates a session for a specified user id
 	* @param int $uid
 	* @param boolean $remember
@@ -346,7 +346,7 @@ class Auth
 		return $data;
 	}
 
-	/*
+	/***
 	* Removes all existing sessions for a given UID
 	* @param int $uid
 	* @return boolean
@@ -359,7 +359,7 @@ class Auth
 		return $query->execute(array($uid));
 	}
 
-	/*
+	/***
 	* Removes a session based on hash
 	* @param string $hash
 	* @return boolean
@@ -372,7 +372,7 @@ class Auth
 		return $query->execute(array($hash));
 	}
 
-	/*
+	/**
 	* Function to check if a session is valid
 	* @param string $hash
 	* @return boolean
@@ -397,7 +397,7 @@ class Auth
 			return false;
 		}
 
-		$row = $query->fetch(PDO::FETCH_ASSOC);
+		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
 		$sid = $row['id'];
 		$uid = $row['uid'];
@@ -424,7 +424,7 @@ class Auth
 		return false;
 	}
 
-	/*
+	/**
 	* Retrieves the UID associated with a given session hash
 	* @param string $hash
 	* @return int $uid
@@ -439,10 +439,10 @@ class Auth
 			return false;
 		}
 
-		return $query->fetch(PDO::FETCH_ASSOC)['uid'];
+		return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
 	}
 
-	/*
+	/**
 	* Checks if an email is already in use
 	* @param string $email
 	* @return boolean
@@ -460,7 +460,7 @@ class Auth
 		return true;
 	}
 
-	/*
+	/**
 	* Adds a new user to database
 	* @param string $email
 	* @param string $password
@@ -519,7 +519,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Gets user data for a given UID and returns an array
 	* @param int $uid
 	* @return array $data
@@ -534,7 +534,7 @@ class Auth
 			return false;
 		}
 
-		$data = $query->fetch(PDO::FETCH_ASSOC);
+		$data = $query->fetch(\PDO::FETCH_ASSOC);
 
 		if (!$data) {
 			return false;
@@ -544,7 +544,7 @@ class Auth
 		return $data;
 	}
 
-	/*
+	/**
 	* Allows a user to delete their account
 	* @param int $uid
 	* @param string $password
@@ -605,7 +605,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Creates an activation entry and sends email to user
 	* @param int $uid
 	* @param string $email
@@ -616,7 +616,7 @@ class Auth
 	{
 		require 'PHPMailer/PHPMailerAutoload.php';
 
-		$mail = new PHPMailer;
+		$mail = new \PHPMailer;
 
 		$return['error'] = true;
 
@@ -629,7 +629,7 @@ class Auth
 		$query->execute(array($uid, $type));
 
 		if($query->rowCount() > 0) {
-			$row = $query->fetch(PDO::FETCH_ASSOC);
+			$row = $query->fetch(\PDO::FETCH_ASSOC);
 
 			$expiredate = strtotime($row['expire']);
 			$currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -702,7 +702,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Returns request data if key is valid
 	* @param string $key
 	* @param string $type
@@ -744,7 +744,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Deletes request from database
 	* @param int $id
 	* @return boolean
@@ -756,7 +756,7 @@ class Auth
 		return $query->execute(array($id));
 	}
 
-	/*
+	/**
 	* Verifies that a password is valid and respects security requirements
 	* @param string $password
 	* @return array $return
@@ -780,7 +780,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Verifies that an email is valid
 	* @param string $email
 	* @return array $return
@@ -812,7 +812,7 @@ class Auth
 	}
 
 
-	/*
+	/**
 	* Allows a user to reset their password after requesting a reset key.
 	* @param string $key
 	* @param string $password
@@ -890,7 +890,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Recreates activation email for a given email and sends
 	* @param string $email
 	* @return array $return
@@ -922,7 +922,7 @@ class Auth
 			return $return;
 		}
 
-		$row = $query->fetch(PDO::FETCH_ASSOC);
+		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
 		if ($this->getUser($row['id'])['isactive'] == 1) {
 			$this->addAttempt();
@@ -945,15 +945,15 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Changes a user's password
 	* @param int $uid
 	* @param string $currpass
 	* @param string $newpass
-	* @return array $return
+    * @param $repeatnewpass
+	* @return $return
 	*/
-
-	public function changePassword($uid, $currpass, $newpass, $repeatnewpass)
+    public function changePassword($uid, $currpass, $newpass, $repeatnewpass)
 	{
 		$return['error'] = true;
 
@@ -1007,11 +1007,11 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Changes a user's email
 	* @param int $uid
-	* @param string $currpass
-	* @param string $newpass
+	* @param string $email
+	* @param string $password
 	* @return array $return
 	*/
 
@@ -1075,7 +1075,7 @@ class Auth
 		return $return;
 	}
 
-	/*
+	/**
 	* Informs if a user is locked out
 	* @return boolean
 	*/
@@ -1091,7 +1091,7 @@ class Auth
 			return false;
 		}
 
-		$row = $query->fetch(PDO::FETCH_ASSOC);
+		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
 		$expiredate = strtotime($row['expiredate']);
 		$currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -1111,7 +1111,7 @@ class Auth
 		return false;
 	}
 
-	/*
+	/**
 	* Adds an attempt to database
 	* @return boolean
 	*/
@@ -1123,7 +1123,7 @@ class Auth
 		$query = $this->dbh->prepare("SELECT count FROM {$this->config->table_attempts} WHERE ip = ?");
 		$query->execute(array($ip));
 
-		$row = $query->fetch(PDO::FETCH_ASSOC);
+		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
 		$attempt_expiredate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
 
@@ -1140,7 +1140,7 @@ class Auth
 		return $query->execute(array($attempt_count, $attempt_expiredate, $ip));
 	}
 
-	/*
+	/**
 	* Deletes all attempts for a given IP from database
 	* @param string $ip
 	* @return boolean
@@ -1152,7 +1152,7 @@ class Auth
 		return $query->execute(array($ip));
 	}
 
-	/*
+	/**
 	* Returns a random string of a specified length
 	* @param int $length
 	* @return string $key
@@ -1170,7 +1170,7 @@ class Auth
 		return $key;
 	}
 
-	/*
+	/**
 	* Returns IP address
 	* @return string $ip
 	*/
@@ -1184,7 +1184,7 @@ class Auth
 		}
 	}
 	
-	/*
+	/**
 	* Returns is user logged in
 	* @return boolean
 	*/

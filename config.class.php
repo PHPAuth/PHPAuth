@@ -1,22 +1,29 @@
 <?php
+namespace PHPAuth;
+
+/**
+ *
+ */
 class Config
 {
     private $dbh;
     private $config;
-    private $config_table;
+    private $config_table = 'config';
 
     /**
+     *
      * Config::__construct()
-     * 
-     * @param mixed $dbh
+     *
+     * @param \PDO $dbh
      * @param string $config_table
-     * @return
      */
     public function __construct(\PDO $dbh, $config_table = 'config')
     {
         $this->dbh = $dbh;
-        $this->config_table = $config_table;
-        
+
+        if (func_num_args() > 1)
+            $this->phpauth_config_table = $config_table;
+
         $this->config = array();
 
         $query = $this->dbh->query("SELECT * FROM {$this->config_table}");
