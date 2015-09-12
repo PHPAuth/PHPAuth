@@ -449,7 +449,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function isEmailTaken($email)
+	public function isEmailTaken($email)
 	{
 		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
@@ -463,8 +463,9 @@ class Auth
 
 	/**
 	* Adds a new user to database
-	* @param string $email
-	* @param string $password
+	* @param string $email      -- email
+	* @param string $password   -- password
+    * @param array $params      -- additional params
 	* @return int $uid
 	*/
 
@@ -612,6 +613,7 @@ class Auth
 	* Creates an activation entry and sends email to user
 	* @param int $uid
 	* @param string $email
+    * @param string $type
 	* @return boolean
 	*/
 
@@ -1199,4 +1201,36 @@ class Auth
 	public function isLogged() {
 		return (isset($_COOKIE[$this->config->cookie_name]) && $this->checkSession($_COOKIE[$this->config->cookie_name]));
 	}
+
+    /**
+     * Returns current session hash
+     * @return string
+     */
+    public function getSessionHash(){
+        return $_COOKIE[$this->config->cookie_name];
+    }
+
+    /**
+     * Compare user's password with given password
+     * @param int $userid
+     * @param string $password_for_check
+     * @return bool
+     */
+    public function comparePasswords($userid, $password_for_check)
+    {
+        $query = $this->dbh->prepare("SELECT password FROM {$this->config->table_users} WHERE id = ?");
+        $query->execute(array($userid));
+
+        if ($query->rowCount() == 0) {
+            return false;
+        }
+
+        $data = $query->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$data) {
+            return false;
+        }
+
+        return password_verify($password_for_check, $data['password']);
+    }
 }
