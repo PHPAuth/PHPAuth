@@ -45,13 +45,15 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (29,    'verify_password_strong_requirements',  '1'),
 (30,    'verify_email_min_length',  '5'),
 (31,    'verify_email_max_length',  '100'),
-(32,    'verify_email_use_banlist', '1');
+(32,    'verify_email_use_banlist', '1'),
+(33,    'attack_mitigation_time', '+30 minutes'),
+(34,    'attempts_before_verify', '5'),
+(35,    'attempts_before_ban', '30');
 
 DROP TABLE IF EXISTS `attempts`;
 CREATE TABLE `attempts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` varchar(39) NOT NULL,
-  `count` int(11) NOT NULL,
   `expiredate` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
