@@ -12,7 +12,7 @@ Features
 * Uses [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) to hash passwords, a secure algorithm that uses an expensive key setup phase
 * Uses an individual 128 bit salt for each user, pulled from /dev/urandom, making rainbow tables useless
 * Uses PHP's [PDO](http://php.net/manual/en/book.pdo.php) database interface and uses prepared statements meaning an efficient system, resilient against SQL injection
-* Blocks attackers by IP for any defined time after any amount of failed actions on the portal
+* Blocks (or verifies) attackers by IP for any defined time after any amount of failed actions on the portal
 * No plain text passwords are sent or stored by the system
 * Integrates easily into most existing websites, and can be a great starting point for new projects
 * Easy configuration of multiple system parameters
@@ -70,9 +70,50 @@ The database table `config` contains multiple parameters allowing you to configu
 * `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`) 
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
-* `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`) 
+* `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`)
+* `attack_mitigation_time` : time used for rolling attempts timeout, default is `+30 minutes`. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
+* `attempts_before_verify` : maximum amount of attempts to be made within `attack_mitigation_time` before requiring captcha. Default is `5`
+* `attempt_before_block` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Defualt is `30`
 
 The rest of the parameters generally do not need changing.
+
+CAPTCHA Implementation
+---------------
+
+If `isBlocked()` returns `verify`, then a CAPTCHA code should be displayed.
+The method `checkCaptcha($captcha)` is called to verify a CAPTCHA code. By default this method returns `true`, but should be overridden to verify a CAPTCHA.
+
+For example, if you are using Google's ReCaptcha NoCaptcha, use the following code:
+
+```php
+    private function checkCaptcha($captcha)
+    {
+ try {
+
+        $url = 'https://www.google.com/recaptcha/api/siteverify';
+        $data = ['secret'   => 'your_secret_here',
+            'response' => $captcha,
+            'remoteip' => $_SERVER['REMOTE_ADDR']];
+
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+
+        $context  = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        return json_decode($result)->success;
+    }
+    catch (\Exception $e) {
+        return false;
+    }
+}
+```
+
+If a CAPTCHA is not to be used, please ensure to set `attempt_before_block` to the same value as `attempts_before_verify`.
 
 How to secure a page
 ---------------

@@ -36,18 +36,27 @@ class Auth
 	* @param string $email
 	* @param string $password
 	* @param int $remember
+    * @param string $captcha = NULL
 	* @return array $return
 	*/
 
-	public function login($email, $password, $remember = 0)
+	public function login($email, $password, $remember = 0, $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validateEmail = $this->validateEmail($email);
 		$validatePassword = $this->validatePassword($password);
@@ -116,17 +125,27 @@ class Auth
 	* @param string $password
 	* @param string $repeatpassword
     * @param array  $params
+     * @param string $captcha = NULL
 	* @return array $return
 	*/
 
-	public function register($email, $password, $repeatpassword, $params = Array())
+	public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
         if ($password !== $repeatpassword) {
             $return['message'] = $this->lang["password_nomatch"];
@@ -177,10 +196,11 @@ class Auth
 	{
 		$return['error'] = true;
 
-		if($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		if(strlen($key) !== 20) {
 			$this->addAttempt();
@@ -224,11 +244,11 @@ class Auth
 	public function requestReset($email)
 	{
 		$return['error'] = true;
-
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validateEmail = $this->validateEmail($email);
 
@@ -383,10 +403,11 @@ class Auth
 	{
 		$ip = $this->getIp();
 
-		if ($this->isBlocked()) {
-			return false;
-		}
-
+        $block_status = $this->isBlocked();
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return false;
+        }
 		if (strlen($hash) != 40) {
 			return false;
 		}
@@ -552,17 +573,27 @@ class Auth
 	* Allows a user to delete their account
 	* @param int $uid
 	* @param string $password
+    * @param string $captcha = NULL
 	* @return array $return
 	*/
 
-	public function deleteUser($uid, $password)
+	public function deleteUser($uid, $password, $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validatePassword = $this->validatePassword($password);
 
@@ -826,17 +857,27 @@ class Auth
 	* @param string $key
 	* @param string $password
 	* @param string $repeatpassword
+    * @param string $captcha = NULL
 	* @return array $return
 	*/
 
-	public function resetPass($key, $password, $repeatpassword)
+	public function resetPass($key, $password, $repeatpassword, $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		if(strlen($key) != 20) {
 			$return['message'] = $this->lang["resetkey_invalid"];
@@ -908,11 +949,11 @@ class Auth
 	public function resendActivation($email)
 	{
 		$return['error'] = true;
-
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validateEmail = $this->validateEmail($email);
 
@@ -959,17 +1000,27 @@ class Auth
 	* @param int $uid
 	* @param string $currpass
 	* @param string $newpass
-    * @param $repeatnewpass
-	* @return $return
+    * @param string $repeatnewpass
+    * @param string $captcha = NULL
+	* @return array $return
 	*/
-    public function changePassword($uid, $currpass, $newpass, $repeatnewpass)
+    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validatePassword = $this->validatePassword($currpass);
 
@@ -1021,17 +1072,27 @@ class Auth
 	* @param int $uid
 	* @param string $email
 	* @param string $password
+    * @param string $captcha = NULL
 	* @return array $return
 	*/
 
-	public function changeEmail($uid, $email, $password)
+	public function changeEmail($uid, $email, $password, $captcha = NULL)
 	{
 		$return['error'] = true;
 
-		if ($this->isBlocked()) {
-			$return['message'] = $this->lang["user_blocked"];
-			return $return;
-		}
+        $block_status = $this->isBlocked();
+        if($block_status == "verify")
+        {
+            if($this->checkCaptcha($captcha) == false)
+            {
+                $return['message'] = $this->lang["user_verify_failed"];
+                return $return;
+            }
+        }
+        if ($block_status == "block") {
+            $return['message'] = $this->lang["user_blocked"];
+            return $return;
+        }
 
 		$validateEmail = $this->validateEmail($email);
 
@@ -1086,39 +1147,39 @@ class Auth
 
 	/**
 	* Informs if a user is locked out
-	* @return boolean
+	* @return string
 	*/
 
-	private function isBlocked()
+	public function isBlocked()
 	{
 		$ip = $this->getIp();
-
+        $this->deleteAttempts($ip, false);
 		$query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
 		$query->execute(array($ip));
 
-		if($query->rowCount() == 0) {
-			return false;
-		}
+        $attempts = $query->rowCount();
 
-		$row = $query->fetch(\PDO::FETCH_ASSOC);
-
-		$expiredate = strtotime($row['expiredate']);
-		$currentdate = strtotime(date("Y-m-d H:i:s"));
-
-		if ($row['count'] == 5) {
-			if ($currentdate < $expiredate) {
-				return true;
-}
-			$this->deleteAttempts($ip);
-			return false;
-		}
-
-		if ($currentdate > $expiredate) {
-			$this->deleteAttempts($ip);
-		}
-
-		return false;
+        if($attempts < intval($this->config->attempts_before_verify))
+        {
+            return "allow";
+        }
+        if($attempts < intval($this->config->attempts_before_ban))
+        {
+            return "verify";
+        }
+     return "block";
 	}
+
+
+    /**
+     * Verifies a captcha code
+     * @param string $captcha
+     * @return boolean
+     */
+    private function checkCaptcha($captcha)
+    {
+        return true;
+    }
 
 	/**
 	* Adds an attempt to database
@@ -1129,36 +1190,41 @@ class Auth
 	{
 		$ip = $this->getIp();
 
-		$query = $this->dbh->prepare("SELECT count FROM {$this->config->table_attempts} WHERE ip = ?");
-		$query->execute(array($ip));
+		$attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
 
-		$row = $query->fetch(\PDO::FETCH_ASSOC);
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (?, ?)");
+        return $query->execute(array($ip, $attempt_expiredate));
 
-		$attempt_expiredate = date("Y-m-d H:i:s", strtotime("+30 minutes"));
-
-		if (!$row) {
-			$attempt_count = 1;
-
-			$query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, count, expiredate) VALUES (?, ?, ?)");
-			return $query->execute(array($ip, $attempt_count, $attempt_expiredate));
-		}
-
-		$attempt_count = $row['count'] + 1;
-
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_attempts} SET count=?, expiredate=? WHERE ip=?");
-		return $query->execute(array($attempt_count, $attempt_expiredate, $ip));
 	}
 
 	/**
 	* Deletes all attempts for a given IP from database
 	* @param string $ip
+     * @param boolean $all = false
 	* @return boolean
 	*/
 
-	private function deleteAttempts($ip)
+	private function deleteAttempts($ip, $all = false)
 	{
+        if($all==true)
+        {
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
 		return $query->execute(array($ip));
+        }
+
+
+        $query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
+        $query->execute(array($ip));
+
+        while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
+            $expiredate = strtotime($row['expiredate']);
+            $currentdate = strtotime(date("Y-m-d H:i:s"));
+            if($currentdate > $expiredate)
+            {
+                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
+                $query->execute(array($row['id']));
+            }
+        }
 	}
 
 	/**
@@ -1166,7 +1232,6 @@ class Auth
 	* @param int $length
 	* @return string $key
 	*/
-
 	public function getRandomKey($length = 20)
 	{
 		$chars = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6";
