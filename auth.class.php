@@ -1154,7 +1154,7 @@ class Auth
 	{
 		$ip = $this->getIp();
         $this->deleteAttempts($ip, false);
-		$query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
+		$query = $this->dbh->prepare("SELECT expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
 		$query->execute(array($ip));
 
         $attempts = $query->rowCount();
