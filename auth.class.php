@@ -1213,7 +1213,7 @@ class Auth
         }
 
 
-        $query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
+        $query = $this->dbh->prepare("SELECT expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
         $query->execute(array($ip));
 
         while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
