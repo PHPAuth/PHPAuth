@@ -526,7 +526,7 @@ class Auth
 			$setParams = ', ' . implode(', ', array_map(function ($entry) {
 				return $entry['value'];
 			}, $customParamsQueryArray));
-		}
+		} else { $setParams = '';}
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
 
