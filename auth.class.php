@@ -472,10 +472,10 @@ class Auth
 
 	public function isEmailTaken($email)
 	{
-		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE email = ?");
+		$query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
 
-		if ($query->rowCount() == 0) {
+		if ($query->fetchColumn() == 0) {
 			return false;
 		}
 
@@ -1152,12 +1152,12 @@ class Auth
 
 	public function isBlocked()
 	{
-		$ip = $this->getIp();
-        $this->deleteAttempts($ip, false);
-		$query = $this->dbh->prepare("SELECT expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
-		$query->execute(array($ip));
+		  $ip = $this->getIp();
+		  $this->deleteAttempts($ip, false);
+		  $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = ?");
+    	  $query->execute(array($ip));
 
-        $attempts = $query->rowCount();
+        $attempts = $query->fetchColumn();
 
         if($attempts < intval($this->config->attempts_before_verify))
         {
