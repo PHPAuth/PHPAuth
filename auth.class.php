@@ -1210,7 +1210,7 @@ class Auth
 	/**
 	* Deletes all attempts for a given IP from database
 	* @param string $ip
-     * @param boolean $all = false
+        * @param boolean $all = false
 	* @return boolean
 	*/
 
@@ -1231,8 +1231,8 @@ class Auth
             $currentdate = strtotime(date("Y-m-d H:i:s"));
             if($currentdate > $expiredate)
             {
-                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
-                $query->execute(array($row['id']));
+                $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
+                $queryDel->execute(array($row['id']));
             }
         }
 	}
