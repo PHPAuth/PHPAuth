@@ -32,7 +32,7 @@ class Config
             $this->config[$row['setting']] = $row['value'];
         }
 
-        $this->setVerifyDefaults(); // Danger foreseen is half avoided.
+        $this->setForgottenDefaults(); // Danger foreseen is half avoided.
     }
 
     /**
@@ -70,7 +70,7 @@ class Config
      * Set default values.
      * REQUIRED FOR USERS THAT DOES NOT UPDATE THEIR `config` TABLES.
      */
-    private function setVerifyDefaults()
+    private function setForgottenDefaults()
     {
         // verify* values.
 
