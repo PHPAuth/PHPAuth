@@ -41,6 +41,7 @@ $lang['logged_out'] = 'Logout effettuato con successo.';
 $lang['system_error'] = 'Si &egrave; verificato un errore tecnico. Per favore riprovate pi&ugrave; tardi.';
 
 $lang['register_success'] = 'Account creato. Codice di attivazione spedito all&quot;indirizzo email.';
+$lang['register_success_emailmessage_suppressed'] = 'Account creato.';
 $lang['email_taken'] = 'L&quot;indirizzo email non &egrave; disponibile.';
 
 $lang['resetkey_invalid'] = 'Il codice per il reset non &egrave; valido.';

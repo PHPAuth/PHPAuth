@@ -40,6 +40,7 @@ $lang['logged_out'] = "Vous avez &eacute;t&eacute; deconnect&eacute;s.";
 $lang['system_error'] = "Une erreur syst&egrave;me a &eacute;t&eacute; rencontr&eacute;e. Veuillez r&eacute;essayer.";
 
 $lang['register_success'] = "Le compte a bien &eacute;t&eacute; cr&eacute;e. L'email d'activation vous a &eacute;t&eacute; envoy&eacute;.";
+$lang['register_success_emailmessage_suppressed'] = "Le compte a bien &eacute;t&eacute; cr&eacute;e.";
 $lang['email_taken'] = "L'adresse email est d&eacute;j&agrave; utilis&eacute;e.";
 
 $lang['resetkey_invalid'] = "La cl&eacute; de r&eacute;initialisation est invalide.";
