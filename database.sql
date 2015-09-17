@@ -11,7 +11,7 @@ CREATE TABLE `config` (
   `setting` varchar(100) NOT NULL,
   `value` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
 
 INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (1,	    'site_name',	'PHPAuth'),
@@ -48,7 +48,8 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (32,    'verify_email_use_banlist', '1'),
 (33,    'attack_mitigation_time', '+30 minutes'),
 (34,    'attempts_before_verify', '5'),
-(35,    'attempts_before_ban', '30');
+(35,    'attempts_before_ban', '30'),
+(36,    'emailmessage_suppress_activation', '0');
 
 DROP TABLE IF EXISTS `attempts`;
 CREATE TABLE `attempts` (

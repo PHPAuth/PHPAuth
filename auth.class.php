@@ -472,10 +472,10 @@ class Auth
 
 	public function isEmailTaken($email)
 	{
-		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE email = ?");
+		$query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
 
-		if ($query->rowCount() == 0) {
+		if ($query->fetchColumn() == 0) {
 			return false;
 		}
 
@@ -486,7 +486,7 @@ class Auth
 	* Adds a new user to database
 	* @param string $email      -- email
 	* @param string $password   -- password
-    * @param array $params      -- additional params
+  * @param array $params      -- additional params
 	* @return int $uid
 	*/
 
@@ -526,7 +526,7 @@ class Auth
 			$setParams = ', ' . implode(', ', array_map(function ($entry) {
 				return $entry['value'];
 			}, $customParamsQueryArray));
-		}
+		} else { $setParams = ''; }
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
 
@@ -717,14 +717,26 @@ class Auth
 		$mail->addAddress($email);
 		$mail->isHTML(true);
 
+		$suppressed = false;
+
 		if($type == "activation") {
-			$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
-			$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
-			$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+			if(!$this->config->emailmessage_suppress_activation){
+				$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
+				$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
+				$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+			} else {
+				$suppressed = true;
+			}
 		} else {
 			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
 			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
+		}
+
+		if($suppressed){
+			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
+			$return['error'] = false;
+			return $return;
 		}
 
 		if(!$mail->send()) {
@@ -1152,12 +1164,12 @@ class Auth
 
 	public function isBlocked()
 	{
-		$ip = $this->getIp();
-        $this->deleteAttempts($ip, false);
-		$query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
-		$query->execute(array($ip));
+		  $ip = $this->getIp();
+		  $this->deleteAttempts($ip, false);
+		  $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = ?");
+    	  $query->execute(array($ip));
 
-        $attempts = $query->rowCount();
+        $attempts = $query->fetchColumn();
 
         if($attempts < intval($this->config->attempts_before_verify))
         {
@@ -1200,7 +1212,7 @@ class Auth
 	/**
 	* Deletes all attempts for a given IP from database
 	* @param string $ip
-     * @param boolean $all = false
+        * @param boolean $all = false
 	* @return boolean
 	*/
 
@@ -1213,7 +1225,7 @@ class Auth
         }
 
 
-        $query = $this->dbh->prepare("SELECT count, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
+        $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
         $query->execute(array($ip));
 
         while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
@@ -1221,8 +1233,8 @@ class Auth
             $currentdate = strtotime(date("Y-m-d H:i:s"));
             if($currentdate > $expiredate)
             {
-                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
-                $query->execute(array($row['id']));
+                $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
+                $queryDel->execute(array($row['id']));
             }
         }
 	}

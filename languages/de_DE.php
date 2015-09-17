@@ -40,6 +40,7 @@ $lang['logged_out'] = "Du bist jetzt abgemeldet.";
 $lang['system_error'] = "Ein Systemfehler ist aufgetreten. Bitte versuche es erneut.";
 
 $lang['register_success'] = "Dein Benutzerkonto wurde erstellt. Wir haben dir eine E-Mail mit einem Aktivierungslink geschickt.";
+$lang['register_success_emailmessage_suppressed'] = "Dein Benutzerkonto wurde erstellt.";
 $lang['email_taken'] = "Mit dieser E-Mail-Adresse ist bereits ein anderer Benutzer registriert.";
 
 $lang['resetkey_invalid'] = "Sicherheitsschlüssel ist ungültig.";

@@ -41,6 +41,7 @@ $lang['logged_out'] = "You are now logged out.";
 $lang['system_error'] = "A system error has been encountered. Please try again.";
 
 $lang['register_success'] = "Account created. Activation email sent to email.";
+$lang['register_success_emailmessage_suppressed'] = "Account created.";
 $lang['email_taken'] = "The email address is already in use.";
 
 $lang['resetkey_invalid'] = "Reset key is invalid.";
