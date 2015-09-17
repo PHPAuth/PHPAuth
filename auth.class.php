@@ -486,7 +486,7 @@ class Auth
 	* Adds a new user to database
 	* @param string $email      -- email
 	* @param string $password   -- password
-    * @param array $params      -- additional params
+  * @param array $params      -- additional params
 	* @return int $uid
 	*/
 
@@ -526,7 +526,7 @@ class Auth
 			$setParams = ', ' . implode(', ', array_map(function ($entry) {
 				return $entry['value'];
 			}, $customParamsQueryArray));
-		} else { $setParams = '';}
+		} else { $setParams = ''; }
 
 		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
 
@@ -717,21 +717,31 @@ class Auth
 		$mail->addAddress($email);
 		$mail->isHTML(true);
 
+		$suppressed = false;
+
 		if($type == "activation") {
-			$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
-			$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
-			$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+			if(!$this->config->emailmessage_suppress_activation){
+				$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
+				$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
+				$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+			} else {
+				$suppressed = true;
+			}
 		} else {
 			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
 			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
-		if(!$mail->send()) {
+		if(!$mail->send() && !$suppressed) {
 			$this->deleteRequest($request_id);
 
 			$return['message'] = $this->lang["system_error"] . " #10";
 			return $return;
+		}
+
+		if($suppressed){
+			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
 		}
 
 		$return['error'] = false;

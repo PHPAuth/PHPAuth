@@ -67,11 +67,13 @@ class Config
     /**
      * Danger foreseen is half avoided.
      *
-     * Set default verify* values.
+     * Set default values.
      * REQUIRED FOR USERS THAT DOES NOT UPDATE THEIR `config` TABLES.
      */
     private function setVerifyDefaults()
     {
+        // verify* values.
+
         if (! isset($this->config['verify_password_min_length']) )
             $this->config['verify_password_min_length'] = 3;
 
@@ -89,5 +91,11 @@ class Config
 
         if (! isset($this->config['verify_email_use_banlist']) )
             $this->config['verify_email_use_banlist'] = 1;
+
+        // emailmessage* values
+
+        if (! isset($this->config['emailmessage_suppress_activation']) )
+            $this->config['emailmessage_suppress_activation'] = 0;
+
     }
 }
