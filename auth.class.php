@@ -733,15 +733,17 @@ class Auth
 			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
-		if(!$mail->send() && !$suppressed) {
+		if($suppressed){
+			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
+			$return['error'] = false;
+			return $return;
+		}
+
+		if(!$mail->send()) {
 			$this->deleteRequest($request_id);
 
 			$return['message'] = $this->lang["system_error"] . " #10";
 			return $return;
-		}
-
-		if($suppressed){
-			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
 		}
 
 		$return['error'] = false;
