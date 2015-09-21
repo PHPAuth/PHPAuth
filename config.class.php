@@ -112,4 +112,6 @@ class Config
             $this->config['emailmessage_suppress_activation'] = 0;
 
     }
+
+
 }
