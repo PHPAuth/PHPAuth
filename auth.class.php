@@ -675,7 +675,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function addRequest($uid, $email, $type,$suppressed = NULL)
+	private function addRequest($uid, $email, $type, $suppressed = NULL)
 	{
 
 
