@@ -11,7 +11,7 @@ CREATE TABLE `config` (
   `setting` varchar(100) NOT NULL,
   `value` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
 
 INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (1,	    'site_name',	'PHPAuth'),
