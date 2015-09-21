@@ -693,6 +693,8 @@ class Auth
                if(!$this->config->emailmessage_suppress_activation)
                {
                    $suppressed = false;
+               } else {
+               		$lang['register_success']=$lang['register_success_emailmessage_suppressed']
                }
            }
            if($type == "reset")
@@ -700,6 +702,8 @@ class Auth
                if(!$this->config->emailmessage_suppress_reset)
                {
                    $suppressed = false;
+               } else {
+               		$lang['reset_requested']=$lang['reset_requested_emailmessage_suppressed']
                }
            }
 
