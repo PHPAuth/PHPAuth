@@ -776,8 +776,6 @@ class Auth
 			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
-
-
 		if(!$mail->send()) {
 			$this->deleteRequest($request_id);
 
