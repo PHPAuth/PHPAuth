@@ -675,7 +675,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function addRequest($uid, $email, $type,$suppressed = NULL)
+	private function addRequest($uid, $email, $type, $suppressed = NULL)
 	{
 
 
@@ -693,6 +693,8 @@ class Auth
                if(!$this->config->emailmessage_suppress_activation)
                {
                    $suppressed = false;
+               } else {
+               		$lang['register_success']=$lang['register_success_emailmessage_suppressed']
                }
            }
            if($type == "reset")
@@ -700,6 +702,8 @@ class Auth
                if(!$this->config->emailmessage_suppress_reset)
                {
                    $suppressed = false;
+               } else {
+               		$lang['reset_requested']=$lang['reset_requested_emailmessage_suppressed']
                }
            }
 
@@ -775,8 +779,6 @@ class Auth
 			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
-
-
 
 		if(!$mail->send()) {
 			$this->deleteRequest($request_id);

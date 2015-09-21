@@ -49,8 +49,7 @@ INSERT INTO `config` (`id`, `setting`, `value`) VALUES
 (33,    'attack_mitigation_time', '+30 minutes'),
 (34,    'attempts_before_verify', '5'),
 (35,    'attempts_before_ban', '30'),
-(36,    'emailmessage_suppress_activation', '0'),
-(37,    'emailmessage_suppress_reset', '0');
+(36,    'emailmessage_suppress_activation', '0');
 
 DROP TABLE IF EXISTS `attempts`;
 CREATE TABLE `attempts` (
