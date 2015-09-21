@@ -87,7 +87,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if (!password_verify($password, $user['password'])) {
 			$this->addAttempt();
@@ -216,7 +216,7 @@ class Auth
 			return $return;
 		}
 
-		if($this->getUser($getRequest['uid'])['isactive'] == 1) {
+		if($this->getBaseUser($getRequest['uid'])['isactive'] == 1) {
 			$this->addAttempt();
 			$this->deleteRequest($getRequest['id']);
 
@@ -336,7 +336,7 @@ class Auth
 	private function addSession($uid, $remember)
 	{
 		$ip = $this->getIp();
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			return false;
@@ -472,10 +472,10 @@ class Auth
 
 	public function isEmailTaken($email)
 	{
-		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE email = ?");
+		$query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = ?");
 		$query->execute(array($email));
 
-		if ($query->rowCount() == 0) {
+		if ($query->fetchColumn() == 0) {
 			return false;
 		}
 
@@ -545,12 +545,12 @@ class Auth
 	}
 
 	/**
-	* Gets user data for a given UID and returns an array
+	* Gets basic user data for a given UID and returns an array
 	* @param int $uid
 	* @return array $data
 	*/
 
-	public function getUser($uid)
+	private function getBaseUser($uid)
 	{
 		$query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
 		$query->execute(array($uid));
@@ -568,6 +568,32 @@ class Auth
 		$data['uid'] = $uid;
 		return $data;
 	}
+	
+	/**
+	* Gets public user data for a given UID and returns an array, password is not returned
+	* @param int $uid
+	* @return array $data
+	*/
+
+	public function getUser($uid)
+	{
+		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = ?");
+		$query->execute(array($uid));
+
+		if ($query->rowCount() == 0) {
+			return false;
+		}
+
+		$data = $query->fetch(\PDO::FETCH_ASSOC);
+
+		if (!$data) {
+			return false;
+		}
+
+		$data['uid'] = $uid;
+		unset($data['password']);
+		return $data;
+	}	
 
 	/**
 	* Allows a user to delete their account
@@ -604,9 +630,9 @@ class Auth
 			return $return;
 		}
 
-		$getUser = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
-		if(!password_verify($password, $getUser['password'])) {
+		if(!password_verify($password, $user['password'])) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["password_incorrect"];
@@ -645,14 +671,13 @@ class Auth
 	* @param int $uid
 	* @param string $email
     * @param string $type
+    * @param boolean $suppressed = NULL
 	* @return boolean
 	*/
 
-	private function addRequest($uid, $email, $type)
+	private function addRequest($uid, $email, $type,$suppressed = NULL)
 	{
-		require 'PHPMailer/PHPMailerAutoload.php';
 
-		$mail = new \PHPMailer;
 
 		$return['error'] = true;
 
@@ -660,7 +685,25 @@ class Auth
 			$return['message'] = $this->lang["system_error"] . " #08";
 			return $return;
 		}
+        if($suppressed == NULL)
+        {
+            $suppressed = true;
+           if($type == "activation")
+           {
+               if(!$this->config->emailmessage_suppress_activation)
+               {
+                   $suppressed = false;
+               }
+           }
+           if($type == "reset")
+           {
+               if(!$this->config->emailmessage_suppress_reset)
+               {
+                   $suppressed = false;
+               }
+           }
 
+        }
 		$query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = ? AND type = ?");
 		$query->execute(array($uid, $type));
 
@@ -678,7 +721,7 @@ class Auth
 			$this->deleteRequest($row['id']);
 		}
 
-		if($type == "activation" && $this->getUser($uid)['isactive'] == 1) {
+		if($type == "activation" && $this->getBaseUser($uid)['isactive'] == 1) {
 			$return['message'] = $this->lang["already_activated"];
 			return $return;
 		}
@@ -696,7 +739,11 @@ class Auth
 		$request_id = $this->dbh->lastInsertId();
 
 		// Check configuration for SMTP parameters
+        if(!$suppressed)
+        {
+            require 'PHPMailer/PHPMailerAutoload.php';
 
+            $mail = new \PHPMailer;
 		if($this->config->smtp) {
 			$mail->isSMTP();
 			$mail->Host = $this->config->smtp_host;
@@ -717,32 +764,20 @@ class Auth
 		$mail->addAddress($email);
 		$mail->isHTML(true);
 
-		$suppressed = false;
-
 		if($type == "activation") {
-			if(!$this->config->emailmessage_suppress_activation){
+
 				$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
 				$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
 				$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
-			} else {
-				$suppressed = true;
 			}
-		} else {
-			if(!$this->config->emailmessage_suppress_reset){
-				$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
-				$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-				$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-			} else {
-				$suppressed = true;
-			}
+    else {
+    	
+			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
+			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
+			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
-		if($suppressed){
-			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
-			$this->lang["reset_requested"] = $this->lang["reset_requested_emailmessage_suppressed"];
-			$return['error'] = false;
-			return $return;
-		}
+
 
 		if(!$mail->send()) {
 			$this->deleteRequest($request_id);
@@ -750,7 +785,7 @@ class Auth
 			$return['message'] = $this->lang["system_error"] . " #10";
 			return $return;
 		}
-
+        }
 		$return['error'] = false;
 		return $return;
 	}
@@ -921,7 +956,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($data['uid']);
+		$user = $this->getBaseUser($data['uid']);
 
 		if(!$user) {
 			$this->addAttempt();
@@ -991,7 +1026,7 @@ class Auth
 
 		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
-		if ($this->getUser($row['id'])['isactive'] == 1) {
+		if ($this->getBaseUser($row['id'])['isactive'] == 1) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["already_activated"];
@@ -1058,7 +1093,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			$this->addAttempt();
@@ -1126,7 +1161,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			$this->addAttempt();
@@ -1169,12 +1204,12 @@ class Auth
 
 	public function isBlocked()
 	{
-		$ip = $this->getIp();
-        $this->deleteAttempts($ip, false);
-		$query = $this->dbh->prepare("SELECT expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
-		$query->execute(array($ip));
+		  $ip = $this->getIp();
+		  $this->deleteAttempts($ip, false);
+		  $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = ?");
+    	  $query->execute(array($ip));
 
-        $attempts = $query->rowCount();
+        $attempts = $query->fetchColumn();
 
         if($attempts < intval($this->config->attempts_before_verify))
         {
@@ -1217,7 +1252,7 @@ class Auth
 	/**
 	* Deletes all attempts for a given IP from database
 	* @param string $ip
-     * @param boolean $all = false
+        * @param boolean $all = false
 	* @return boolean
 	*/
 
@@ -1238,8 +1273,8 @@ class Auth
             $currentdate = strtotime(date("Y-m-d H:i:s"));
             if($currentdate > $expiredate)
             {
-                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
-                $query->execute(array($row['id']));
+                $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
+                $queryDel->execute(array($row['id']));
             }
         }
 	}
