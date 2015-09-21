@@ -115,4 +115,6 @@ class Config
             $this->config['emailmessage_suppress_reset'] = 0;
 
     }
+
+
 }
