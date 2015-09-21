@@ -65,6 +65,20 @@ class Config
     }
 
     /**
+     * Config::override()
+     * 
+     * @param mixed $setting
+     * @param mixed $value
+     * @return bool
+     */
+    public function override($setting, $value){
+
+        $this->config[$setting] = $value;
+        return true;
+
+    }
+
+    /**
      * Danger foreseen is half avoided.
      *
      * Set default values.
