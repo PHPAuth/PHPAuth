@@ -87,7 +87,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if (!password_verify($password, $user['password'])) {
 			$this->addAttempt();
@@ -216,7 +216,7 @@ class Auth
 			return $return;
 		}
 
-		if($this->getUser($getRequest['uid'])['isactive'] == 1) {
+		if($this->getBaseUser($getRequest['uid'])['isactive'] == 1) {
 			$this->addAttempt();
 			$this->deleteRequest($getRequest['id']);
 
@@ -336,7 +336,7 @@ class Auth
 	private function addSession($uid, $remember)
 	{
 		$ip = $this->getIp();
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			return false;
@@ -545,12 +545,12 @@ class Auth
 	}
 
 	/**
-	* Gets user data for a given UID and returns an array
+	* Gets basic user data for a given UID and returns an array
 	* @param int $uid
 	* @return array $data
 	*/
 
-	public function getUser($uid)
+	private function getBaseUser($uid)
 	{
 		$query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
 		$query->execute(array($uid));
@@ -568,6 +568,32 @@ class Auth
 		$data['uid'] = $uid;
 		return $data;
 	}
+	
+	/**
+	* Gets public user data for a given UID and returns an array, password is not returned
+	* @param int $uid
+	* @return array $data
+	*/
+
+	public function getUser($uid)
+	{
+		$query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = ?");
+		$query->execute(array($uid));
+
+		if ($query->rowCount() == 0) {
+			return false;
+		}
+
+		$data = $query->fetch(\PDO::FETCH_ASSOC);
+
+		if (!$data) {
+			return false;
+		}
+
+		$data['uid'] = $uid;
+		unset($data['password']);
+		return $data;
+	}	
 
 	/**
 	* Allows a user to delete their account
@@ -604,9 +630,9 @@ class Auth
 			return $return;
 		}
 
-		$getUser = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
-		if(!password_verify($password, $getUser['password'])) {
+		if(!password_verify($password, $user['password'])) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["password_incorrect"];
@@ -695,7 +721,7 @@ class Auth
 			$this->deleteRequest($row['id']);
 		}
 
-		if($type == "activation" && $this->getUser($uid)['isactive'] == 1) {
+		if($type == "activation" && $this->getBaseUser($uid)['isactive'] == 1) {
 			$return['message'] = $this->lang["already_activated"];
 			return $return;
 		}
@@ -929,7 +955,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($data['uid']);
+		$user = $this->getBaseUser($data['uid']);
 
 		if(!$user) {
 			$this->addAttempt();
@@ -999,7 +1025,7 @@ class Auth
 
 		$row = $query->fetch(\PDO::FETCH_ASSOC);
 
-		if ($this->getUser($row['id'])['isactive'] == 1) {
+		if ($this->getBaseUser($row['id'])['isactive'] == 1) {
 			$this->addAttempt();
 
 			$return['message'] = $this->lang["already_activated"];
@@ -1066,7 +1092,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			$this->addAttempt();
@@ -1134,7 +1160,7 @@ class Auth
 			return $return;
 		}
 
-		$user = $this->getUser($uid);
+		$user = $this->getBaseUser($uid);
 
 		if(!$user) {
 			$this->addAttempt();
