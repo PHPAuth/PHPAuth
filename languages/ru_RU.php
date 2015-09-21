@@ -53,6 +53,7 @@ $lang['activationkey_incorrect'] = "Неверный ключ акцивации
 $lang['activationkey_expired'] = "Срок действия ключа активации истёк!";
 
 $lang['reset_requested'] = "Запрос на сброс пароля выслан по почте.";
+$lang['reset_requested_emailmessage_suppressed'] = "Запрос сброса пароля создан.";
 $lang['reset_exists'] = "Сброс пароля уже запрошен.";
 $lang['password_reset'] = "Пароль сброшен успешно.";
 
