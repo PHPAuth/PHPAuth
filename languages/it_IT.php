@@ -54,7 +54,6 @@ $lang['activationkey_incorrect'] = 'Il codice attivazione non &egrave; corretto'
 $lang['activationkey_expired'] = 'Il codice attivazione &egrave; scaduto.';
 
 $lang['reset_requested'] = 'Codice per il reset della password spedito all&quot;indirizzo email associato all&quot;account.';
-$lang['reset_requested_emailmessage_suppressed'] = 'Codice per il reset della password stato creato.';
 $lang['reset_exists'] = '&Egrave; gi&agrave; stato richiesto il reset della password.';
 
 $lang['already_activated'] = 'L&quot;account &egrave; gi&agrave; in stato attivo.';

@@ -728,18 +728,13 @@ class Auth
 				$suppressed = true;
 			}
 		} else {
-			if(!$this->config->emailmessage_suppress_reset){
-				$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
-				$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-				$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-			} else {
-				$suppressed = true;
-			}
+			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
+			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
+			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 		}
 
 		if($suppressed){
 			$this->lang["register_success"] = $this->lang["register_success_emailmessage_suppressed"];
-			$this->lang["reset_requested"] = $this->lang["reset_requested_emailmessage_suppressed"];
 			$return['error'] = false;
 			return $return;
 		}

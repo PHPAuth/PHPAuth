@@ -53,7 +53,6 @@ $lang['activationkey_incorrect'] = "Aktivierungsschlüssel ist nicht korrekt.";
 $lang['activationkey_expired'] = "Aktivierungsschlüssel ist abgelaufen.";
 
 $lang['reset_requested'] = "Wir haben dir eine E-Mail zum Zurücksetzen deines Passworts geschickt.";
-$lang['reset_requested_emailmessage_suppressed'] = "Erstellt Anforderung an Passwort zurückzusetzen.";
 $lang['reset_exists'] = "Es liegt bereits eine Anfrage zum Zurücksetzen deines Passworts vor.";
 
 $lang['already_activated'] = "Benutzerkonto ist bereits aktiviert.";

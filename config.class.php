@@ -111,8 +111,5 @@ class Config
         if (! isset($this->config['emailmessage_suppress_activation']) )
             $this->config['emailmessage_suppress_activation'] = 0;
 
-        if (! isset($this->config['emailmessage_suppress_reset']) )
-            $this->config['emailmessage_suppress_reset'] = 0;
-
     }
 }

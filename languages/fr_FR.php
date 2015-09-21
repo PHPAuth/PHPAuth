@@ -53,7 +53,6 @@ $lang['activationkey_incorrect'] = "La cl&eacute; d'activation est incorrecte.";
 $lang['activationkey_expired'] = "La cl&eacute; d'activation est expir&eacute;e.";
 
 $lang['reset_requested'] = "Une demande de r&eacute;initialisation de votre mot de passe a &eacute;t&eacute; envoy&eacute;.";
-$lang['reset_requested_emailmessage_suppressed'] = "Une demande de r&eacute;initialisation de votre mot de passe a &eacutet&eacute cr&eacute&eacute.";
 $lang['reset_exists'] = "Une demande de r&eacute;initialisation de votre mot de passe existe d&eacute;j&agrave;.";
 
 $lang['already_activated'] = "Le compte est d&eacute;j&agrave; activ&eacute;.";
