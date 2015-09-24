@@ -125,11 +125,12 @@ class Auth
 	* @param string $password
 	* @param string $repeatpassword
     * @param array  $params
-     * @param string $captcha = NULL
+    * @param string $captcha = NULL
+	* @param bool $sendmail = NULL
 	* @return array $return
 	*/
 
-	public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL)
+	public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL, $sendmail = NULL)
 	{
 		$return['error'] = true;
 
@@ -173,15 +174,15 @@ class Auth
 			return $return;
 		}
 
-		$addUser = $this->addUser($email, $password, $params);
+		$addUser = $this->addUser($email, $password, $params, $sendmail);
 
 		if($addUser['error'] != 0) {
 			$return['message'] = $addUser['message'];
 			return $return;
 		}
-
+	
 		$return['error'] = false;
-		$return['message'] = $this->lang["register_success"];
+		$return['message'] = ($sendmail == true ? $this->lang["register_success"] : $this->lang['register_success_emailmessage_suppressed'] );
 
 		return $return;
 	}
@@ -241,7 +242,7 @@ class Auth
 	* @return array $return
 	*/
 
-	public function requestReset($email)
+	public function requestReset($email, $sendmail = NULL)
 	{
 		$return['error'] = true;
         $block_status = $this->isBlocked();
@@ -267,7 +268,7 @@ class Auth
 			return $return;
 		}
 
-		$addRequest = $this->addRequest($query->fetch(\PDO::FETCH_ASSOC)['id'], $email, "reset");
+		$addRequest = $this->addRequest($query->fetch(\PDO::FETCH_ASSOC)['id'], $email, "reset", $sendmail);
 		if ($addRequest['error'] == 1) {
 			$this->addAttempt();
 
@@ -276,7 +277,7 @@ class Auth
 		}
 
 		$return['error'] = false;
-		$return['message'] = $this->lang["reset_requested"];
+		$return['message'] = ($sendmail == true ? $this->lang["reset_requested"] : $this->lang['reset_requested_emailmessage_suppressed']);
 
 		return $return;
 	}
@@ -490,7 +491,7 @@ class Auth
 	* @return int $uid
 	*/
 
-	private function addUser($email, $password, $params = array())
+	private function addUser($email, $password, $params = array(), &$sendmail)
 	{
 		$return['error'] = true;
 
@@ -504,7 +505,7 @@ class Auth
 		$uid = $this->dbh->lastInsertId();
 		$email = htmlentities(strtolower($email));
 
-		$addRequest = $this->addRequest($uid, $email, "activation");
+		$addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
 
 		if($addRequest['error'] == 1) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
@@ -671,43 +672,31 @@ class Auth
 	* @param int $uid
 	* @param string $email
     * @param string $type
-    * @param boolean $suppressed = NULL
+    * @param boolean $sendmail = NULL
 	* @return boolean
 	*/
 
-	private function addRequest($uid, $email, $type, $suppressed = NULL)
+	private function addRequest($uid, $email, $type, &$sendmail)
 	{
-
-
 		$return['error'] = true;
 
 		if($type != "activation" && $type != "reset") {
 			$return['message'] = $this->lang["system_error"] . " #08";
 			return $return;
-		}
-        if($suppressed == NULL)
-        {
-            $suppressed = true;
-           if($type == "activation")
-           {
-               if(!$this->config->emailmessage_suppress_activation)
-               {
-                   $suppressed = false;
-               } else {
-               		$this->lang['register_success']=$this->lang['register_success_emailmessage_suppressed'];
-               }
-           }
-           if($type == "reset")
-           {
-               if(!$this->config->emailmessage_suppress_reset)
-               {
-                   $suppressed = false;
-               } else {
-               	  $this->lang['reset_requested']=$this->lang['reset_requested_emailmessage_suppressed'];
-               }
-           }
-
-        }
+		}        
+	
+        // if not set manually, check config data
+        if($sendmail === NULL)
+		{
+			$sendmail = true;			
+			if($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
+				$sendmail = false;
+			} 
+			if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
+				$sendmail = false;
+			}
+		}			
+	
 		$query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = ? AND type = ?");
 		$query->execute(array($uid, $type));
 
@@ -742,51 +731,53 @@ class Auth
 
 		$request_id = $this->dbh->lastInsertId();
 
-		// Check configuration for SMTP parameters
-        if(!$suppressed)
+		if($sendmail === true)
         {
-            require 'PHPMailer/PHPMailerAutoload.php';
-
-            $mail = new \PHPMailer;
-		if($this->config->smtp) {
-			$mail->isSMTP();
-			$mail->Host = $this->config->smtp_host;
-			$mail->SMTPAuth = $this->config->smtp_auth;
-			if(!is_null($this->config->smtp_auth)) {
-            			$mail->Username = $this->config->smtp_username;
-            			$mail->Password = $this->config->smtp_password;
-            		}
-			$mail->Port = $this->config->smtp_port;
-
-			if(!is_null($this->config->smtp_security)) {
-				$mail->SMTPSecure = $this->config->smtp_security;
+			// Check configuration for SMTP parameters
+	       
+	            require 'PHPMailer/PHPMailerAutoload.php';
+	
+	            $mail = new \PHPMailer;
+				if($this->config->smtp) {
+					$mail->isSMTP();
+					$mail->Host = $this->config->smtp_host;
+					$mail->SMTPAuth = $this->config->smtp_auth;
+					if(!is_null($this->config->smtp_auth)) {
+	            			$mail->Username = $this->config->smtp_username;
+	            			$mail->Password = $this->config->smtp_password;
+	            		}
+					$mail->Port = $this->config->smtp_port;
+	
+					if(!is_null($this->config->smtp_security)) {
+						$mail->SMTPSecure = $this->config->smtp_security;
+				}
 			}
-		}
-
-		$mail->From = $this->config->site_email;
-		$mail->FromName = $this->config->site_name;
-		$mail->addAddress($email);
-		$mail->isHTML(true);
-
-		if($type == "activation") {
-
-				$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
-				$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
-				$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+	
+			$mail->From = $this->config->site_email;
+			$mail->FromName = $this->config->site_name;
+			$mail->addAddress($email);
+			$mail->isHTML(true);
+	
+			if($type == "activation") {
+	
+					$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
+					$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
+					$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
+				}
+	        else {
+				$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
+				$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
+				$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 			}
-        else {
-			$mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
-			$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-			$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-		}
-
-		if(!$mail->send()) {
-			$this->deleteRequest($request_id);
-
-			$return['message'] = $this->lang["system_error"] . " #10";
-			return $return;
-		}
+	
+			if(!$mail->send()) {
+				$this->deleteRequest($request_id);
+	
+				$return['message'] = $this->lang["system_error"] . " #10";
+				return $return;
+			}
         }
+
 		$return['error'] = false;
 		return $return;
 	}
