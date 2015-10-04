@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/PHPAuth/PHPAuth.png)](https://travis-ci.org/PHPAuth/PHPAuth)
 PHPAuth
 =======
 
