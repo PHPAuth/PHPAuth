@@ -12,7 +12,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 	{
 		require_once __DIR__ . '/../auth.class.php';
 		require_once __DIR__ . '/../config.class.php';
-		require_once __DIR__ . '/../languages/en_GB.php';
+		require __DIR__ . '/../languages/en_GB.php';
 
 		// $dbh = new PDO(sqlite::memory:);
 		$this->dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
