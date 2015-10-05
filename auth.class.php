@@ -29,6 +29,8 @@ class Auth
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
+
+		date_default_timezone_set($this->config->site_timezone);
 	}
 
 	/***
@@ -315,6 +317,7 @@ class Auth
 	* @return array $uid
 	*/
 
+
 	public function getUID($email)
 	{
 		$query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
@@ -377,8 +380,9 @@ class Auth
 	private function deleteExistingSessions($uid)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
+		$query->execute(array($uid));
 
-		return $query->execute(array($uid));
+		return $query->rowCount() == 1;
 	}
 
 	/***
@@ -390,8 +394,9 @@ class Auth
 	private function deleteSession($hash)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = ?");
+		$query->execute(array($hash));
 
-		return $query->execute(array($hash));
+		return $query->rowCount() == 1;
 	}
 
 	/**
@@ -487,7 +492,7 @@ class Auth
 	* Adds a new user to database
 	* @param string $email      -- email
 	* @param string $password   -- password
-  * @param array $params      -- additional params
+	* @param array $params      -- additional params
 	* @return int $uid
 	*/
 
@@ -505,17 +510,21 @@ class Auth
 		$uid = $this->dbh->lastInsertId();
 		$email = htmlentities(strtolower($email));
 
-		$addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
+		if($sendmail) {
+			$addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
 
-		if($addRequest['error'] == 1) {
-			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
-			$query->execute(array($uid));
+			if($addRequest['error'] == 1) {
+				$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
+				$query->execute(array($uid));
 
-			$return['message'] = $addRequest['message'];
-			return $return;
+				$return['message'] = $addRequest['message'];
+				return $return;
+			}
+
+			$isactive = 0;
+		} else {
+			$isactive = 1;
 		}
-		
-		$isactive = ($sendmail === false ? 1 : 0);
 		
 		$password = $this->getHash($password);
 		
