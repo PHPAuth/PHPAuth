@@ -514,7 +514,9 @@ class Auth
 			$return['message'] = $addRequest['message'];
 			return $return;
 		}
-
+		
+		$isactive = ($sendmail === false ? 1 : 0);
+		
 		$password = $this->getHash($password);
 		
 		if (is_array($params)&& count($params) > 0) {
@@ -529,9 +531,9 @@ class Auth
 			}, $customParamsQueryArray));
 		} else { $setParams = ''; }
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?");
 
-		$bindParams = array_values(array_merge(array($email, $password), $params, array($uid)));
+		$bindParams = array_values(array_merge(array($email, $password, $isactive), $params, array($uid)));
 
 		if(!$query->execute($bindParams)) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
@@ -691,9 +693,13 @@ class Auth
 			$sendmail = true;			
 			if($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
 				$sendmail = false;
+				$return['error'] = false;
+				return $return;
 			} 
 			if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
 				$sendmail = false;
+				$return['error'] = false;
+				return $return;
 			}
 		}			
 	
