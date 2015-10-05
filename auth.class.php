@@ -960,7 +960,6 @@ class Auth
 
 		if(password_verify($password, $user['password'])) {
 			$this->addAttempt();
-			$this->deleteRequest($data['id']);
 
 			$return['message'] = $this->lang["newpassword_match"];
 			return $return;
