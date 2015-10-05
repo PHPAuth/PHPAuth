@@ -12,7 +12,7 @@ matrix:
 
 before_script:
   - mysql -e 'create database phpauthtest;'
-  - mysql -u root -p phpauthtest < database.sql
+  - mysql -u root phpauthtest < database.sql
 
 script:
     - phpunit
