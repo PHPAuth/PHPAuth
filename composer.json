@@ -5,5 +5,9 @@
 			"type": "vcs",
 			"url": "https://github.com/PHPAuth/PHPAuth"
 		}
-	]
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"another-vendor/package": "1.*"
+	}
 }
