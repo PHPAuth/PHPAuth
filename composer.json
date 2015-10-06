@@ -1,0 +1,9 @@
+{
+	"name": "PHPAuth",
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/PHPAuth/PHPAuth"
+		}
+	]
+}
