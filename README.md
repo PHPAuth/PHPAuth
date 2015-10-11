@@ -51,7 +51,7 @@ PHPAuth currently isn't available on [Packagist](https://packagist.org/) however
   }
 ],
 "require": {
-    "PHPAuth": "[GitHub release version]"
+    "phpauth/phpauth": "[GitHub release version]"
 }
 ```
 
