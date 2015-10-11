@@ -1,12 +1,17 @@
 {
-	"name": "PHPAuth",
-	"repositories": [
-		{
-			"type": "vcs",
-			"url": "https://github.com/PHPAuth/PHPAuth"
-		}
-	],
+	"name": "phpauth/phpauth",
+	"description": "A secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.",
+	"type": "library",
+	"keywords": ["authentication","class","secure"],
+	"homepage": "http://phpauth.github.io/PHPAuth/",
+	"license": "GPL-3.0+",
 	"require": {
-		"php": ">=5.4.0"
+		"php": ">=5.4.0",
+		"ext-mcrypt": "*"
+	},
+	"autoload": {
+		"psr-4": {
+			"PHPAuth\\": "/"
+		}
 	}
 }
