@@ -39,6 +39,22 @@ Requirements
 * SMTP server / sendmail
 * PHP Mcrypt
 
+Composer Support
+---------------
+PHPAuth currently isn't available on [Packagist](https://packagist.org/) however, you can add this repo and require it in your project's *composer.json*:
+
+```json
+"repositories": [
+  {
+    "type": "vcs",
+    "url": "https://github.com/PHPAuth/PHPAuth"
+  }
+],
+"require": {
+    "PHPAuth": "[GitHub release version]"
+}
+```
+
 Configuration
 ---------------
 
@@ -68,7 +84,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
 * `verify_password_min_length` : minimum password length, default is `3`  
 * `verify_password_max_length` : maximum password length, default is `150`
-* `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`) 
+* `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`)
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
 * `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`)
