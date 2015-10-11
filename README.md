@@ -39,6 +39,22 @@ Requirements
 * SMTP server / sendmail
 * PHP Mcrypt
 
+Composer Support
+---------------
+PHPAuth currently isn't available on [Packagist](https://packagist.org/) however, you can add this repo and require it in your project's *composer.json*:
+
+```json
+"repositories": [
+  {
+    "type": "vcs",
+    "url": "https://github.com/PHPAuth/PHPAuth"
+  }
+],
+"require": {
+    "phpauth/phpauth": "[GitHub release version]"
+}
+```
+
 Configuration
 ---------------
 
@@ -68,7 +84,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
 * `verify_password_min_length` : minimum password length, default is `3`  
 * `verify_password_max_length` : maximum password length, default is `150`
-* `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`) 
+* `verify_password_strong_requirements` : use strong password requirments (at least one uppercase and lowercase character, and at least one digit), default is `1` (`true`)
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
 * `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`)
@@ -149,16 +165,6 @@ Documentation
 All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)  
 System error codes are listed and explained [here](https://github.com/PHPAuth/PHPAuth/wiki/System-error-codes)
 
-License
----------------
-
-Copyright (C) 2014 - 2015 PHPAuth
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/
 
 Contributing
 ---------------
