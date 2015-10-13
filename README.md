@@ -141,8 +141,8 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 <?php
 
 include("languages/en_GB.php");
-include("config.class.php");
-include("auth.class.php");
+include("Config.php");
+include("Auth.php");
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
