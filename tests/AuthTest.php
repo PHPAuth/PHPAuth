@@ -10,8 +10,8 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
 	public function __construct()
 	{
-		require_once __DIR__ . '/../auth.class.php';
-		require_once __DIR__ . '/../config.class.php';
+		require_once __DIR__ . '/../Auth.php';
+		require_once __DIR__ . '/../Config.php';
 		require __DIR__ . '/../languages/en_GB.php';
 
 		// $dbh = new PDO(sqlite::memory:);
