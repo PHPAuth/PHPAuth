@@ -3,6 +3,7 @@
 $lang = array();
 
 $lang['user_blocked'] = "Ваш аккаунт заблокирован.";
+$lang['user_verify_failed'] = "Защитный код код недействителен.";
 
 $lang['email_password_invalid'] = "Недопустимые E-Mail или пароль.";
 $lang['email_password_incorrect'] = "Пользователь с указанным E-Mail'ом не обнаружен в системе или пароль не подходит.";

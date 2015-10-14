@@ -225,6 +225,29 @@ class AuthTest extends PHPUnit_Framework_TestCase
 		// Failed deleteUser: incorrect UID
 		$this->assertTrue($this->auth->deleteUser(9999999, "IncorrectPassword1")['error']);
 	}
+
+	public function testLanguageFiles()
+	{
+		// Use the english language file as main reference
+		include __DIR__ . '/../languages/en_GB.php';
+
+		$baseLang = $lang;
+
+		include __DIR__ . '/../languages/fr_FR.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+
+		include __DIR__ . '/../languages/de_DE.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+
+		include __DIR__ . '/../languages/it_IT.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+
+		include __DIR__ . '/../languages/ru_RU.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+
+		include __DIR__ . '/../languages/nl_BE.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+	}
 }
 
 ?>

@@ -3,6 +3,7 @@
 $lang = array();
 
 $lang['user_blocked'] = "Dein Benutzer ist im System aktuell gesperrt.";
+$lang['user_verify_failed'] = "Captcha-Code ist ungültig.";
 
 $lang['email_password_invalid'] = "E-Mail-Adresse / Passwort ungültig.";
 $lang['email_password_incorrect'] = "E-Mail-Adresse / Passwort nicht korrekt.";
