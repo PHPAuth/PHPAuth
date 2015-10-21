@@ -14,7 +14,7 @@ $lang['password_long'] = "Senha muito longa.";
 $lang['password_invalid'] = "A senha deve conter pelomenos uma letra maiuscula, minuscula e um numero.";
 $lang['password_nomatch'] = "As senhas não combinam.";
 $lang['password_changed'] = "Senha alterada com sucesso.";
-$lang['password_incorrect'] = "A Senha atual está incorreta.";
+$lang['password_incorrect'] = "A senha atual está incorreta.";
 $lang['password_notvalid'] = "Senha invalida.";
 
 $lang['newpassword_short'] = "A senha nova é curta.";
