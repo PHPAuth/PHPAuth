@@ -29,6 +29,8 @@ class Auth
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
+
+		date_default_timezone_set($this->config->site_timezone);
 	}
 
 	/***
@@ -315,6 +317,7 @@ class Auth
 	* @return array $uid
 	*/
 
+
 	public function getUID($email)
 	{
 		$query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
@@ -377,8 +380,9 @@ class Auth
 	private function deleteExistingSessions($uid)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
+		$query->execute(array($uid));
 
-		return $query->execute(array($uid));
+		return $query->rowCount() == 1;
 	}
 
 	/***
@@ -390,8 +394,9 @@ class Auth
 	private function deleteSession($hash)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = ?");
+		$query->execute(array($hash));
 
-		return $query->execute(array($hash));
+		return $query->rowCount() == 1;
 	}
 
 	/**
@@ -487,7 +492,7 @@ class Auth
 	* Adds a new user to database
 	* @param string $email      -- email
 	* @param string $password   -- password
-  * @param array $params      -- additional params
+	* @param array $params      -- additional params
 	* @return int $uid
 	*/
 
@@ -505,16 +510,22 @@ class Auth
 		$uid = $this->dbh->lastInsertId();
 		$email = htmlentities(strtolower($email));
 
-		$addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
+		if($sendmail) {
+			$addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
 
-		if($addRequest['error'] == 1) {
-			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
-			$query->execute(array($uid));
+			if($addRequest['error'] == 1) {
+				$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
+				$query->execute(array($uid));
 
-			$return['message'] = $addRequest['message'];
-			return $return;
+				$return['message'] = $addRequest['message'];
+				return $return;
+			}
+
+			$isactive = 0;
+		} else {
+			$isactive = 1;
 		}
-
+		
 		$password = $this->getHash($password);
 		
 		if (is_array($params)&& count($params) > 0) {
@@ -529,9 +540,9 @@ class Auth
 			}, $customParamsQueryArray));
 		} else { $setParams = ''; }
 
-		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ? {$setParams} WHERE id = ?");
+		$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?");
 
-		$bindParams = array_values(array_merge(array($email, $password), $params, array($uid)));
+		$bindParams = array_values(array_merge(array($email, $password, $isactive), $params, array($uid)));
 
 		if(!$query->execute($bindParams)) {
 			$query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
@@ -691,9 +702,13 @@ class Auth
 			$sendmail = true;			
 			if($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
 				$sendmail = false;
+				$return['error'] = false;
+				return $return;
 			} 
 			if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
 				$sendmail = false;
+				$return['error'] = false;
+				return $return;
 			}
 		}			
 	
@@ -960,7 +975,6 @@ class Auth
 
 		if(password_verify($password, $user['password'])) {
 			$this->addAttempt();
-			$this->deleteRequest($data['id']);
 
 			$return['message'] = $this->lang["newpassword_match"];
 			return $return;

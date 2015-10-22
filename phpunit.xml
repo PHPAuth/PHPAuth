@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true">
+    <testsuites>
+        <testsuite name="PHP PHPAuth Test Suite">
+            <directory>tests/</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+    	<ini name="sendmail_path" value="/bin/true" />
+    	<server name="REMOTE_ADDR" value="127.0.0.1" />
+    	<server name="HTTP_USER_AGENT" value="PHPUnit Test Browser" />
+    </php>
+</phpunit>
