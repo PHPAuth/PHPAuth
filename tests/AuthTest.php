@@ -247,6 +247,12 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
 		include __DIR__ . '/../languages/nl_BE.php';
 		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+		
+		include __DIR__ . '/../languages/fa_IR.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+
+		include __DIR__ . '/../languages/pt_BR.php';
+		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
 	}
 }
 
