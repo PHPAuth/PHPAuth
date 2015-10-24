@@ -804,7 +804,7 @@ class Auth
 	* @return array $return
 	*/
 
-	private function getRequest($key, $type)
+	public function getRequest($key, $type)
 	{
 		$return['error'] = true;
 
