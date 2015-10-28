@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS config;
 CREATE TABLE config (
   id serial NOT NULL,
   setting character varying(100) NOT NULL,
-  value character varying(100) DEFAULT NULL
+  value character varying(100) DEFAULT NULL,
+  PRIMARY KEY (id)
 );
 
 INSERT INTO config (id, setting, value) VALUES
@@ -48,7 +49,8 @@ DROP TABLE IF EXISTS attempts;
 CREATE TABLE attempts (
   id serial NOT NULL,
   ip character varying(39) NOT NULL,
-  expiredate timestamp without time zone NOT NULL
+  expiredate timestamp without time zone NOT NULL,
+  PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS requests;
@@ -57,7 +59,8 @@ CREATE TABLE requests (
   uid integer NOT NULL,
   rkey character varying (20) NOT NULL,
   expire character timestamp without time zone NOT NULL,
-  type character varying (20) NOT NULL
+  type character varying (20) NOT NULL,
+  PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS sessions;
@@ -68,7 +71,8 @@ CREATE TABLE sessions (
   expiredate timestamp without time zone NOT NULL,
   ip varying(39) NOT NULL,
   agent character varying(200) NOT NULL,
-  cookie_crc character varying(40) NOT NULL
+  cookie_crc character varying(40) NOT NULL,
+  PRIMARY KEY (id)
 );
 
 
@@ -78,5 +82,6 @@ CREATE TABLE users (
   email character varying(100) DEFAULT NULL,
   password character varying(60) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
-  dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
+  dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
 );
