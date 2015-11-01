@@ -9,7 +9,7 @@ php:
 
 before_script:
   - mysql -e 'create database phpauthtest;'
-  - mysql -u root phpauthtest < database.sql
+  - mysql -u root phpauthtest < database_mysql.sql
 
 script:
     - phpunit
