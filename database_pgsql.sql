@@ -58,7 +58,7 @@ CREATE TABLE requests (
   id serial NOT NULL,
   uid integer NOT NULL,
   rkey character varying (20) NOT NULL,
-  expire character timestamp without time zone NOT NULL,
+  expire timestamp without time zone NOT NULL,
   type character varying (20) NOT NULL,
   PRIMARY KEY (id)
 );
@@ -69,7 +69,7 @@ CREATE TABLE sessions (
   uid integer NOT NULL,
   hash character varying(40) NOT NULL,
   expiredate timestamp without time zone NOT NULL,
-  ip varying(39) NOT NULL,
+  ip character varying(39) NOT NULL,
   agent character varying(200) NOT NULL,
   cookie_crc character varying(40) NOT NULL,
   PRIMARY KEY (id)
@@ -78,7 +78,7 @@ CREATE TABLE sessions (
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-  id serial NOT NULLL,
+  id serial NOT NULL,
   email character varying(100) DEFAULT NULL,
   password character varying(60) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
