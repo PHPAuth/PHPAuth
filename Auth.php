@@ -177,7 +177,7 @@ class Auth
 
         $zxcvbn = new Zxcvbn();
 
-		if($zxcvbn->passwordStrength($password)['score'] < $this->config->password_min_score) {
+		if($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
 			$return['message'] = $this->lang['password_weak'];
 			return $return;
 		}
@@ -1108,7 +1108,7 @@ class Auth
 
 		$zxcvbn = new Zxcvbn();
 
-		if($zxcvbn->passwordStrength($newpass)['score'] < $this->config->password_min_score) {
+		if($zxcvbn->passwordStrength($newpass)['score'] < intval($this->config->password_min_score)) {
 			$return['message'] = $this->lang['password_weak'];
 			return $return;
 		}

@@ -29,16 +29,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
 	public function testRegister()
 	{
 		// Successful registration
-		$this->assertFalse($this->auth->register("test@email.com", "TestPassword1", "TestPassword1", array(), NULL, false)['error']);
+		$this->assertFalse($this->auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
 		// Failed registration: same email
-		$this->assertTrue($this->auth->register("test@email.com", "TestPassword1", "TestPassword1", array(), NULL, false)['error']);
+		$this->assertTrue($this->auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
 		// Failed registration: invalid email address
-		$this->assertTrue($this->auth->register("InvalidEmail", "TestPassword1", "TestPassword1", array(), NULL, false)['error']);
+		$this->assertTrue($this->auth->register('InvalidEmail', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
 		// Failed registration: invalid password
-		$this->assertTrue($this->auth->register("test2@email.com", "lamepass", "lamepass", array(), NULL, false)['error']);
+		$this->assertTrue($this->auth->register('test2@email.com', 'lamepass', 'lamepass')['error']);
 	}
 
 	/**
@@ -51,7 +51,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 		$this->dbh->exec("DELETE FROM attempts;");
 
 		// Successful login
-		$this->assertFalse($this->auth->login("test@email.com", "TestPassword1")['error']);
+		$this->assertFalse($this->auth->login("test@email.com", 'T3H-1337-P@$$')['error']);
 
 		// Failed login: incorrect email
 		$this->assertTrue($this->auth->login("incorrect@email.com", "IncorrectPassword1")['error']);
@@ -135,22 +135,22 @@ class AuthTest extends PHPUnit_Framework_TestCase
 		$uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
 		// Successful changePassword
-		$this->assertFalse($this->auth->changePassword($uid, "TestPassword1", "TestPassword2", "TestPassword2")['error']);
+		$this->assertFalse($this->auth->changePassword($uid, 'T3H-1337-P@$$', 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
 		// Failed changePassword: invalid current password
-		$this->assertTrue($this->auth->changePassword($uid, "lamepass", "TestPassword2", "TestPassword2")['error']);
+		$this->assertTrue($this->auth->changePassword($uid, "invalid", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
 		// Failed changePassword: incorrect current password
-		$this->assertTrue($this->auth->changePassword($uid, "IncorrectPassword1", "TestPassword2", "TestPassword2")['error']);
+		$this->assertTrue($this->auth->changePassword($uid, "IncorrectPassword1", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
 		// Failed changePassword: invalid new password
-		$this->assertTrue($this->auth->changePassword($uid, "TestPassword2", "lamepass", "lamepass")['error']);
+		$this->assertTrue($this->auth->changePassword($uid, 'T3H-1337-P@$$2', "lamepass", "lamepass")['error']);
 
 		// Failed changePassword: new password and confirmation do not match
-		$this->assertTrue($this->auth->changePassword($uid, "TestPassword2", "TestPassword3", "TestPassword4")['error']);
+		$this->assertTrue($this->auth->changePassword($uid, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$4')['error']);
 
 		// Failed changePassword: incorrect UID
-		$this->assertTrue($this->auth->changePassword(9999999, "TestPassword2", "TestPassword3", "TestPassword3")['error']);
+		$this->assertTrue($this->auth->changePassword(9999999, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$3')['error']);
 	}
 
 	/**
@@ -162,16 +162,16 @@ class AuthTest extends PHPUnit_Framework_TestCase
 		$uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
 		// Successful changeEmail
-		$this->assertFalse($this->auth->changeEmail($uid, "test2@email.com", "TestPassword2")['error']);
+		$this->assertFalse($this->auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
 
 		// Failed changeEmail: invalid email
-		$this->assertTrue($this->auth->changeEmail($uid, "invalid.email", "TestPassword2")['error']);
+		$this->assertTrue($this->auth->changeEmail($uid, "invalid.email", 'T3H-1337-P@$$2')['error']);
 
 		// Failed changeEmail: new email is the same as current email
-		$this->assertTrue($this->auth->changeEmail($uid, "test2@email.com", "TestPassword2")['error']);
+		$this->assertTrue($this->auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
 
 		// Failed changeEmail: password is invalid
-		$this->assertTrue($this->auth->changeEmail($uid, "test3@email.com", "lamepass")['error']);
+		$this->assertTrue($this->auth->changeEmail($uid, "test3@email.com", "invalid")['error']);
 
 		// Failed changeEmail: password is incorrect
 		$this->assertTrue($this->auth->changeEmail($uid, "test3@email.com", "IncorrectPassword1")['error']);
@@ -219,7 +219,7 @@ class AuthTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($this->auth->deleteUser($uid, "IncorrectPassword1")['error']);
 
 		// Successful deleteUser
-		$this->assertFalse($this->auth->deleteUser($uid, "TestPassword2")['error']);
+		$this->assertFalse($this->auth->deleteUser($uid, 'T3H-1337-P@$$2')['error']);
 
 		// Failed deleteUser: incorrect UID
 		$this->assertTrue($this->auth->deleteUser(9999999, "IncorrectPassword1")['error']);
