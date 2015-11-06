@@ -36,8 +36,6 @@ Requirements
 ---------------
 * PHP 5.4
 * MySQL / MariaDB database
-* SMTP server / sendmail
-* PHP Mcrypt
 
 Composer Support
 ---------------
