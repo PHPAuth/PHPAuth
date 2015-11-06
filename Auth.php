@@ -751,10 +751,7 @@ class Auth
 
 		if($sendmail === true)
         {
-			// Check configuration for SMTP parameters
-	       
-	            require 'PHPMailer/PHPMailerAutoload.php';
-	
+			// Check configuration for SMTP parameters	
 	            $mail = new \PHPMailer;
 				if($this->config->smtp) {
 					$mail->isSMTP();
