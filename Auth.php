@@ -1,5 +1,8 @@
 <?php
+
 namespace PHPAuth;
+
+use ZxcvbnPhp\Zxcvbn;
 
 /***
 * Auth class
@@ -171,6 +174,13 @@ class Auth
             $return['message'] = $validatePassword['message'];
             return $return;
         }
+
+        $zxcvbn = new Zxcvbn();
+
+		if($zxcvbn->passwordStrength($password)['score'] < $this->config->password_min_score) {
+			$return['message'] = $this->lang['password_weak'];
+			return $return;
+		}
 
 		if ($this->isEmailTaken($email)) {
 			$this->addAttempt();
@@ -863,15 +873,7 @@ class Auth
 		if (strlen($password) < (int)$this->config->verify_password_min_length ) {
 			$return['message'] = $this->lang["password_short"];
 			return $return;
-		} elseif (strlen($password) > (int)$this->config->verify_password_max_length ) {
-			$return['message'] = $this->lang["password_long"];
-			return $return;
-		} elseif ( (int)$this->config->verify_password_strong_requirements ) {
-            if (!preg_match('@[A-Z]@', $password) || !preg_match('@[a-z]@', $password) || !preg_match('@[0-9]@', $password)) {
-                $return['message'] = $this->lang["password_invalid"];
-                return $return;
-            }
-        }
+		}
 
 		$return['error'] = false;
 		return $return;
@@ -1004,7 +1006,7 @@ class Auth
 	* @return array $return
 	*/
 
-	public function resendActivation($email, $sendmail)
+	public function resendActivation($email, $sendmail = NULL)
 	{
 		$return['error'] = true;
         $block_status = $this->isBlocked();
@@ -1101,6 +1103,13 @@ class Auth
 			return $return;
 		} elseif($newpass !== $repeatnewpass) {
 			$return['message'] = $this->lang["newpassword_nomatch"];
+			return $return;
+		}
+
+		$zxcvbn = new Zxcvbn();
+
+		if($zxcvbn->passwordStrength($newpass)['score'] < $this->config->password_min_score) {
+			$return['message'] = $this->lang['password_weak'];
 			return $return;
 		}
 

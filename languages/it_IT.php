@@ -10,8 +10,7 @@ $lang['email_password_incorrect'] = 'Email o password non corretti';
 $lang['remember_me_invalid'] = 'Il valore del campo &quot;ricorda&quot; &egrave; invalido';
 
 $lang['password_short'] = 'La password &egrave; troppo corta.';
-$lang['password_long'] = 'La password &egrave; troppo lunga.';
-$lang['password_invalid'] = 'La password deve contenere almeno un carattere maiuscolo, uno minuscolo e una cifra.';
+$lang['password_weak'] = "Password is too weak.";
 $lang['password_nomatch'] = 'Le password non coincidono.';
 $lang['password_changed'] = 'Password modificata con successo.';
 $lang['password_incorrect'] = 'La vecchia password non &egrave; corretta.';

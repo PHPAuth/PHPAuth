@@ -10,8 +10,7 @@ $lang['email_password_incorrect'] = "Email address / password are incorrect.";
 $lang['remember_me_invalid'] = "The remember me field is invalid.";
 
 $lang['password_short'] = "Password is too short.";
-$lang['password_long'] = "Password is too long.";
-$lang['password_invalid'] = "Password must contain at least one uppercase and lowercase character, and at least one digit.";
+$lang['password_weak'] = "Password is too weak.";
 $lang['password_nomatch'] = "Passwords do not match.";
 $lang['password_changed'] = "Password changed successfully.";
 $lang['password_incorrect'] = "Current password is incorrect.";

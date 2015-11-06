@@ -7,12 +7,10 @@ $lang['user_verify_failed'] = "Защитный код код недействи
 
 $lang['email_password_invalid'] = "Недопустимые E-Mail или пароль.";
 $lang['email_password_incorrect'] = "Пользователь с указанным E-Mail'ом не обнаружен в системе или пароль не подходит.";
-
 $lang['remember_me_invalid'] = 'Недопустимое значение поля "запомнить пользователя".';
 
 $lang['password_short'] = "Пароль слишком короткий.";
-$lang['password_long'] = "Пароль слишком длинный.";
-$lang['password_invalid'] = "Пароль должен содержать хотя бы одну цифру, хотя бы одну строчную букву и хотя бы одну прописную.";
+$lang['password_weak'] = "Password is too weak.";
 $lang['password_nomatch'] = "Пароли не совпадают.";
 $lang['password_changed'] = "Пароль успешно изменен.";
 $lang['password_incorrect'] = "Текущий пароль указан неверно.";

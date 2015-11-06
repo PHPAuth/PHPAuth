@@ -10,8 +10,7 @@ $lang['email_password_incorrect'] = "Je e-mail addres en/of passwoord is fout.";
 $lang['remember_me_invalid'] = "Het \"remember me\" veld is niet juist.";
 
 $lang['password_short'] = "Je gekozen paswoord is te kort.";
-$lang['password_long'] = "Je gekozen paswoord is te lang.";
-$lang['password_invalid'] = "Je paswoord moet ten minste één hoofdletter, één kleine letter en één cijfer bevatten.";
+$lang['password_weak'] = "Password is too weak.";
 $lang['password_nomatch'] = "De paswoorden zijn niet gelijk.";
 $lang['password_changed'] = "Je paswoord is met success aangepast.";
 $lang['password_incorrect'] = "Je huidig paswoord is fout.";
