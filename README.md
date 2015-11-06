@@ -35,7 +35,7 @@ User actions
 Requirements
 ---------------
 * PHP 5.4
-* MySQL / MariaDB database
+* MySQL / MariaDB database or PostGreSQL database
 
 Composer Support
 ---------------
