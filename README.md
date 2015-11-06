@@ -41,19 +41,9 @@ Requirements
 
 Composer Support
 ---------------
-PHPAuth currently isn't available on [Packagist](https://packagist.org/) however, you can add this repo and require it in your project's *composer.json*:
+PHPAuth can now be installed with the following command:
 
-```json
-"repositories": [
-  {
-    "type": "vcs",
-    "url": "https://github.com/PHPAuth/PHPAuth"
-  }
-],
-"require": {
-    "phpauth/phpauth": "[GitHub release version]"
-}
-```
+`composer require phpauth/phpauth`
 
 Configuration
 ---------------
