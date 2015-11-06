@@ -16,11 +16,10 @@ class Auth
 	* Initiates database connection
 	*/
 
-	public function __construct(\PDO $dbh, $config, $lang)
+	public function __construct(\PDO $dbh, $config, $language = "en_GB")
 	{
 		$this->dbh = $dbh;
 		$this->config = $config;
-		$this->lang = $lang;
 
         if (version_compare(phpversion(), '5.4.0', '<')) {
             die('PHP 5.4.0 required for PHPAuth engine!');
@@ -29,6 +28,10 @@ class Auth
 		if (version_compare(phpversion(), '5.5.0', '<')) {
 			require("files/password.php");
 		}
+
+		// Load language
+		require "languages/{$language}.php";
+		$this->lang = $lang;
 
 		date_default_timezone_set($this->config->site_timezone);
 	}
@@ -1004,13 +1007,18 @@ class Auth
 	* @return array $return
 	*/
 
-	public function resendActivation($email)
+	public function resendActivation($email, $sendmail)
 	{
 		$return['error'] = true;
         $block_status = $this->isBlocked();
         if ($block_status == "block") {
             $return['message'] = $this->lang["user_blocked"];
             return $return;
+        }
+
+        if($sendmail == NULL) {
+        	$return['message'] = $this->lang['function_disabled'];
+        	return $return;
         }
 
 		$validateEmail = $this->validateEmail($email);
@@ -1039,7 +1047,7 @@ class Auth
 			return $return;
 		}
 
-		$addRequest = $this->addRequest($row['id'], $email, "activation");
+		$addRequest = $this->addRequest($row['id'], $email, "activation", $sendmail);
 
 		if ($addRequest['error'] == 1) {
 			$this->addAttempt();

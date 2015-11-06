@@ -12,13 +12,11 @@ class AuthTest extends PHPUnit_Framework_TestCase
 	{
 		require_once __DIR__ . '/../Auth.php';
 		require_once __DIR__ . '/../Config.php';
-		require __DIR__ . '/../languages/en_GB.php';
 
-		// $dbh = new PDO(sqlite::memory:);
 		$this->dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
 
 		$this->config = new PHPAuth\Config($this->dbh);
-		$this->auth   = new PHPAuth\Auth($this->dbh, $this->config, $lang);
+		$this->auth   = new PHPAuth\Auth($this->dbh, $this->config);
 
 		// Clean up the database
 		$this->dbh->exec("DELETE FROM attempts;");
@@ -233,26 +231,14 @@ class AuthTest extends PHPUnit_Framework_TestCase
 
 		$baseLang = $lang;
 
-		include __DIR__ . '/../languages/fr_FR.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+		$languageFiles = glob(__DIR__ . '/../languages/*.php');
 
-		include __DIR__ . '/../languages/de_DE.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+		foreach($languageFiles as $languageFile) {
+			$languageFile = basename($languageFile);
 
-		include __DIR__ . '/../languages/it_IT.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
-
-		include __DIR__ . '/../languages/ru_RU.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
-
-		include __DIR__ . '/../languages/nl_BE.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
-		
-		include __DIR__ . '/../languages/fa_IR.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
-
-		include __DIR__ . '/../languages/pt_BR.php';
-		$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+			include __DIR__ . "/../languages/{$languageFile}";
+			$this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+		}
 	}
 }
 

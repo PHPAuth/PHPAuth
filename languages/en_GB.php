@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Hello,<br/><br/>To reset your password click the fo
 $lang['email_reset_altbody'] = 'Hello, ' . "\n\n" . 'To reset your password please visiting the following link :' . "\n" . '%1$s/%2$s' . "\n\n" . 'You then need to use the following password reset key: %3$s' . "\n\n" . 'If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
 
 $lang['account_deleted'] = "Account deleted successfully.";
-
-?>
+$lang['function_disabled'] = "This function has been disabled.";

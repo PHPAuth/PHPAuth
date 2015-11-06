@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Bonjour,<br/><br/>Pour reinitialiser votre mot de p
 $lang['email_reset_altbody'] = 'Bonjour,' . "\n\n" . 'Pour reinitialiser votre mot de passe cliquez sur le lien suivant :' . "\n" . '%1$s/%2$s' . "\n\n" . 'Vous devrez utiliser cette clé pour reinitialiser votre mot de passe depuis cette adresse :  %1$s' . "\n\n" . 'Si vous n\'avez pas demandé une réinitialisation du mot de passe, vous pouvez ignorer ce message.';
 
 $lang['account_deleted'] = "Compte supprimé.";
-
-?>
+$lang['function_disabled'] = "Cette fonction a &eacute;t&eacute; desactiv&eacute;.";

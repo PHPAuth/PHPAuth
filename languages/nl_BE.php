@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Hallo,<br/><br/>Om je paswoord te herstellen, klik 
 $lang['email_reset_altbody'] = 'Hallo, ' . "\n\n" . 'Om je paswoord te herstellen, klik deze link:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Vervolgens moet je deze herstelsleutel gebruiken: %3$s' . "\n\n" . 'Als je recent geen account op %1$s hebt proberen aanmaken, dan is dit bericht foutief verstuurd - gelieve het te negeren.';
 
 $lang['account_deleted'] = "Je account is met success verwijderd.";
-
-?>
+$lang['function_disabled'] = "Deze functie is uitgeschakeld.";

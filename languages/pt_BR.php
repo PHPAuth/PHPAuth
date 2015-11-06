@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Olá,<br/><br/>Para você resetar sua senha você p
 $lang['email_reset_altbody'] = 'Olá, ' . "\n\n" . 'Para você resetar sua senha você primeiro precisa entrar no seguinte link:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Logo depois você precisa utilizar a seguinte chave de reset: %3$s' . "\n\n" . 'Caso você não solicitou o reset de senha em %1$s recentemente ignore este email.';
 
 $lang['account_deleted'] = "Conta deletada com sucesso.";
-
-?>
+$lang['function_disabled'] = "Esta função foi desabilitada.";

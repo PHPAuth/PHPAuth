@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Hallo,<br/><br/>um dein Passwort zurückzusetzen, k
 $lang['email_reset_altbody'] = 'Hallo,' . "\n\n" . 'um dein Passwort zurückzusetzen, klicke bitte auf folgenden Link oder kopiere ihn manuell in die Adresszeile des Browsers:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Du benötigst folgenden Sicherheitsschlüssel: %3$s' . "\n\n" . 'Wenn dein Passwort auf %1$s gar nicht zurücksetzen willst, dann ignoriere diese E-Mail bitte einfach.';
 
 $lang['account_deleted'] = "Benutzerkonto wurde erfolgreich gelöscht.";
-
-?>
+$lang['function_disabled'] = "Diese Funktion wurde deaktiviert.";

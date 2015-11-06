@@ -70,5 +70,4 @@ $lang['email_reset_body'] = 'Ciao,<br/><br/>per eseguire il reset della password
 $lang['email_reset_altbody'] = 'Ciao, ' . "\n\n" . 'per eseguire il reset della password clicca su questo link :' . "\n" . '%1$s/%2$s' . "\n\n" . 'Inserisci poi il seguente codice di reset password: %3$s' . "\n\n" . 'Per favore ignora questo messaggio se non ha richiesto recentemente il reset della password su %1$s.';
 
 $lang['account_deleted'] = "Account eliminato con successo.";
-
-?>
+$lang['function_disabled'] = "Questa funzione è stata disabilitata.";

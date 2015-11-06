@@ -45,6 +45,8 @@ PHPAuth can now be installed with the following command:
 
 `composer require phpauth/phpauth`
 
+Then: `require 'vendor/autoload.php';`
+
 Configuration
 ---------------
 
@@ -130,14 +132,13 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 ```php
 <?php
 
-include("languages/en_GB.php");
 include("Config.php");
 include("Auth.php");
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
 $config = new PHPAuth\Config($dbh);
-$auth   = new PHPAuth\Auth($dbh, $config, $lang);
+$auth   = new PHPAuth\Auth($dbh, $config);
 
 if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
@@ -148,6 +149,26 @@ if (!$auth->isLogged()) {
 
 ?>
 ```
+
+Message languages
+---------------------
+
+The language for error and success messages returned by PHPAuth can be configured by passing in one of
+the available languages as the third parameter to the Auth constructor. If no language parameter is provided
+then the default `en_GB`language is used.
+
+Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
+
+Available languages:
+
+* `en_GB` (Default)
+* `de_DE`
+* `fa_IR`
+* `fr_FR`
+* `it_IT`
+* `nl_BE`
+* `pt_BR`
+* `ru_RU`
 
 Documentation
 ---------------
