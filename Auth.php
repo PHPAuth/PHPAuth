@@ -3,6 +3,7 @@
 namespace PHPAuth;
 
 use ZxcvbnPhp\Zxcvbn;
+use PHPMailer\PHPMailer\PHPMailer;
 
 /***
 * Auth class
@@ -762,7 +763,7 @@ class Auth
 		if($sendmail === true)
         {
 			// Check configuration for SMTP parameters	
-	            $mail = new \PHPMailer;
+        $mail = new PHPMailer;
 				if($this->config->smtp) {
 					$mail->isSMTP();
 					$mail->Host = $this->config->smtp_host;
