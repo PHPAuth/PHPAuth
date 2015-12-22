@@ -368,7 +368,7 @@ class Auth
 			$data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
 			$data['expiretime'] = strtotime($data['expire']);
 		} else {
-			$data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
+			$data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_forget));
 			$data['expiretime'] = 0;
 		}
 
