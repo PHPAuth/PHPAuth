@@ -1,4 +1,6 @@
-[![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://api.travis-ci.org/PHPAuth/PHPAuth)
+[![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://api.travis-ci.org/PHPAuth/PHPAuth) 
+[![ghit.me](https://ghit.me/badge.svg?repo=phpauth/phpauth)](https://ghit.me/repo/phpauth/phpauth)
+
 PHPAuth
 =======
 
