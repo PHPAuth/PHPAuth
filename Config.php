@@ -22,7 +22,7 @@ class Config
         $this->dbh = $dbh;
 
         if (func_num_args() > 1)
-            $this->phpauth_config_table = $config_table;
+            $this->config_table = $config_table;
 
         $this->config = array();
 
@@ -55,7 +55,7 @@ class Config
      */
     public function __set($setting, $value)
     {
-        $query = $this->dbh->prepare("UPDATE {$this->phpauth_config_table} SET value = ? WHERE setting = ?");
+        $query = $this->dbh->prepare("UPDATE {$this->config_table} SET value = ? WHERE setting = ?");
 
         if($query->execute(array($value, $setting))) {
             $this->config[$setting] = $value;
