@@ -749,7 +749,7 @@ class Auth
 		}
 
 		$key = $this->getRandomKey(20);
-		$expire = date("Y-m-d H:i:s", strtotime("+1 day"));
+		$expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
 
 		$query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, rkey, expire, type) VALUES (?, ?, ?, ?)");
 
