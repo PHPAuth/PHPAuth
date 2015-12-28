@@ -42,7 +42,7 @@ INSERT INTO config (setting, value) VALUES
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
 ('verify_password_min_length',  '3'),
-('request_key_expiration', '+10 minutes'),
+('request_key_expiration', '+10 minutes');
 
 DROP TABLE IF EXISTS attempts;
 CREATE TABLE attempts (
