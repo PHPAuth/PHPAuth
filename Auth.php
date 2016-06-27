@@ -39,13 +39,22 @@ class Auth
 
 		date_default_timezone_set($this->config->site_timezone);
 	}
+	
+	/***
+	* Returns current language
+	* @return array $lang
+	*/
+    
+    	public function returnLang() {
+        	return $this->lang;
+    	}	
 
 	/***
 	* Logs a user in
 	* @param string $email
 	* @param string $password
 	* @param int $remember
-    * @param string $captcha = NULL
+    	* @param string $captcha = NULL
 	* @return array $return
 	*/
 
