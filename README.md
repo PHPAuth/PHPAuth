@@ -163,13 +163,16 @@ Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
 Available languages:
 
 * `en_GB` (Default)
+* `da_DK`
 * `de_DE`
 * `fa_IR`
 * `fr_FR`
 * `it_IT`
 * `nl_BE`
+* `nl_NL`
 * `pt_BR`
 * `ru_RU`
+* `se_SE`
 
 Documentation
 ---------------
