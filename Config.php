@@ -6,9 +6,9 @@ namespace PHPAuth;
  */
 class Config
 {
-    private $dbh;
-    private $config;
-    private $config_table = 'config';
+    protected $dbh;
+    protected $config;
+    protected $config_table = 'config';
 
     /**
      *
@@ -37,7 +37,7 @@ class Config
 
     /**
      * Config::__get()
-     * 
+     *
      * @param mixed $setting
      * @return string
      */
@@ -48,7 +48,7 @@ class Config
 
     /**
      * Config::__set()
-     * 
+     *
      * @param mixed $setting
      * @param mixed $value
      * @return bool
@@ -60,13 +60,13 @@ class Config
         if($query->execute(array($value, $setting))) {
             $this->config[$setting] = $value;
             return true;
-        } 
+        }
         return false;
     }
 
     /**
      * Config::override()
-     * 
+     *
      * @param mixed $setting
      * @param mixed $value
      * @return bool
@@ -84,7 +84,7 @@ class Config
      * Set default values.
      * REQUIRED FOR USERS THAT DOES NOT UPDATE THEIR `config` TABLES.
      */
-    private function setForgottenDefaults()
+    protected function setForgottenDefaults()
     {
         // verify* values.
 

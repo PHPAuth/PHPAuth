@@ -10,7 +10,7 @@ $lang['email_password_incorrect'] = "E-Mail-Adresse / Passwort nicht korrekt.";
 $lang['remember_me_invalid'] = "Das Angemeldet bleiben-Feld ist ungültig.";
 
 $lang['password_short'] = "Passwort ist zu kurz.";
-$lang['password_weak'] = "Password is too weak.";
+$lang['password_weak'] = "Passwort ist zu einfach.";
 $lang['password_nomatch'] = "Passwörter stimmen nicht überein";
 $lang['password_changed'] = "Passwort wurde erfolgreich geändert.";
 $lang['password_incorrect'] = "Aktuelles Passwort ist nicht korrekt.";
