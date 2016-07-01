@@ -12,7 +12,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Auth
 {
-	private $dbh;
+	protected $dbh;
 	public $config;
 	public $lang;
 
@@ -196,7 +196,7 @@ class Auth
 			$return['message'] = $addUser['message'];
 			return $return;
 		}
-	
+
 		$return['error'] = false;
 		$return['message'] = ($sendmail == true ? $this->lang["register_success"] : $this->lang['register_success_emailmessage_suppressed'] );
 
@@ -351,7 +351,7 @@ class Auth
 	* @return array $data
 	*/
 
-	private function addSession($uid, $remember)
+	protected function addSession($uid, $remember)
 	{
 		$ip = $this->getIp();
 		$user = $this->getBaseUser($uid);
@@ -391,7 +391,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function deleteExistingSessions($uid)
+	protected function deleteExistingSessions($uid)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
 		$query->execute(array($uid));
@@ -405,7 +405,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function deleteSession($hash)
+	protected function deleteSession($hash)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = ?");
 		$query->execute(array($hash));
@@ -510,7 +510,7 @@ class Auth
 	* @return int $uid
 	*/
 
-	private function addUser($email, $password, $params = array(), &$sendmail)
+	protected function addUser($email, $password, $params = array(), &$sendmail)
 	{
 		$return['error'] = true;
 
@@ -539,16 +539,16 @@ class Auth
 		} else {
 			$isactive = 1;
 		}
-		
+
 		$password = $this->getHash($password);
-		
+
 		if (is_array($params)&& count($params) > 0) {
 			$customParamsQueryArray = Array();
-	
+
 			foreach($params as $paramKey => $paramValue) {
 				$customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
 			}
-	
+
 			$setParams = ', ' . implode(', ', array_map(function ($entry) {
 				return $entry['value'];
 			}, $customParamsQueryArray));
@@ -576,7 +576,7 @@ class Auth
 	* @return array $data
 	*/
 
-	private function getBaseUser($uid)
+	protected function getBaseUser($uid)
 	{
 		$query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
 		$query->execute(array($uid));
@@ -594,7 +594,7 @@ class Auth
 		$data['uid'] = $uid;
 		return $data;
 	}
-	
+
 	/**
 	* Gets public user data for a given UID and returns an array, password is not returned
 	* @param int $uid
@@ -619,7 +619,7 @@ class Auth
 		$data['uid'] = $uid;
 		unset($data['password']);
 		return $data;
-	}	
+	}
 
 	/**
 	* Allows a user to delete their account
@@ -701,31 +701,31 @@ class Auth
 	* @return boolean
 	*/
 
-	private function addRequest($uid, $email, $type, &$sendmail)
+	protected function addRequest($uid, $email, $type, &$sendmail)
 	{
 		$return['error'] = true;
 
 		if($type != "activation" && $type != "reset") {
 			$return['message'] = $this->lang["system_error"] . " #08";
 			return $return;
-		}        
-	
+		}
+
         // if not set manually, check config data
         if($sendmail === NULL)
 		{
-			$sendmail = true;			
+			$sendmail = true;
 			if($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
 				$sendmail = false;
 				$return['error'] = false;
 				return $return;
-			} 
+			}
 			if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
 				$sendmail = false;
 				$return['error'] = false;
 				return $return;
 			}
-		}			
-	
+		}
+
 		$query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = ? AND type = ?");
 		$query->execute(array($uid, $type));
 
@@ -762,7 +762,7 @@ class Auth
 
 		if($sendmail === true)
         {
-			// Check configuration for SMTP parameters	
+			// Check configuration for SMTP parameters
         $mail = new PHPMailer;
 				if($this->config->smtp) {
 					$mail->isSMTP();
@@ -773,19 +773,19 @@ class Auth
 	            			$mail->Password = $this->config->smtp_password;
 	            		}
 					$mail->Port = $this->config->smtp_port;
-	
+
 					if(!is_null($this->config->smtp_security)) {
 						$mail->SMTPSecure = $this->config->smtp_security;
 				}
 			}
-	
+
 			$mail->From = $this->config->site_email;
 			$mail->FromName = $this->config->site_name;
 			$mail->addAddress($email);
 			$mail->isHTML(true);
-	
+
 			if($type == "activation") {
-	
+
 					$mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
 					$mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
 					$mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
@@ -795,10 +795,10 @@ class Auth
 				$mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 				$mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
 			}
-	
+
 			if(!$mail->send()) {
 				$this->deleteRequest($request_id);
-	
+
 				$return['message'] = $this->lang["system_error"] . " #10";
 				return $return;
 			}
@@ -856,7 +856,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function deleteRequest($id)
+	protected function deleteRequest($id)
 	{
 		$query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE id = ?");
 		return $query->execute(array($id));
@@ -868,7 +868,7 @@ class Auth
 	* @return array $return
 	*/
 
-	private function validatePassword($password) {
+	protected function validatePassword($password) {
 		$return['error'] = true;
 
 		if (strlen($password) < (int)$this->config->verify_password_min_length ) {
@@ -886,7 +886,7 @@ class Auth
 	* @return array $return
 	*/
 
-	private function validateEmail($email) {
+	protected function validateEmail($email) {
 		$return['error'] = true;
 
 		if (strlen($email) < (int)$this->config->verify_email_min_length ) {
@@ -1249,7 +1249,7 @@ class Auth
      * @param string $captcha
      * @return boolean
      */
-    private function checkCaptcha($captcha)
+    protected function checkCaptcha($captcha)
     {
         return true;
     }
@@ -1259,7 +1259,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function addAttempt()
+	protected function addAttempt()
 	{
 		$ip = $this->getIp();
 
@@ -1277,7 +1277,7 @@ class Auth
 	* @return boolean
 	*/
 
-	private function deleteAttempts($ip, $all = false)
+	protected function deleteAttempts($ip, $all = false)
 	{
         if($all==true)
         {
@@ -1322,7 +1322,7 @@ class Auth
 	* @return string $ip
 	*/
 
-	private function getIp()
+	protected function getIp()
 	{
 		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
 		   return $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -1330,7 +1330,7 @@ class Auth
 		   return $_SERVER['REMOTE_ADDR'];
 		}
 	}
-	
+
 	/**
 	* Returns is user logged in
 	* @return boolean
