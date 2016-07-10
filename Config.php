@@ -21,8 +21,9 @@ class Config
     {
         $this->dbh = $dbh;
 
-        if (func_num_args() > 1)
+        if (func_num_args() > 1) {
             $this->config_table = $config_table;
+        }
 
         $this->config = array();
 
@@ -57,10 +58,12 @@ class Config
     {
         $query = $this->dbh->prepare("UPDATE {$this->config_table} SET value = ? WHERE setting = ?");
 
-        if($query->execute(array($value, $setting))) {
+        if ($query->execute(array($value, $setting))) {
             $this->config[$setting] = $value;
+
             return true;
         }
+
         return false;
     }
 
@@ -71,11 +74,11 @@ class Config
      * @param mixed $value
      * @return bool
      */
-    public function override($setting, $value){
-
+    public function override($setting, $value)
+    {
         $this->config[$setting] = $value;
-        return true;
 
+        return true;
     }
 
     /**
@@ -88,33 +91,39 @@ class Config
     {
         // verify* values.
 
-        if (! isset($this->config['verify_password_min_length']) )
+        if (!isset($this->config['verify_password_min_length'])) {
             $this->config['verify_password_min_length'] = 3;
+        }
 
-        if (! isset($this->config['verify_password_max_length']) )
+        if (!isset($this->config['verify_password_max_length'])) {
             $this->config['verify_password_max_length'] = 150;
+        }
 
-        if (! isset($this->config['verify_password_strong_requirements']) )
+        if (!isset($this->config['verify_password_strong_requirements'])) {
             $this->config['verify_password_strong_requirements'] = 1;
+        }
 
-        if (! isset($this->config['verify_email_min_length']) )
+        if (!isset($this->config['verify_email_min_length'])) {
             $this->config['verify_email_min_length'] = 5;
+        }
 
-        if (! isset($this->config['verify_email_max_length']) )
+        if (!isset($this->config['verify_email_max_length'])) {
             $this->config['verify_email_max_length'] = 100;
+        }
 
-        if (! isset($this->config['verify_email_use_banlist']) )
+        if (!isset($this->config['verify_email_use_banlist'])) {
             $this->config['verify_email_use_banlist'] = 1;
+        }
 
         // emailmessage* values
 
-        if (! isset($this->config['emailmessage_suppress_activation']) )
+        if (!isset($this->config['emailmessage_suppress_activation'])) {
             $this->config['emailmessage_suppress_activation'] = 0;
+        }
 
-        if (! isset($this->config['emailmessage_suppress_reset']) )
+        if (!isset($this->config['emailmessage_suppress_reset'])) {
             $this->config['emailmessage_suppress_reset'] = 0;
-
+        }
     }
-
 
 }
