@@ -1,5 +1,4 @@
 <?php
-
 $lang = array();
 
 $lang['user_blocked'] = 'Il tuo account &egrave; stato bloccato.';

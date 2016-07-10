@@ -1,5 +1,4 @@
 <?php
-
 $lang = array();
 
 $lang['user_blocked'] = "Je bent momenteel uitgesloten van het systeem.";

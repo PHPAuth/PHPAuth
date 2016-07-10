@@ -1,5 +1,4 @@
 <?php
-
 $lang = array();
 
 $lang['user_blocked'] = "Dein Benutzer ist im System aktuell gesperrt.";
