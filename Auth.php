@@ -128,7 +128,7 @@ class Auth
         return $return;
     }
 
-    /***
+    /**
     * Creates a new user, adds them to database
     * @param string $email
     * @param string $password
@@ -211,7 +211,7 @@ class Auth
         return $return;
     }
 
-    /***
+    /**
     * Activates a user's account
     * @param string $key
     * @return array $return
@@ -262,7 +262,7 @@ class Auth
         return $return;
     }
 
-    /***
+    /**
     * Creates a reset key for an email address and sends email
     * @param string $email
     * @return array $return
@@ -313,7 +313,7 @@ class Auth
         return $return;
     }
 
-    /***
+    /**
     * Logs out the session, identified by hash
     * @param string $hash
     * @return boolean
@@ -328,7 +328,7 @@ class Auth
         return $this->deleteSession($hash);
     }
 
-    /***
+    /**
     * Hashes provided password with Bcrypt
     * @param string $password
     * @param string $password
@@ -340,7 +340,7 @@ class Auth
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
     }
 
-    /***
+    /**
     * Gets UID for a given email address and returns an array
     * @param string $email
     * @return array $uid
@@ -359,7 +359,7 @@ class Auth
         return $query->fetch(\PDO::FETCH_ASSOC)['id'];
     }
 
-    /***
+    /**
     * Creates a session for a specified user id
     * @param int $uid
     * @param boolean $remember
@@ -401,7 +401,7 @@ class Auth
         return $data;
     }
 
-    /***
+    /**
     * Removes all existing sessions for a given UID
     * @param int $uid
     * @return boolean
@@ -415,7 +415,7 @@ class Auth
         return $query->rowCount() == 1;
     }
 
-    /***
+    /**
     * Removes a session based on hash
     * @param string $hash
     * @return boolean
