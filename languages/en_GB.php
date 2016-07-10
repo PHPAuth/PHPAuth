@@ -1,5 +1,4 @@
 <?php
-
 $lang = array();
 
 $lang['user_blocked'] = "You are currently locked out of the system.";

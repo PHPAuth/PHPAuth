@@ -1,5 +1,4 @@
-﻿<?php
-
+<?php
 $lang = array();
 
 $lang['user_blocked'] = "شما از طرف سیستم بلاک شدید";
