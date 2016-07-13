@@ -5,8 +5,6 @@ SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
-USE phpauth;
-
 DROP TABLE IF EXISTS `attempts`;
 CREATE TABLE `attempts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
