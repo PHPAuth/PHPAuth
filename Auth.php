@@ -791,7 +791,7 @@ class Auth
         if ($sendmail === true) {
             // Check configuration for SMTP parameters
             $mail = new PHPMailer;
-			$mail->CharSet = $this->$config->mail_charset;
+			$mail->CharSet = $this->config->mail_charset;
             if ($this->config->smtp) {
                 $mail->isSMTP();
                 $mail->Host = $this->config->smtp_host;
