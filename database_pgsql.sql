@@ -19,6 +19,7 @@ INSERT INTO config (setting, value) VALUES
 ('cookie_secure', '0'),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
+('mail_charset','UTF-8'),
 ('password_min_score',  '3'),
 ('site_activation_page',  'activate'),
 ('site_email',  'no-reply@phpauth.cuonic.com'),
