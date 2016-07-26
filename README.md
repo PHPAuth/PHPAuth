@@ -167,13 +167,15 @@ Available languages:
 * `de_DE`
 * `fa_IR`
 * `fr_FR`
+* `gr_GR`
 * `it_IT`
 * `nl_BE`
 * `nl_NL`
+* `no_NB`
 * `pt_BR`
 * `ru_RU`
 * `se_SE`
-
+* `vi_VN`
 Documentation
 ---------------
 
