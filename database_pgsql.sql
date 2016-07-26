@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS config;
 CREATE TABLE config (
   setting character varying(100) NOT NULL,
   value character varying(100) DEFAULT NULL,
-  UNIQUE KEY setting (setting)
+  UNIQUE (setting)
 );
 
 INSERT INTO config (setting, value) VALUES
