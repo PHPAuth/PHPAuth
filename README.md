@@ -1,5 +1,6 @@
 [![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://api.travis-ci.org/PHPAuth/PHPAuth) 
 [![ghit.me](https://ghit.me/badge.svg?repo=phpauth/phpauth)](https://ghit.me/repo/phpauth/phpauth)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%205.4-8892BF.svg?style=flat-circle)](https://php.net/)
 
 PHPAuth
 =======
