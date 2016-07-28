@@ -124,6 +124,8 @@ class Auth
 
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expiretime'];
+		
+		$return['cookie_name'] = $this->config->cookie_name;
 
         return $return;
     }
@@ -290,7 +292,7 @@ class Auth
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
         $query->execute(array($email));
 
-        if ($query->rowCount() == 0) {
+		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
             $this->addAttempt();
 
             $return['message'] = $this->lang["email_incorrect"];
@@ -352,11 +354,11 @@ class Auth
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
         $query->execute(array($email));
 
-        if ($query->rowCount() == 0) {
+        if(!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
             return false;
         }
 
-        return $query->fetch(\PDO::FETCH_ASSOC)['id'];
+        return $row['id'];
     }
 
     /**
@@ -452,11 +454,10 @@ class Auth
         $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = ?");
         $query->execute(array($hash));
 
-        if ($query->rowCount() == 0) {
-            return false;
-        }
+		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+			return false;
+		}
 
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
         $sid = $row['id'];
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
@@ -492,12 +493,12 @@ class Auth
     {
         $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
         $query->execute(array($hash));
+		
+		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+			return false;
+		}
 
-        if ($query->rowCount() == 0) {
-            return false;
-        }
-
-        return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
+		return $row['uid'];
     }
 
     /**
@@ -597,10 +598,6 @@ class Auth
         $query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
         $query->execute(array($uid));
 
-        if ($query->rowCount() == 0) {
-            return false;
-        }
-
         $data = $query->fetch(\PDO::FETCH_ASSOC);
 
         if (!$data) {
@@ -622,10 +619,6 @@ class Auth
     {
         $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = ?");
         $query->execute(array($uid));
-
-        if ($query->rowCount() == 0) {
-            return false;
-        }
 
         $data = $query->fetch(\PDO::FETCH_ASSOC);
 
@@ -754,8 +747,7 @@ class Auth
         $query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = ? AND type = ?");
         $query->execute(array($uid, $type));
 
-        if ($query->rowCount() > 0) {
-            $row = $query->fetch(\PDO::FETCH_ASSOC);
+        if ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
 
             $expiredate = strtotime($row['expire']);
             $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -850,7 +842,7 @@ class Auth
         $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE rkey = ? AND type = ?");
         $query->execute(array($key, $type));
 
-        if ($query->rowCount() === 0) {
+        if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
             $this->addAttempt();
             $return['message'] = $this->lang[$type."key_incorrect"];
 
@@ -1073,14 +1065,12 @@ class Auth
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
         $query->execute(array($email));
 
-        if ($query->rowCount() == 0) {
+		if(!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
             $this->addAttempt();
             $return['message'] = $this->lang["email_incorrect"];
 
             return $return;
         }
-
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
 
         if ($this->getBaseUser($row['id'])['isactive'] == 1) {
             $this->addAttempt();
@@ -1401,10 +1391,6 @@ class Auth
     {
         $query = $this->dbh->prepare("SELECT password FROM {$this->config->table_users} WHERE id = ?");
         $query->execute(array($userid));
-
-        if ($query->rowCount() == 0) {
-            return false;
-        }
 
         $data = $query->fetch(\PDO::FETCH_ASSOC);
 
