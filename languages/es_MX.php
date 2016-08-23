@@ -63,7 +63,7 @@ $lang['email_activation_subject'] = '%s - Activar cuenta';
 $lang['email_activation_body'] = 'Hola,<br/><br/>Para inciar sesión en tu cuenta de usuario primero tienes que activar tu cuenta dando click en el siguiente enlace: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> Después, necesitas usar la siguiente clave de activación: <strong>%3$s</strong><br/><br/> Si no te registraste en %1$s recientemente entonces este mensaje fue enviado por error, por favor ignóralo.';
 $lang['email_activation_altbody'] = 'Hola, ' . "\n\n" . 'Para inciar sesión en tu cuenta de usuario primero tienes que activar tu cuenta dando click en el siguiente enlace :' . "\n" . '%1$s/%2$s' . "\n\n" . 'Después, necesitas usar la siguiente clave de activación: %3$s' . "\n\n" . 'Si no te registraste en %1$s recientemente entonces este mensaje fue enviado por error, por favor ignóralo';
 
-$lang['email_reset_subject'] = '%s - Petición para reinicia contraseña';
+$lang['email_reset_subject'] = '%s - Petición para reiniciar contraseña';
 $lang['email_reset_body'] = 'Hola,<br/><br/>Para reiniciar tu contraseña por favor da click en el siguiente enlace:<br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Después, necesitas usar la siguiente clave de reinicio: <strong>%3$s</strong><br/><br/>Si no solicitaste reiniciar tu contraseña en %1$s por favor ignora este mensaje.';
 $lang['email_reset_altbody'] = 'Hola, ' . "\n\n" . 'Para reiniciar tu contraseña por favor da click en el siguiente enlace:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Después, necesitas usar la siguiente clave de reinicio: %3$s' . "\n\n" . 'Si no solicitaste reiniciar tu contraseña en %1$s por favor ignora este mensaje.';
 
