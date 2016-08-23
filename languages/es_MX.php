@@ -1,7 +1,7 @@
 <?php
 $lang = array();
 
-$lang['user_blocked'] = "No has iniciado sesión en el sestema.";
+$lang['user_blocked'] = "No has iniciado sesión en el sistema.";
 $lang['user_verify_failed'] = "El código Captcha fue inválido.";
 
 $lang['email_password_invalid'] = "El correo electrónico / La contraseña son inválidos.";
