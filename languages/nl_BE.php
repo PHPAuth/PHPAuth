@@ -4,8 +4,8 @@ $lang = array();
 $lang['user_blocked'] = "Je bent momenteel uitgesloten van het systeem.";
 $lang['user_verify_failed'] = "De Captcha Code is niet juist.";
 
-$lang['email_password_invalid'] = "Je e-mail addres en/of passwoord zijn niet juist.";
-$lang['email_password_incorrect'] = "Je e-mail addres en/of passwoord is fout.";
+$lang['email_password_invalid'] = "Je e-mail adres en/of paswoord zijn niet juist.";
+$lang['email_password_incorrect'] = "Je e-mail adres en/of paswoord is fout.";
 $lang['remember_me_invalid'] = "Het \"remember me\" veld is niet juist.";
 
 $lang['password_short'] = "Je gekozen paswoord is te kort.";
