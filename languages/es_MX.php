@@ -68,4 +68,4 @@ $lang['email_reset_body'] = 'Hola,<br/><br/>Para reiniciar tu contraseña por fa
 $lang['email_reset_altbody'] = 'Hola, ' . "\n\n" . 'Para reiniciar tu contraseña por favor da click en el siguiente enlace:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Después, necesitas usar la siguiente clave de reinicio: %3$s' . "\n\n" . 'Si no solicitaste reiniciar tu contraseña en %1$s por favor ignora este mensaje.';
 
 $lang['account_deleted'] = "La cuenta se ha borrado con éxito.";
-$lang['function_desabled'] = "Esta función ha sido desactivada.";
+$lang['function_disabled'] = "Esta función ha sido desactivada.";
