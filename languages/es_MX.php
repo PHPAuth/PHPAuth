@@ -38,8 +38,8 @@ $lang['logged_out'] = "Tu sesión ha terminado.";
 
 $lang['system_error'] = "Ha ocurrido un error en el sistema. Por favor trate de nuevo.";
 
-$lang['regester_success'] = "La cuenta se ha creado y el correo electrónico de activación ha sido enviado.";
-$lang['regester_success_emailmessage_suppressed'] = "La cuenta se ha creado.";
+$lang['register_success'] = "La cuenta se ha creado y el correo electrónico de activación ha sido enviado.";
+$lang['register_success_emailmessage_suppressed'] = "La cuenta se ha creado.";
 $lang['email_taken'] = "El correo electrónico está actualmente en uso.";
 
 $lang['resetkey_invalid'] = "La clave de reinicio es inválida.";
@@ -53,11 +53,11 @@ $lang['activationkey_expired'] = "La clave de activación ha expirado.";
 
 $lang['reset_requested'] = "La petición para reiniciar la contraseña ha sido enviado al correo electrónico.";
 $lang['reset_requested_emailmessage_suppressed'] = "La petición para reiniciar la contraseña ha sido creada.";
-$lang['reset_exests'] = "Ya existe una petición para reiniciar la contraseña.";
+$lang['reset_exists'] = "Ya existe una petición para reiniciar la contraseña.";
 
 $lang['already_activated'] = "La cuenta ya ha sido activada.";
 $lang['activation_sent'] = "El correo electrónico de activación ha sido enviado.";
-$lang['activation_exests'] = "El correo electrónico de activación ya ha sido enviado.";
+$lang['activation_exists'] = "El correo electrónico de activación ya ha sido enviado.";
 
 $lang['email_activation_subject'] = '%s - Activar cuenta';
 $lang['email_activation_body'] = 'Hola,<br/><br/>Para inciar sesión en tu cuenta de usuario primero tienes que activar tu cuenta dando click en el siguiente enlace: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> Después, necesitas usar la siguiente clave de activación: <strong>%3$s</strong><br/><br/> Si no te registraste en %1$s recientemente entonces este mensaje fue enviado por error, por favor ignóralo.';
