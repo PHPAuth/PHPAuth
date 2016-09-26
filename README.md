@@ -11,6 +11,10 @@ What is it
 
 PHPAuth is a secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.
 
+PHPAuth is work in progress, and not meant for people that doesn't know how to program, its meant for people that know what they are doing.. We cannot help everyone because they dont understand this class.. 
+
+IT'S NOT FOR BEGINNERS!
+
 Features
 ---------------
 * Authentication by email and password combination
