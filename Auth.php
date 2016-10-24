@@ -300,7 +300,7 @@ class Auth
             return $return;
         }
 
-        $addRequest = $this->addRequest($query->fetch(\PDO::FETCH_ASSOC)['id'], $email, "reset", $sendmail);
+        $addRequest = $this->addRequest($row['id'], $email, "reset", $sendmail);
 
         if ($addRequest['error'] == 1) {
             $this->addAttempt();
