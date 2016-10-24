@@ -849,8 +849,6 @@ class Auth
             return $return;
         }
 
-        $row = $query->fetch();
-
         $expiredate = strtotime($row['expire']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
 
