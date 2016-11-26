@@ -28,10 +28,7 @@ class Config
         $this->config = array();
 
         $query = $this->dbh->query("SELECT * FROM {$this->config_table}");
-
-        while($row = $query->fetch()) {
-            $this->config[$row['setting']] = $row['value'];
-        }
+        $this->config = $query->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         $this->setForgottenDefaults(); // Danger foreseen is half avoided.
     }
@@ -45,6 +42,14 @@ class Config
     public function __get($setting)
     {
         return $this->config[$setting];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll()
+    {
+        return $this->config;
     }
 
     /**
