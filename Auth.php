@@ -531,14 +531,14 @@ class Auth
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_users} VALUES ()");
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_users} (isactive) VALUES (0)");
 
         if (!$query->execute()) {
             $return['message'] = $this->lang["system_error"] . " #03";
             return $return;
         }
 
-        $uid = $this->dbh->lastInsertId();
+        $uid = $this->dbh->lastInsertId("{$this->config->table_users}_id_seq");
         $email = htmlentities(strtolower($email));
 
         if ($sendmail) {
