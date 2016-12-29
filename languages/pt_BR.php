@@ -51,8 +51,8 @@ $lang['activationkey_invalid'] = "A chave de ativação é inválida.";
 $lang['activationkey_incorrect'] = "A chave de ativação está incorreta.";
 $lang['activationkey_expired'] = "A chave de ativação está expirada.";
 
-$lang['reset_requested'] = "A requisição de redefinição da senha foi enviado.";
-$lang['reset_requested_emailmessage_suppressed'] = "Requisição de redefinição da senha foi criado.";
+$lang['reset_requested'] = "A requisição de redefinição da senha foi enviada.";
+$lang['reset_requested_emailmessage_suppressed'] = "Requisição de redefinição da senha foi criada.";
 $lang['reset_exists'] = "Essa requisição já existe.";
 
 $lang['already_activated'] = "Essa conta já está ativada.";
