@@ -3,7 +3,7 @@
 namespace PHPAuth;
 
 use ZxcvbnPhp\Zxcvbn;
-use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer;
 
 /**
  * Auth class
