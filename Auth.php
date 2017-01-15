@@ -378,7 +378,7 @@ class Auth
         }
 
         $data['hash'] = sha1($this->config->site_key . microtime());
-        $agent = $_SERVER['HTTP_USER_AGENT'];
+        $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
         $this->deleteExistingSessions($uid);
 
