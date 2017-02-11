@@ -33,19 +33,19 @@ $lang['newemail_match'] = "Alamat Email baru persis dengan email sebelumnya.";
 $lang['account_inactive'] = "Akun belum di aktifkan.";
 $lang['account_activated'] = "Akun sudah di aktifkan..";
 
-$lang['logged_in'] = "You are now logged in.";
-$lang['logged_out'] = "You are now logged out.";
+$lang['logged_in'] = "Anda sekarang telah login.";
+$lang['logged_out'] = "Anda sekarang telah logout";
 
-$lang['system_error'] = "A system error has been encountered. Please try again.";
+$lang['system_error'] = "Kesalahan pada sistem. silahkan coba kembali.";
 
-$lang['register_success'] = "Account created. Activation email sent to email.";
-$lang['register_success_emailmessage_suppressed'] = "Account created.";
-$lang['email_taken'] = "The email address is already in use.";
+$lang['register_success'] = "Akun telah dibuat email aktivasi telah dikirim kepada alamat email.";
+$lang['register_success_emailmessage_suppressed'] = "Akun dibuat.";
+$lang['email_taken'] = "Alamat Email ini telah digunakan";
 
-$lang['resetkey_invalid'] = "Reset key is invalid.";
-$lang['resetkey_incorrect'] = "Reset key is incorrect.";
-$lang['resetkey_expired'] = "Reset key has expired.";
-$lang['password_reset'] = "Password reset successfully.";
+$lang['resetkey_invalid'] = "Kunci reset tidak tepat.";
+$lang['resetkey_incorrect'] = "Kunci Reset tidak benar.";
+$lang['resetkey_expired'] = "Kunci Reset telah habis masa waktu.";
+$lang['password_reset'] = "Password sukses di reset.";
 
 $lang['activationkey_invalid'] = "Kunci Aktivasi tidak tepat.";
 $lang['activationkey_incorrect'] = "Kunci Aktivasi tidak benar.";
@@ -61,13 +61,11 @@ $lang['activation_exists'] = "Sebuah aktivasi email sudah dikirim.";
 
 $lang['email_activation_subject'] = '%s - Aktivasi akun';
 $lang['email_activation_body'] = 'Halo,<br/><br/> Agar bisa login dengan akun Anda, pastikan melakukan aktivasi dengan klik link berikut ini
-: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> 
-Anda harus menggunakan kunci aktivasi : <strong>%3$s</strong><br/><br/> Jika kamu tidak pernah melakukan pendaftaran di %1$s berarti email ini kesalahan pengiriman abaikan saja';
+: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> Anda harus menggunakan kunci aktivasi : <strong>%3$s</strong><br/><br/> Jika kamu tidak pernah melakukan pendaftaran di %1$s berarti email ini kesalahan pengiriman abaikan saja';
 $lang['email_activation_altbody'] = 'Halo, ' . "\n\n" . 'Agar bisa login dengan akun Anda, pastikan melakukan aktivasi dengan klik link berikut ini :' . "\n" . '%1$s/%2$s' . "\n\n" . 'Anda harus menggunakan kunci aktivasi: %3$s' . "\n\n" . 'Jika kamu tidak pernah melakukan pendaftaran di %1$s berarti email ini kesalahan pengiriman abaikan saja';
 
 $lang['email_reset_subject'] = '%s - Permintaan reset password';
-$lang['email_reset_body'] = 'Hello,<br/><br/>
-Untuk melakukan reset password silahkan klik link ini: <br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Anda harus menggunakan kunci aktivasi: <strong>%3$s</strong><br/><br/>
+$lang['email_reset_body'] = 'Hello,<br/><br/> Untuk melakukan reset password silahkan klik link ini: <br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Anda harus menggunakan kunci aktivasi: <strong>%3$s</strong><br/><br/>
 Jika Anda tidak melakukan permintaan reset password pada on %1$s berarti email ini kesalahan pengiriman abaikan saja.';
 $lang['email_reset_altbody'] = 'Hello, ' . "\n\n" . 'Untuk melakukan reset password silahkan klik link ini :' . "\n" . '%1$s/%2$s' . "\n\n" . 'Anda harus menggunakan kunci aktivasi: %3$s' . "\n\n" . 'Jika Anda tidak melakukan permintaan reset password pada on %1$s berarti email ini kesalahan pengiriman abaikan saja..';
 
