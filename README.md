@@ -181,6 +181,7 @@ Available languages:
 * `pt_BR`
 * `ru_RU`
 * `se_SE`
+* `th_TH`
 * `vi_VN`
 
 Documentation
