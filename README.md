@@ -109,7 +109,7 @@ For example, if you are using Google's ReCaptcha NoCaptcha, use the following co
         $url = 'https://www.google.com/recaptcha/api/siteverify';
         $data = ['secret'   => 'your_secret_here',
             'response' => $captcha,
-            'remoteip' => $_SERVER['REMOTE_ADDR']];
+            'remoteip' => $this->getIp()];
 
         $options = [
             'http' => [
