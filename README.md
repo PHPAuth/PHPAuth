@@ -109,7 +109,7 @@ For example, if you are using Google's ReCaptcha NoCaptcha, use the following co
         $url = 'https://www.google.com/recaptcha/api/siteverify';
         $data = ['secret'   => 'your_secret_here',
             'response' => $captcha,
-            'remoteip' => $_SERVER['REMOTE_ADDR']];
+            'remoteip' => $this->getIp()];
 
         $options = [
             'http' => [
@@ -169,18 +169,23 @@ Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
 Available languages:
 
 * `en_GB` (Default)
+* `cs_CZ`
 * `da_DK`
 * `de_DE`
+* `es_MX`
 * `fa_IR`
 * `fr_FR`
 * `gr_GR`
+* `id_ID`
 * `it_IT`
 * `nl_BE`
 * `nl_NL`
 * `no_NB`
+* `ps_AF`
 * `pt_BR`
 * `ru_RU`
 * `se_SE`
+* `th_TH`
 * `vi_VN`
 
 Documentation
