@@ -168,10 +168,11 @@ Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
 
 Available languages:
 
-* `en_GB` (Default)
+* `ar-TN`
 * `cs_CZ`
 * `da_DK`
 * `de_DE`
+* `en_GB` (Default)
 * `es_MX`
 * `fa_IR`
 * `fr_FR`
@@ -181,11 +182,14 @@ Available languages:
 * `nl_BE`
 * `nl_NL`
 * `no_NB`
+* `pl_PL`
 * `ps_AF`
 * `pt_BR`
 * `ru_RU`
 * `se_SE`
+* `sr_RS`
 * `th_TH`
+* `uk_UA`
 * `vi_VN`
 
 Documentation
