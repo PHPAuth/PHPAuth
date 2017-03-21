@@ -16,7 +16,7 @@ $lang['password_incorrect'] = "A megadott jelszó hibás.";
 $lang['password_notvalid'] = "A megadott jelszó helytelen";
 
 $lang['newpassword_short'] = "Az új jelszó túl rövid.";
-$lang['newpassword_long'] = "Az új jelszó túl hosszú."
+$lang['newpassword_long'] = "Az új jelszó túl hosszú.";
 $lang['newpassword_invalid'] = "A jelszónak tartalmaznia kell, legalább egy nagybetűs karaktert és egy számot.";
 $lang['newpassword_nomatch'] = "A Jelszavak nem egyeznek.";
 $lang['newpassword_match'] = "Az új jelszó ugyanaz mint a régi.";
