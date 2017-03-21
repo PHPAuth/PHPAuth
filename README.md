@@ -177,6 +177,7 @@ Available languages:
 * `fa_IR`
 * `fr_FR`
 * `gr_GR`
+* `hu_HU`
 * `id_ID`
 * `it_IT`
 * `nl_BE`
