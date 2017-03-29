@@ -987,6 +987,14 @@ class Auth
             return $return;
         }
 
+        $zxcvbn = new Zxcvbn();
+
+        if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
+            $return['message'] = $this->lang['password_weak'];
+
+            return $return;
+        }
+	    
         $data = $this->getRequest($key, "reset");
 
         if ($data['error'] == 1) {
