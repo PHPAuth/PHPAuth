@@ -1218,6 +1218,13 @@ class Auth
             return $return;
         }
 
+        if ($this->isEmailTaken($email)) {
+            $this->addAttempt();
+            $return['message'] = $this->lang["email_taken"];
+
+            return $return;
+        }
+
         $validatePassword = $this->validatePassword($password);
 
         if ($validatePassword['error'] == 1) {
