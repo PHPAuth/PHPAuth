@@ -1108,7 +1108,7 @@ class Auth
     * @param string $captcha = NULL
     * @return array $return
     */
-    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha = NULL)
+    public function changePassword($uid, $currpass = NULL, $newpass, $repeatnewpass, $captcha = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -1128,7 +1128,7 @@ class Auth
 
         $validatePassword = $this->validatePassword($currpass);
 
-        if ($validatePassword['error'] == 1) {
+        if ($currpass !== NULL && $validatePassword['error'] == 1) {
             $this->addAttempt();
             $return['message'] = $validatePassword['message'];
 
@@ -1164,7 +1164,7 @@ class Auth
             return $return;
         }
 
-        if (!password_verify($currpass, $user['password'])) {
+        if ($currpass !== NULL && !password_verify($currpass, $user['password'])) {
             $this->addAttempt();
             $return['message'] = $this->lang["password_incorrect"];
 
