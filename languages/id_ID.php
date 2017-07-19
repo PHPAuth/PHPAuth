@@ -17,7 +17,7 @@ $lang['password_notvalid'] = "Password tidak tepat.";
 
 $lang['newpassword_short'] = "Pasword baru terlalu pendek.";
 $lang['newpassword_long'] = "Password baru terlalu pendek.";
-$lang['newpassword_invalid'] = "Password baru harus memiliki minimal satu hurup besar dan hurup kecil serta, dan minimal angka minimal sati digit.";
+$lang['newpassword_invalid'] = "Password baru harus memiliki minimal satu hurup besar dan hurup kecil serta, dan minimal angka minimal satu digit.";
 $lang['newpassword_nomatch'] = "Password baru tidak sama.";
 $lang['newpassword_match'] = "Password sama dengan password yang lama.";
 
