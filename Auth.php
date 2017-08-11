@@ -980,6 +980,14 @@ class Auth
             return $return;
         }
 
+        $zxcvbn = new Zxcvbn();
+	
+        if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
+            $return['message'] = $this->lang['password_weak'];
+
+            return $return;
+        }
+        
         if ($password !== $repeatpassword) {
             // Passwords don't match
             $return['message'] = $this->lang["newpassword_nomatch"];
