@@ -123,7 +123,7 @@ class Auth
         $return['message'] = $this->lang["logged_in"];
 
         $return['hash'] = $sessiondata['hash'];
-        $return['expire'] = $sessiondata['expiretime'];
+        $return['expire'] = $sessiondata['expire'];
 		
 		$return['cookie_name'] = $this->config->cookie_name;
 
@@ -383,22 +383,21 @@ class Auth
         $this->deleteExistingSessions($uid);
 
         if ($remember == true) {
-            $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
-            $data['expiretime'] = strtotime($data['expire']);
+            $data['expire'] = strtotime($this->config->cookie_remember);
         } else {
-            $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_forget));
-            $data['expiretime'] = 0;
+            $data['expire'] = strtotime($this->config->cookie_forget);
         }
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
         $query = $this->dbh->prepare("INSERT INTO {$this->config->table_sessions} (uid, hash, expiredate, ip, agent, cookie_crc) VALUES (?, ?, ?, ?, ?, ?)");
 
-        if (!$query->execute(array($uid, $data['hash'], $data['expire'], $ip, $agent, $data['cookie_crc']))) {
+        if (!$query->execute(array($uid, $data['hash'], date("Y-m-d H:i:s", $data['expire']), $ip, $agent, $data['cookie_crc']))) {
             return false;
         }
 
-        $data['expire'] = strtotime($data['expire']);
+        setcookie($this->config->cookie_name, $data['hash'], $data['expire'], $this->config->cookie_path, $this->config->cookie_domain, $this->config->cookie_secure, $this->config->cookie_http);
+        $_COOKIE[$this->config->cookie_name] = $data['hash'];
 
         return $data;
     }
