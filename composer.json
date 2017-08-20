@@ -11,7 +11,7 @@
 		"bjeavons/zxcvbn-php": "^0.3"
 	},
 	"require_dev": {
-		"phpunit/phpunit": "3.7.*"
+		"phpunit/phpunit": "5.*"
 	},
 	"autoload": {
 		"psr-4": {
