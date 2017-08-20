@@ -7,42 +7,40 @@ if (!class_exists('\PHPUnit\Framework\TestCase') && class_exists('\PHPUnit_Frame
 
 class AuthTest extends \PHPUnit\Framework\TestCase
 {
-    public $auth;
-    public $config;
-    public $dbh;
+    public static $auth;
+    public static $config;
+    public static $dbh;
 
-    private $hash;
-
-    public function __construct()
+    public static function setUpBeforeClass()
     {
         require_once __DIR__ . '/../vendor/autoload.php';
         require_once __DIR__ . '/../Auth.php';
         require_once __DIR__ . '/../Config.php';
 
-        $this->dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
-        $this->config = new PHPAuth\Config($this->dbh);
-        $this->auth   = new PHPAuth\Auth($this->dbh, $this->config);
+        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
+        self::$config = new PHPAuth\Config(self::$dbh);
+        self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config);
 
         // Clean up the database
-        $this->dbh->exec("DELETE FROM attempts;");
-        $this->dbh->exec("DELETE FROM users;");
-        $this->dbh->exec("DELETE FROM sessions;");
-        $this->dbh->exec("DELETE FROM requests;");
+        self::$dbh->exec("DELETE FROM attempts;");
+        self::$dbh->exec("DELETE FROM users;");
+        self::$dbh->exec("DELETE FROM sessions;");
+        self::$dbh->exec("DELETE FROM requests;");
     }
 
     public function testRegister()
     {
         // Successful registration
-        $this->assertFalse($this->auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertFalse(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
         // Failed registration: same email
-        $this->assertTrue($this->auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertTrue(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
         // Failed registration: invalid email address
-        $this->assertTrue($this->auth->register('InvalidEmail', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertTrue(self::$auth->register('InvalidEmail', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
 
         // Failed registration: invalid password
-        $this->assertTrue($this->auth->register('test2@email.com', 'lamepass', 'lamepass')['error']);
+        $this->assertTrue(self::$auth->register('test2@email.com', 'lamepass', 'lamepass')['error']);
     }
 
     /**
@@ -51,16 +49,16 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogin()
     {
         // Empty attempts table
-        $this->dbh->exec("DELETE FROM attempts;");
+        self::$dbh->exec("DELETE FROM attempts;");
 
         // Successful login
-        $this->assertFalse($this->auth->login("test@email.com", 'T3H-1337-P@$$')['error']);
+        $this->assertFalse(self::$auth->login("test@email.com", 'T3H-1337-P@$$')['error']);
 
         // Failed login: incorrect email
-        $this->assertTrue($this->auth->login("incorrect@email.com", "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->login("incorrect@email.com", "IncorrectPassword1")['error']);
 
         // Failed login: incorrect password
-        $this->assertTrue($this->auth->login("test@email.com", "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->login("test@email.com", "IncorrectPassword1")['error']);
     }
 
     /**
@@ -69,16 +67,16 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testCheckSession()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = $this->dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful checkSession
-        $this->assertTrue($this->auth->checkSession($hash));
+        $this->assertTrue(self::$auth->checkSession($hash));
 
         // Failed checkSession: invalid session hash
-        $this->assertFalse($this->auth->checkSession("invalidhash"));
+        $this->assertFalse(self::$auth->checkSession("invalidhash"));
 
         // Failed checkSession: inexistant session hash
-        $this->assertFalse($this->auth->checkSession("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+        $this->assertFalse(self::$auth->checkSession("aaafda8ea2c65a596c7e089f256b1534f2298000"));
     }
 
     /**
@@ -86,17 +84,17 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSessionUID()
     {
-        $uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
-        $hash = $this->dbh->query("SELECT hash FROM sessions WHERE uid = {$uid};", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = {$uid};", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful getSessionUID
-        $this->assertEquals($uid, $this->auth->getSessionUID($hash));
+        $this->assertEquals($uid, self::$auth->getSessionUID($hash));
 
         // Failed getSessionUID: invalid session hash
-        $this->assertFalse($this->auth->getSessionUID("invalidhash"));
+        $this->assertFalse(self::$auth->getSessionUID("invalidhash"));
 
         // Failed getSessionUID: inexistant session hash
-        $this->assertFalse($this->auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+        $this->assertFalse(self::$auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
     }
 
     /**
@@ -105,10 +103,10 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testIsEmailTaken()
     {
         // Successful isEmailTaken
-        $this->assertTrue($this->auth->isEmailTaken("test@email.com"));
+        $this->assertTrue(self::$auth->isEmailTaken("test@email.com"));
 
         // Failed isEmailTaken: unused email
-        $this->assertFalse($this->auth->isEmailTaken("unused@email.com"));
+        $this->assertFalse(self::$auth->isEmailTaken("unused@email.com"));
     }
 
     /**
@@ -116,13 +114,13 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetUser()
     {
-        $uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful getUser
-        $this->assertEquals("test@email.com", $this->auth->getUser($uid)['email']);
+        $this->assertEquals("test@email.com", self::$auth->getUser($uid)['email']);
 
         // Failed getUser: inexistant UID
-        $this->assertFalse($this->auth->getUser(9999999));
+        $this->assertFalse(self::$auth->getUser(9999999));
     }
 
     /**
@@ -130,25 +128,25 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testChangePassword()
     {
-        $uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful changePassword
-        $this->assertFalse($this->auth->changePassword($uid, 'T3H-1337-P@$$', 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
+        $this->assertFalse(self::$auth->changePassword($uid, 'T3H-1337-P@$$', 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
         // Failed changePassword: invalid current password
-        $this->assertTrue($this->auth->changePassword($uid, "invalid", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
+        $this->assertTrue(self::$auth->changePassword($uid, "invalid", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
         // Failed changePassword: incorrect current password
-        $this->assertTrue($this->auth->changePassword($uid, "IncorrectPassword1", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
+        $this->assertTrue(self::$auth->changePassword($uid, "IncorrectPassword1", 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
 
         // Failed changePassword: invalid new password
-        $this->assertTrue($this->auth->changePassword($uid, 'T3H-1337-P@$$2', "lamepass", "lamepass")['error']);
+        $this->assertTrue(self::$auth->changePassword($uid, 'T3H-1337-P@$$2', "lamepass", "lamepass")['error']);
 
         // Failed changePassword: new password and confirmation do not match
-        $this->assertTrue($this->auth->changePassword($uid, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$4')['error']);
+        $this->assertTrue(self::$auth->changePassword($uid, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$4')['error']);
 
         // Failed changePassword: incorrect UID
-        $this->assertTrue($this->auth->changePassword(9999999, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$3')['error']);
+        $this->assertTrue(self::$auth->changePassword(9999999, 'T3H-1337-P@$$2', 'T3H-1337-P@$$3', 'T3H-1337-P@$$3')['error']);
     }
 
     /**
@@ -156,25 +154,25 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testChangeEmail()
     {
-        $uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful changeEmail
-        $this->assertFalse($this->auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
+        $this->assertFalse(self::$auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
 
         // Failed changeEmail: invalid email
-        $this->assertTrue($this->auth->changeEmail($uid, "invalid.email", 'T3H-1337-P@$$2')['error']);
+        $this->assertTrue(self::$auth->changeEmail($uid, "invalid.email", 'T3H-1337-P@$$2')['error']);
 
         // Failed changeEmail: new email is the same as current email
-        $this->assertTrue($this->auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
+        $this->assertTrue(self::$auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
 
         // Failed changeEmail: password is invalid
-        $this->assertTrue($this->auth->changeEmail($uid, "test3@email.com", "invalid")['error']);
+        $this->assertTrue(self::$auth->changeEmail($uid, "test3@email.com", "invalid")['error']);
 
         // Failed changeEmail: password is incorrect
-        $this->assertTrue($this->auth->changeEmail($uid, "test3@email.com", "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->changeEmail($uid, "test3@email.com", "IncorrectPassword1")['error']);
 
         // Failed changeEmail: UID is incorrect
-        $this->assertTrue($this->auth->changeEmail(9999999, "test2@email.com", "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->changeEmail(9999999, "test2@email.com", "IncorrectPassword1")['error']);
     }
 
     /**
@@ -183,16 +181,16 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogout()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = $this->dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful logout
-        $this->assertTrue($this->auth->logout($hash));
+        $this->assertTrue(self::$auth->logout($hash));
 
         // Failed logout: invalid session hash
-        $this->assertFalse($this->auth->logout("invalidhash"));
+        $this->assertFalse(self::$auth->logout("invalidhash"));
 
         // Failed logout: inexistant session hash
-        $this->assertFalse($this->auth->logout("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+        $this->assertFalse(self::$auth->logout("aaafda8ea2c65a596c7e089f256b1534f2298000"));
     }
 
     /**
@@ -203,21 +201,21 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testDeleteUser()
     {
         // Empty attempts table
-        $this->dbh->exec("DELETE FROM attempts;");
+        self::$dbh->exec("DELETE FROM attempts;");
 
-        $uid = $this->dbh->query("SELECT id FROM users WHERE email = 'test2@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test2@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Failed deleteUser: invalid password
-        $this->assertTrue($this->auth->deleteUser($uid, "lamepass")['error']);
+        $this->assertTrue(self::$auth->deleteUser($uid, "lamepass")['error']);
 
         // Failed deleteUser: incorrect password
-        $this->assertTrue($this->auth->deleteUser($uid, "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->deleteUser($uid, "IncorrectPassword1")['error']);
 
         // Successful deleteUser
-        $this->assertFalse($this->auth->deleteUser($uid, 'T3H-1337-P@$$2')['error']);
+        $this->assertFalse(self::$auth->deleteUser($uid, 'T3H-1337-P@$$2')['error']);
 
         // Failed deleteUser: incorrect UID
-        $this->assertTrue($this->auth->deleteUser(9999999, "IncorrectPassword1")['error']);
+        $this->assertTrue(self::$auth->deleteUser(9999999, "IncorrectPassword1")['error']);
     }
 
     public function testLanguageFiles()
