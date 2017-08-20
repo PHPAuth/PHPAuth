@@ -88,7 +88,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`)
 * `attack_mitigation_time` : time used for rolling attempts timeout, default is `+30 minutes`. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `attempts_before_verify` : maximum amount of attempts to be made within `attack_mitigation_time` before requiring captcha. Default is `5`
-* `attempt_before_block` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Default is `30`
+* `attempt_before_ban` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Default is `30`
 * `password_min_score` : the minimum score given by [zxcvbn](https://github.com/bjeavons/zxcvbn-php) that is allowed. Default is `3`
 
 The rest of the parameters generally do not need changing.
