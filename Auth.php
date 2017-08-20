@@ -15,6 +15,8 @@ class Auth
     protected $dbh;
     public $config;
     public $lang;
+    protected $islogged = NULL;
+    protected $currentuser = NULL;
 
     /**
      * Initiates database connection
@@ -523,6 +525,7 @@ class Auth
     * @param string $email      -- email
     * @param string $password   -- password
     * @param array $params      -- additional params
+    * @param boolean $sendmail  -- activate email confirm or not
     * @return int $uid
     */
 
@@ -631,6 +634,7 @@ class Auth
         return $data;
     }
 
+
     /**
     * Allows a user to delete their account
     * @param int $uid
@@ -711,7 +715,7 @@ class Auth
     * @param int $uid
     * @param string $email
     * @param string $type
-    * @param boolean $sendmail = NULL
+    * @param boolean $sendmail
     * @return boolean
     */
 
@@ -1373,9 +1377,9 @@ class Auth
     }
 
     /**
-    * Returns IP address
-    * @return string $ip
-    */
+     * Returns IP address
+     * @return string $ip
+     */
     protected function getIp()
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
@@ -1386,19 +1390,47 @@ class Auth
     }
 
     /**
-    * Returns is user logged in
-    * @return boolean
-    */
-    public function isLogged() {
-        return (isset($_COOKIE[$this->config->cookie_name]) && $this->checkSession($_COOKIE[$this->config->cookie_name]));
+     * Returns current session hash
+     * @return string
+     * @return boolean false if no cookie
+     */
+    public function getSessionHash(){
+        return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
     }
 
     /**
-     * Returns current session hash
-     * @return string
+     * Returns is user logged in
+     * @return boolean
      */
-    public function getSessionHash(){
-        return $_COOKIE[$this->config->cookie_name];
+    public function isLogged() {
+        if ($this->islogged === NULL) {
+            $this->islogged = $this->checkSession($this->getSessionHash());
+        }
+        return $this->islogged;
+    }
+
+    /**
+    * Gets user data for current user (from cookie) and returns an array, password is not returned
+    * @return array $data
+    * @return boolean false if no current user
+    */
+
+    public function getCurrentUser()
+    {
+        if ($this->currentuser === NULL) {
+            $hash = $this->getSessionHash();
+            if ($hash === false) {
+                return false;
+            }
+
+            $uid = $this->getSessionUID($hash);
+            if ($uid === false) {
+                return false;
+            }
+
+            $this->currentuser = $this->getUser($uid);
+        }
+        return $this->currentuser;
     }
 
     /**
