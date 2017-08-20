@@ -13,7 +13,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     private $hash;
 
-    public function __construct($name = null, array $data = [], $dataName = '')
+    public function __construct()
     {
         require_once __DIR__ . '/../vendor/autoload.php';
         require_once __DIR__ . '/../Auth.php';
