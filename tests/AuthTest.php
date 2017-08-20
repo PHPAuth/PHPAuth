@@ -1,6 +1,6 @@
 <?php
 
-class AuthTest extends PHPUnit_Framework_TestCase
+class AuthTest extends \PHPUnit\Framework\TestCase
 {
     public $auth;
     public $config;
