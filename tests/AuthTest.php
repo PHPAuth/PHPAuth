@@ -1,5 +1,7 @@
 <?php
 
+require_once 'PHPUnit/Autoload.php';
+
 class AuthTest extends PHPUnit_Framework_TestCase
 {
     public $auth;
