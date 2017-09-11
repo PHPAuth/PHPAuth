@@ -10,6 +10,9 @@
 		"phpmailer/phpmailer": "^5.2",
 		"bjeavons/zxcvbn-php": "^0.3"
 	},
+	"require_dev": {
+		"phpunit/phpunit": "6.*"
+	},
 	"autoload": {
 		"psr-4": {
 			"PHPAuth\\": "/"

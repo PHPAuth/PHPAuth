@@ -15,6 +15,8 @@ class Auth
     protected $dbh;
     public $config;
     public $lang;
+    protected $islogged = NULL;
+    protected $currentuser = NULL;
 
     /**
      * Initiates database connection
@@ -123,7 +125,7 @@ class Auth
         $return['message'] = $this->lang["logged_in"];
 
         $return['hash'] = $sessiondata['hash'];
-        $return['expire'] = $sessiondata['expiretime'];
+        $return['expire'] = $sessiondata['expire'];
 		
 		$return['cookie_name'] = $this->config->cookie_name;
 
@@ -383,22 +385,21 @@ class Auth
         $this->deleteExistingSessions($uid);
 
         if ($remember == true) {
-            $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
-            $data['expiretime'] = strtotime($data['expire']);
+            $data['expire'] = strtotime($this->config->cookie_remember);
         } else {
-            $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_forget));
-            $data['expiretime'] = 0;
+            $data['expire'] = strtotime($this->config->cookie_forget);
         }
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
         $query = $this->dbh->prepare("INSERT INTO {$this->config->table_sessions} (uid, hash, expiredate, ip, agent, cookie_crc) VALUES (?, ?, ?, ?, ?, ?)");
 
-        if (!$query->execute(array($uid, $data['hash'], $data['expire'], $ip, $agent, $data['cookie_crc']))) {
+        if (!$query->execute(array($uid, $data['hash'], date("Y-m-d H:i:s", $data['expire']), $ip, $agent, $data['cookie_crc']))) {
             return false;
         }
 
-        $data['expire'] = strtotime($data['expire']);
+        setcookie($this->config->cookie_name, $data['hash'], $data['expire'], $this->config->cookie_path, $this->config->cookie_domain, $this->config->cookie_secure, $this->config->cookie_http);
+        $_COOKIE[$this->config->cookie_name] = $data['hash'];
 
         return $data;
     }
@@ -524,6 +525,7 @@ class Auth
     * @param string $email      -- email
     * @param string $password   -- password
     * @param array $params      -- additional params
+    * @param boolean $sendmail  -- activate email confirm or not
     * @return int $uid
     */
 
@@ -632,6 +634,7 @@ class Auth
         return $data;
     }
 
+
     /**
     * Allows a user to delete their account
     * @param int $uid
@@ -712,7 +715,7 @@ class Auth
     * @param int $uid
     * @param string $email
     * @param string $type
-    * @param boolean $sendmail = NULL
+    * @param boolean $sendmail
     * @return boolean
     */
 
@@ -1374,9 +1377,9 @@ class Auth
     }
 
     /**
-    * Returns IP address
-    * @return string $ip
-    */
+     * Returns IP address
+     * @return string $ip
+     */
     protected function getIp()
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
@@ -1387,19 +1390,47 @@ class Auth
     }
 
     /**
-    * Returns is user logged in
-    * @return boolean
-    */
-    public function isLogged() {
-        return (isset($_COOKIE[$this->config->cookie_name]) && $this->checkSession($_COOKIE[$this->config->cookie_name]));
+     * Returns current session hash
+     * @return string
+     * @return boolean false if no cookie
+     */
+    public function getSessionHash(){
+        return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
     }
 
     /**
-     * Returns current session hash
-     * @return string
+     * Returns is user logged in
+     * @return boolean
      */
-    public function getSessionHash(){
-        return $_COOKIE[$this->config->cookie_name];
+    public function isLogged() {
+        if ($this->islogged === NULL) {
+            $this->islogged = $this->checkSession($this->getSessionHash());
+        }
+        return $this->islogged;
+    }
+
+    /**
+    * Gets user data for current user (from cookie) and returns an array, password is not returned
+    * @return array $data
+    * @return boolean false if no current user
+    */
+
+    public function getCurrentUser()
+    {
+        if ($this->currentuser === NULL) {
+            $hash = $this->getSessionHash();
+            if ($hash === false) {
+                return false;
+            }
+
+            $uid = $this->getSessionUID($hash);
+            if ($uid === false) {
+                return false;
+            }
+
+            $this->currentuser = $this->getUser($uid);
+        }
+        return $this->currentuser;
     }
 
     /**
