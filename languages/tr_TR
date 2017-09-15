@@ -1,4 +1,4 @@
-<? Php
+<?php
 $lang = array();
 $lang['user_blocked'] = "Şu anda sistemden atıldınız.";
 $lang['user_verify_failed'] = "Captcha Kodu geçersiz.";
