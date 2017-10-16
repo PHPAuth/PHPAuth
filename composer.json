@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"require": {
 		"php": ">=5.4.0",
-		"phpmailer/phpmailer": "^5.2",
+		"phpmailer/phpmailer": "^6.0",
 		"bjeavons/zxcvbn-php": "*"
 	},
 	"autoload": {
