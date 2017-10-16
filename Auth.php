@@ -786,7 +786,7 @@ class Auth
         if ($sendmail === true) {
             // Check configuration for SMTP parameters
             $mail = new PHPMailer;
-			$mail->CharSet = $this->config->mail_charset;
+            $mail->CharSet = $this->config->mail_charset;            
             if ($this->config->smtp) {
                 $mail->isSMTP();
                 $mail->Host = $this->config->smtp_host;
@@ -800,6 +800,12 @@ class Auth
                 if (!is_null($this->config->smtp_security)) {
                     $mail->SMTPSecure = $this->config->smtp_security;
                 }
+            }
+
+            if ( $this->config->smtp_ssl_context ) 
+            {
+                // smtp_ssl_context must be array.
+                $mail->SMTPOptions = array( 'ssl' => $this->config->smtp_ssl_context );
             }
 
             $mail->From = $this->config->site_email;
