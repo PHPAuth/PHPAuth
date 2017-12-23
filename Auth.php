@@ -99,7 +99,7 @@ class Auth
 
         $user = $this->getBaseUser($uid);
 
-        if (!password_verify($password, $user['password'])) {
+        if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
             $return['message'] = $this->lang["email_password_incorrect"];
 
@@ -1451,5 +1451,28 @@ class Auth
         }
 
         return password_verify($password_for_check, $data['password']);
+    }
+	
+	/**
+     * Check if users password needs to be rehashed
+     * @param string $password
+	 * @param string $hash
+	 * @param int $uid
+     * @return bool
+     */
+	public function password_verify_with_rehash($password, $hash, $uid)
+	{
+		if (!password_verify($password, $hash)) {
+			return false;
+		}
+	
+		if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
+			$hash = $this->getHash($password);
+	
+			$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
+        	$query->execute(array($hash, $uid));
+		}
+	
+		return true;
     }
 }
