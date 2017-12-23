@@ -1452,4 +1452,20 @@ class Auth
 
         return password_verify($password_for_check, $data['password']);
     }
+	
+	
+	public function securePage()
+	{
+		$dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
+
+		$config = new PHPAuth\Config($dbh);
+		$auth   = new PHPAuth\Auth($dbh, $config);
+
+		if (!$auth->isLogged()) {
+    		header('HTTP/1.0 403 Forbidden');
+    		echo "Forbidden";
+
+    		exit();
+		}	
+	}
 }
