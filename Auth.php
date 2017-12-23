@@ -1409,7 +1409,7 @@ class Auth
         return $this->islogged;
     }
 
-    /**
+   /**
     * Gets user data for current user (from cookie) and returns an array, password is not returned
     * @return array $data
     * @return boolean false if no current user
@@ -1453,26 +1453,26 @@ class Auth
         return password_verify($password_for_check, $data['password']);
     }
 	
-	/**
+    /**
      * Check if users password needs to be rehashed
      * @param string $password
-	 * @param string $hash
-	 * @param int $uid
+     * @param string $hash
+     * @param int $uid
      * @return bool
      */
-	public function password_verify_with_rehash($password, $hash, $uid)
-	{
-		if (!password_verify($password, $hash)) {
-			return false;
-		}
-	
-		if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
-			$hash = $this->getHash($password);
-	
-			$query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
-        	$query->execute(array($hash, $uid));
-		}
-	
-		return true;
+    public function password_verify_with_rehash($password, $hash, $uid)
+    {
+        if (!password_verify($password, $hash)) {
+            return false;
+        }
+    
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
+            $hash = $this->getHash($password);
+    
+            $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
+            $query->execute(array($hash, $uid));
+        }
+    
+        return true;
     }
 }
