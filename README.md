@@ -187,6 +187,7 @@ Available languages:
 * `ru_RU`
 * `se_SE`
 * `sr_RS`
+* `tr_TR`
 * `th_TH`
 * `uk_UA`
 * `vi_VN`
