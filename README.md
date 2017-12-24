@@ -139,19 +139,8 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 
 include("Config.php");
 include("Auth.php");
-
-$dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
-
-$config = new PHPAuth\Config($dbh);
-$auth   = new PHPAuth\Auth($dbh, $config);
-
-if (!$auth->isLogged()) {
-    header('HTTP/1.0 403 Forbidden');
-    echo "Forbidden";
-
-    exit();
-}
-
+securePage(); //if my pull request is accepted. Seems like a little better way to just call a function if this works?
+ 
 ?>
 ```
 
