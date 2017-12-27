@@ -150,7 +150,7 @@ $auth   = new PHPAuth\Auth($dbh, $config, $lang);
 // If not logged in, redirect to login-page.
 
 if (!$auth->isLogged()) {
-    header('Location: /' . $auth->config->site_loginPage);
+    header('Location: /login.php');
 	
     exit();
 }
