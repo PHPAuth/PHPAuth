@@ -7,7 +7,7 @@ use PHPMailer;
 
 /**
  * Auth class
- * Required PHP 5.4 and above.
+ * Required PHP 5.6 and above.
  */
 
 class Auth
@@ -26,12 +26,8 @@ class Auth
         $this->dbh = $dbh;
         $this->config = $config;
 
-        if (version_compare(phpversion(), '5.4.0', '<')) {
-            die('PHP 5.4.0 required for PHPAuth engine!');
-        }
-
-        if (version_compare(phpversion(), '5.5.0', '<')) {
-            require("files/password.php");
+        if (version_compare(phpversion(), '5.6.0', '<')) {
+            die('PHP 5.6.0 required for PHPAuth engine!');
         }
 
         // Load language
