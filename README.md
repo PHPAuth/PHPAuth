@@ -138,12 +138,25 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 <?php
 
 include("Config.php");
+include("Language.php");
 include("Auth.php");
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
 $config = new PHPAuth\Config($dbh);
-$auth   = new PHPAuth\Auth($dbh, $config);
+$lang = new PHPAuth\Language($dbh, $config);
+$auth   = new PHPAuth\Auth($dbh, $config, $lang);
+
+// If not logged in, redirect to login-page.
+
+if (!$auth->isLogged()) {
+    header('Location: /' . $auth->config->site_loginPage);
+	
+    exit();
+}
+
+// Alternative method.
+// If not logged in, display "Forbidden".
 
 if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
@@ -158,11 +171,9 @@ if (!$auth->isLogged()) {
 Message languages
 ---------------------
 
-The language for error and success messages returned by PHPAuth can be configured by passing in one of
-the available languages as the third parameter to the Auth constructor. If no language parameter is provided
-then the default `en_GB`language is used.
-
-Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
+The language for error and success messages returned by PHPAuth can be configured by setting `language_preferred` 
+and `language_fallback` in the `config`-table. If the spcific phrase haven't yet been translated to `language_preferred` 
+the text stored in `language_fallback` is used.
 
 Available languages:
 
@@ -185,7 +196,7 @@ Available languages:
 * `ps_AF`
 * `pt_BR`
 * `ru_RU`
-* `se_SE`
+* `sv_SE`
 * `sr_RS`
 * `tr_TR`
 * `th_TH`
