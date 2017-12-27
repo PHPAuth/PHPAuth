@@ -80,6 +80,8 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_password` : the password for the SMTP server
 * `smtp_port` : the port for the SMTP server
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
+* `language_preferred` : the preferred language for error and success messages returned by the system. Default: en_GB.
+* `language_fallback` : the fallback language, used only if translation is not available in preferred language. Default: en_GB.
 * `verify_password_min_length` : minimum password length, default is `3`  
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
@@ -102,7 +104,7 @@ For example, if you are using Google's ReCaptcha NoCaptcha, use the following co
 ```php
     private function checkCaptcha($captcha)
     {
- try {
+    try {
 
         $url = 'https://www.google.com/recaptcha/api/siteverify';
         $data = ['secret'   => 'your_secret_here',
@@ -172,12 +174,12 @@ Message languages
 ---------------------
 
 The language for error and success messages returned by PHPAuth can be configured by setting `language_preferred` 
-and `language_fallback` in the `config`-table. If the spcific phrase haven't yet been translated to `language_preferred` 
+and `language_fallback` in the `config`-table. If the specific phrase haven't yet been translated to `language_preferred` 
 the text stored in `language_fallback` is used.
 
 Available languages:
 
-* `ar-TN`
+* `ar_TN`
 * `cs_CZ`
 * `da_DK`
 * `de_DE`
