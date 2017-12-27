@@ -39,12 +39,14 @@ class Language
      */
     public function __get($key)
     {
-        if($this->lang[$key] == NULL && $key != "system_error"){
-            return $this->lang->system_error . " #16";
-        }
-        
-        if($this->lang[$key] == NULL){
-            return "A system error has been encountered. Please try again. #16";
+        if(!array_key_exists($key, $this->lang))
+        {
+            if(!array_key_exists("system_error", $this->lang))
+            {
+                return "A system error has been encountered. Translation text for system_error is missing. #16";
+            }
+                
+            return $this->lang["system_error"] . " #16";
         }
         
         return $this->lang[$key];
