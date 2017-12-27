@@ -23,14 +23,11 @@ class Language
         $this->dbh = $dbh;
         $this->config = $config;
         
-        $this->lang = array();
-        
         $langPreferred = $this->getLangId($this->config->language_preferred);
         $langFallback = $this->getLangId($this->config->language_fallback);
         
-        // What if $this->config->language_preferred = this->config->language_fallback ?????
-        
-        $lang = array_merge($this->getLang($langFallback), $this->getLang($langPreferred))
+        $lang = array();
+        $lang = array_merge($this->getLang($langFallback), $this->getLang($langPreferred));
         $this->lang = $lang;
     }
 
@@ -53,7 +50,7 @@ class Language
      */
     public function getLangId($code)
     {
-        $query = $this->dbh->query("SELECT id FROM {$this->config->table_languages} WHERE lang = ?");
+        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_languages} WHERE lang = ?");
         $query->execute(array($code));
 
         $data = $query->fetchColumn();
@@ -73,10 +70,10 @@ class Language
      */
     public function getLang($id)
     {
-        $query = $this->dbh->query("SELECT key, text FROM {$this->config->table_translations} WHERE lang = ?");
+        $query = $this->dbh->prepare("SELECT `key`, `text` FROM {$this->config->table_translations} WHERE lang = ?");
         $query->execute(array($id));
         
-        $data = $query->fetch(\PDO::FETCH_ASSOC);
+        $data = $query->fetchAll(\PDO::FETCH_KEY_PAIR);
         
         if (!$data) {
             return false;
