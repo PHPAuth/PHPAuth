@@ -116,7 +116,7 @@ CREATE TABLE `translations` (
   `key` varchar(255) NOT NULL,
   `text` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 -- 2015-11-06 14:09:37
