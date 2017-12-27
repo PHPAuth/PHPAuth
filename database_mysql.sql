@@ -55,11 +55,16 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('table_requests',  'requests'),
 ('table_sessions',  'sessions'),
 ('table_users', 'users'),
+('table_languages',  'languages'),
+('table_translations',  'translations'),
+('language_preferred',  'en'),
+('language_fallback',  'en'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
 ('verify_password_min_length',  '3'),
 ('request_key_expiration', '+10 minutes');
+
 
 DROP TABLE IF EXISTS `requests`;
 CREATE TABLE `requests` (
@@ -94,6 +99,24 @@ CREATE TABLE `users` (
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `languages`;
+CREATE TABLE `languages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` varchar(2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `translations`;
+CREATE TABLE `translations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` int(11) NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `text` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 -- 2015-11-06 14:09:37
