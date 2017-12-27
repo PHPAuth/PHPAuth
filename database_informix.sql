@@ -40,8 +40,8 @@ INSERT INTO config (setting, value) VALUES ('table_sessions',  'sessions');
 INSERT INTO config (setting, value) VALUES ('table_users', 'users');
 INSERT INTO config (setting, value) VALUES ('table_languages',  'languages');
 INSERT INTO config (setting, value) VALUES ('table_translations',  'translations');
-INSERT INTO config (setting, value) VALUES ('language_preferred',  'en');
-INSERT INTO config (setting, value) VALUES ('language_fallback', 'en');
+INSERT INTO config (setting, value) VALUES ('language_preferred',  'en_GB');
+INSERT INTO config (setting, value) VALUES ('language_fallback', 'en_GB');
 INSERT INTO config (setting, value) VALUES ('verify_email_max_length', '100');
 INSERT INTO config (setting, value) VALUES ('verify_email_min_length', '5');
 INSERT INTO config (setting, value) VALUES ('verify_email_use_banlist',  '1');
@@ -91,7 +91,7 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
   id SERIAL,
-  lang varchar(2) NOT NULL,
+  lang varchar(5) NOT NULL,
   PRIMARY KEY (id)
 );
 

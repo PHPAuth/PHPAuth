@@ -1,9 +1,9 @@
--- Adminer 4.2.2 MySQL dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
 
 DROP TABLE IF EXISTS `attempts`;
 CREATE TABLE `attempts` (
@@ -57,8 +57,8 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('table_users', 'users'),
 ('table_languages',  'languages'),
 ('table_translations',  'translations'),
-('language_preferred',  'en'),
-('language_fallback',  'en'),
+('language_preferred',  'en_GB'),
+('language_fallback',  'en_GB'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
@@ -104,9 +104,9 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `languages`;
 CREATE TABLE `languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `lang` varchar(2) NOT NULL,
+  `lang` varchar(5) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 DROP TABLE IF EXISTS `translations`;
@@ -116,7 +116,4 @@ CREATE TABLE `translations` (
   `key` varchar(255) NOT NULL,
   `text` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
--- 2015-11-06 14:09:37
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

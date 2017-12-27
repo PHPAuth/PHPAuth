@@ -43,8 +43,8 @@ INSERT INTO config (setting, value) VALUES
 ('table_users', 'users'),
 ('table_languages',  'languages'),
 ('table_translations',  'translations'),
-('language_preferred',  'en'),
-('language_fallback',  'en'),
+('language_preferred',  'en_GB'),
+('language_fallback',  'en_GB'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
@@ -94,7 +94,7 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
   id SERIAL,
-  lang character varying(2) NOT NULL,
+  lang character varying(5) NOT NULL,
   PRIMARY KEY (id)
 );
 

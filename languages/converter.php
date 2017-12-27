@@ -17,7 +17,7 @@ foreach($files as $file)
         $lang = array();
         require $file;
         
-        $code = explode("_", $file);
+        $code = explode(".", $file);
         $code = $code[0];
         
         $query = $dbh->prepare("INSERT INTO languages (`lang`) VALUES (?)");
