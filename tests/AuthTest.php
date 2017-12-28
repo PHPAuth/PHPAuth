@@ -11,7 +11,6 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public static $config;
     public static $lang;
     public static $dbh;
-    public static $query;
 
     public static function setUpBeforeClass()
     {
