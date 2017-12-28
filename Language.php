@@ -26,7 +26,7 @@ class Language
         $langFallback = $this->getLangId($this->config->language_fallback);
         
         $fallback = array();
-        $fallback["system_error"] = "A system error has been encountered. Translation text for system_error is missing.";
+        $fallback["system_error"] = "A system error has been encountered. Translation text missing.";
         
         $lang = array();
         $lang = array_merge($fallback, $this->getLang($langFallback), $this->getLang($langPreferred));
