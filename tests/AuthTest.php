@@ -224,16 +224,16 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLanguageFiles()
     {
         
-        self::$dbh->prepare("SELECT id FROM languages");
-        self::$dbh->execute();
+        $query = self::$dbh->prepare("SELECT id FROM languages");
+        self::$query->execute();
         $languages = self::$dbh->fetchAll();
         
         $i = 0;
         $lengthPrev = 0;
         
         foreach($languages as $id) {
-            self::$dbh->prepare("SELECT count(*) FROM translations WHERE lang = ?");
-            self::$dbh->execute(array($id));
+            $query = self::$dbh->prepare("SELECT count(*) FROM translations WHERE lang = ?");
+            self::$query->execute(array($id));
             $lengthThis = self::$dbh->fetchColumn();
             
             if($i > 0){
