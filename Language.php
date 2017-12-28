@@ -5,13 +5,12 @@ namespace PHPAuth;
 /**
  * PHPAuth Language class
  */
- 
+
 class Language
 {
     protected $dbh;
     protected $config;
     protected $lang;
-    protected $langPreferred;
 
     /**
      *
@@ -26,8 +25,11 @@ class Language
         $langPreferred = $this->getLangId($this->config->language_preferred);
         $langFallback = $this->getLangId($this->config->language_fallback);
         
+        $fallback = array();
+        $fallback["system_error"] = "A system error has been encountered. Translation text for system_error is missing.";
+        
         $lang = array();
-        $lang = array_merge($this->getLang($langFallback), $this->getLang($langPreferred));
+        $lang = array_merge($fallback, $this->getLang($langFallback), $this->getLang($langPreferred));
         $this->lang = $lang;
     }
 
@@ -41,11 +43,6 @@ class Language
     {
         if(!array_key_exists($key, $this->lang))
         {
-            if(!array_key_exists("system_error", $this->lang))
-            {
-                return "A system error has been encountered. Translation text for system_error is missing. #16";
-            }
-                
             return $this->lang["system_error"] . " #16";
         }
         
