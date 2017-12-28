@@ -184,7 +184,7 @@ class Auth
         $zxcvbn = new Zxcvbn();
 
         if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
-            $return['message'] = $this->lang('password_weak');
+            $return['message'] = $this->lang->password_weak;
 
             return $return;
         }
@@ -803,13 +803,13 @@ class Auth
             $mail->isHTML(true);
 
             if ($type == "activation") {
-                    $mail->Subject = sprintf($this->lang('email_activation_subject'), $this->config->site_name);
-                    $mail->Body = sprintf($this->lang('email_activation_body'), $this->config->site_url, $this->config->site_activation_page, $key);
-                    $mail->AltBody = sprintf($this->lang('email_activation_altbody'), $this->config->site_url, $this->config->site_activation_page, $key);
+                    $mail->Subject = sprintf($this->lang->email_activation_subject, $this->config->site_name);
+                    $mail->Body = sprintf($this->lang->email_activation_body, $this->config->site_url, $this->config->site_activation_page, $key);
+                    $mail->AltBody = sprintf($this->lang->email_activation_altbody, $this->config->site_url, $this->config->site_activation_page, $key);
             } else {
-                $mail->Subject = sprintf($this->lang('email_reset_subject'), $this->config->site_name);
-                $mail->Body = sprintf($this->lang('email_reset_body'), $this->config->site_url, $this->config->site_password_reset_page, $key);
-                $mail->AltBody = sprintf($this->lang('email_reset_altbody'), $this->config->site_url, $this->config->site_password_reset_page, $key);
+                $mail->Subject = sprintf($this->lang->email_reset_subject, $this->config->site_name);
+                $mail->Body = sprintf($this->lang->email_reset_body, $this->config->site_url, $this->config->site_password_reset_page, $key);
+                $mail->AltBody = sprintf($this->lang->email_reset_altbody, $this->config->site_url, $this->config->site_password_reset_page, $key);
             }
 
             if (!$mail->send()) {
@@ -842,7 +842,7 @@ class Auth
 
         if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
             $this->addAttempt();
-            $return['message'] = $this->lang($type."key_incorrect");
+            $return['message'] = $this->lang->{$type} . "key_incorrect";
 
             return $return;
         }
@@ -853,7 +853,7 @@ class Auth
         if ($currentdate > $expiredate) {
             $this->addAttempt();
             $this->deleteRequest($row['id']);
-            $return['message'] = $this->lang($type."key_expired");
+            $return['message'] = $this->lang->{$type} . "key_expired";
 
             return $return;
         }
@@ -981,7 +981,7 @@ class Auth
         $zxcvbn = new Zxcvbn();
 	
         if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
-            $return['message'] = $this->lang('password_weak');
+            $return['message'] = $this->lang->password_weak;
 
             return $return;
         }
@@ -996,7 +996,7 @@ class Auth
         $zxcvbn = new Zxcvbn();
 
         if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
-            $return['message'] = $this->lang('password_weak');
+            $return['message'] = $this->lang->password_weak;
 
             return $return;
         }
@@ -1061,7 +1061,7 @@ class Auth
         }
 
         if ($sendmail == NULL) {
-            $return['message'] = $this->lang('function_disabled');
+            $return['message'] = $this->lang->function_disabled;
 
             return $return;
         }
@@ -1156,7 +1156,7 @@ class Auth
         $zxcvbn = new Zxcvbn();
 
         if ($zxcvbn->passwordStrength($newpass)['score'] < intval($this->config->password_min_score)) {
-            $return['message'] = $this->lang('password_weak');
+            $return['message'] = $this->lang->password_weak;
 
             return $return;
         }
