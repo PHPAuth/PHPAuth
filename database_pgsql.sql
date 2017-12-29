@@ -82,7 +82,7 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id serial NOT NULL,
   email character varying(100) DEFAULT NULL,
-  password character varying(60) DEFAULT NULL,
+  password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
