@@ -939,8 +939,8 @@ class Auth
 
             return $return;
         }
-
-        if ($this->isEmailBanned($email)) {
+        
+        if ($this->isEmailBanned($email) && (int)$this->config->verify_email_use_banlist) {
             $this->addAttempt();
             $return['message'] = $this->lang["email_banned"];
 
