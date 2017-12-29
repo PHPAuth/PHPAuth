@@ -45,6 +45,7 @@ class Auth
      * @param string $captcha = NULL
      * @return array $return
      */
+
     public function login($email, $password, $remember = 0, $captcha = NULL)
     {
         $return['error'] = true;
@@ -346,7 +347,6 @@ class Auth
     * @return array $uid
     */
 
-
     public function getUID($email)
     {
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
@@ -629,7 +629,6 @@ class Auth
 
         return $data;
     }
-
 
     /**
     * Allows a user to delete their account
@@ -937,7 +936,6 @@ class Auth
         return $return;
     }
 
-
     /**
     * Allows a user to reset their password after requesting a reset key.
     * @param string $key
@@ -1115,6 +1113,7 @@ class Auth
     * @param string $captcha = NULL
     * @return array $return
     */
+
     public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha = NULL)
     {
         $return['error'] = true;
@@ -1308,6 +1307,7 @@ class Auth
      * @param string $captcha
      * @return boolean
      */
+
     protected function checkCaptcha($captcha)
     {
         return true;
@@ -1360,6 +1360,7 @@ class Auth
     * @param int $length
     * @return string $key
     */
+
     public function getRandomKey($length = 20)
     {
         $chars = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6";
@@ -1376,6 +1377,7 @@ class Auth
      * Returns IP address
      * @return string $ip
      */
+
     protected function getIp()
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
@@ -1390,6 +1392,7 @@ class Auth
      * @return string
      * @return boolean false if no cookie
      */
+
     public function getSessionHash(){
         return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
     }
@@ -1398,6 +1401,7 @@ class Auth
      * Returns is user logged in
      * @return boolean
      */
+
     public function isLogged() {
         if ($this->islogged === NULL) {
             $this->islogged = $this->checkSession($this->getSessionHash());
@@ -1435,6 +1439,7 @@ class Auth
      * @param string $password_for_check
      * @return bool
      */
+
     public function comparePasswords($userid, $password_for_check)
     {
         $query = $this->dbh->prepare("SELECT password FROM {$this->config->table_users} WHERE id = ?");
@@ -1456,6 +1461,7 @@ class Auth
      * @param int $uid
      * @return bool
      */
+    
     public function password_verify_with_rehash($password, $hash, $uid)
     {
         if (!password_verify($password, $hash)) {
