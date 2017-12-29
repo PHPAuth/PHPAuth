@@ -38,6 +38,7 @@ INSERT INTO config (setting, value) VALUES ('table_attempts',  'attempts');
 INSERT INTO config (setting, value) VALUES ('table_requests',  'requests');
 INSERT INTO config (setting, value) VALUES ('table_sessions',  'sessions');
 INSERT INTO config (setting, value) VALUES ('table_users', 'users');
+INSERT INTO config (setting, value) VALUES ('table_emailBanlist', 'emailBanlist');
 INSERT INTO config (setting, value) VALUES ('verify_email_max_length', '100');
 INSERT INTO config (setting, value) VALUES ('verify_email_min_length', '5');
 INSERT INTO config (setting, value) VALUES ('verify_email_use_banlist',  '1');

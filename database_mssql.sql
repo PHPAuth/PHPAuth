@@ -41,6 +41,7 @@ INSERT INTO config (setting, value) VALUES
 ('table_requests',  'requests'),
 ('table_sessions',  'sessions'),
 ('table_users', 'users'),
+('table_emailBanlist', 'emailBanlist'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
