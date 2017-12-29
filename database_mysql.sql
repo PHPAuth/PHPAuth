@@ -25,7 +25,7 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('attack_mitigation_time',  '+30 minutes'),
 ('attempts_before_ban', '30'),
 ('attempts_before_verify',  '5'),
-('bcrypt_cost', '10'),
+('password_hashOptions', '{"cost": 10}'),
 ('cookie_domain', NULL),
 ('cookie_forget', '+30 minutes'),
 ('cookie_http', '0'),

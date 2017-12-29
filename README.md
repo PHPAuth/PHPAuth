@@ -18,7 +18,7 @@ IT'S NOT FOR BEGINNERS!
 Features
 ---------------
 * Authentication by email and password combination
-* Uses [bcrypt](http://en.wikipedia.org/wiki/Bcrypt) to hash passwords, a secure algorithm that uses an expensive key setup phase
+* Uses [PHP: Password Hashing](http://php.net/manual/en/book.password.php)-functions to deal with passwords, a secure algorithm that uses an expensive key setup phase.
 * Uses an individual 128 bit salt for each user, pulled from /dev/urandom, making rainbow tables useless
 * Uses PHP's [PDO](http://php.net/manual/en/book.pdo.php) database interface and uses prepared statements meaning an efficient system, resilient against SQL injection
 * Blocks (or verifies) attackers by IP for any defined time after any amount of failed actions on the portal
@@ -72,7 +72,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_http` : the HTTP only protocol setting of the session cookie, do not change unless necessary
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
-* `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
+* `password_hashOptions` : the options provided to the password_hash() function, formatted in JSON. Please refer to [PHP: password_hash](http://php.net/manual/en/function.password-hash.php) for a list of available options.
 * `smtp` : `0` to use sendmail for emails, `1` to use SMTP
 * `smtp_host` : hostname of the SMTP server
 * `smtp_auth` : `0` if the SMTP server doesn't require authentication, `1` if authentication is required

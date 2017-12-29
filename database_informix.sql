@@ -8,7 +8,7 @@ CREATE TABLE config (
 INSERT INTO config (setting, value) VALUES ('attack_mitigation_time',  '+30 minutes');
 INSERT INTO config (setting, value) VALUES ('attempts_before_ban', '30');
 INSERT INTO config (setting, value) VALUES ('attempts_before_verify',  '5');
-INSERT INTO config (setting, value) VALUES ('bcrypt_cost', '10');
+INSERT INTO config (setting, value) VALUES ('password_hashOptions', '{"cost": 10}'),
 INSERT INTO config (setting, value) VALUES ('cookie_domain', NULL);
 INSERT INTO config (setting, value) VALUES ('cookie_forget', '+30 minutes');
 INSERT INTO config (setting, value) VALUES ('cookie_http', '0');

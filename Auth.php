@@ -337,7 +337,7 @@ class Auth
 
     public function getHash($password)
     {
-        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
+        return password_hash($password, PASSWORD_DEFAULT, $this->config->password_hashOptions);
     }
 
     /**
@@ -1462,7 +1462,7 @@ class Auth
             return false;
         }
     
-        if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT, $this->config->password_hashOptions)) {
             $hash = $this->getHash($password);
     
             $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
