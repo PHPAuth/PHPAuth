@@ -524,8 +524,8 @@ class Auth
 
     public function isEmailBanned($email)
     {
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emailBanlist} WHERE email = ?");
-        $query->execute(array($email));
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emailBanlist} WHERE domain = ?");
+        $query->execute(array(strtolower(explode('@', $email)[1])));
 
         if ($query->fetchColumn() == 0) {
             return false;
