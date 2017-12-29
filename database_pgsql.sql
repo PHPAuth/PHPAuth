@@ -77,7 +77,6 @@ CREATE TABLE sessions (
   PRIMARY KEY (id)
 );
 
-
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id serial NOT NULL,
@@ -85,5 +84,12 @@ CREATE TABLE users (
   password character varying(60) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS emailBanlist;
+CREATE TABLE emailBanlist (
+  id serial NOT NULL,
+  domain character varying(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );

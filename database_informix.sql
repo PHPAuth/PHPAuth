@@ -83,3 +83,10 @@ CREATE TABLE users (
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
   PRIMARY KEY (id)
 );
+
+DROP TABLE emailBanlist;
+CREATE TABLE emailBanlist (
+  id serial NOT NULL,
+  domain character varying(100) DEFAULT NULL,
+  PRIMARY KEY (id)
+);

@@ -96,4 +96,12 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `emailBanlist`;
+CREATE TABLE `emailBanlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `domain` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 -- 2015-11-06 14:09:37
