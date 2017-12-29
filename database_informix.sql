@@ -88,14 +88,14 @@ CREATE TABLE users (
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS languages;
+DROP TABLE languages;
 CREATE TABLE languages (
   id SERIAL,
   lang varchar(5) NOT NULL,
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS translations;
+DROP TABLE translations;
 CREATE TABLE translations (
   id SERIAL,
   lang integer NOT NULL,
