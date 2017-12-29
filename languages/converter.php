@@ -1,10 +1,11 @@
 <?php
 
-$config = array();
-$config['name'] = "test";           // Database name
-$config['host'] = "localhost";      // Database host
-$config['user'] = "test";           // Database user
-$config['pass'] = "123456789";      // Database user password
+$config = array(
+    'host' => 'localhost',          // Database name
+    'name' => 'test',               // Database host
+    'user' => 'test',               // Database user
+    'pass' => '123456789',          // Database user password
+);
 
 $dbh = new PDO('mysql:dbname=' . $config['name'] . ';host=' . $config['host'] . ';charset=utf8', $config['user'], $config['pass']);
 
