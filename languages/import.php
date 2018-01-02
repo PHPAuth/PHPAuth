@@ -55,7 +55,6 @@ function insertLanguage($dbh, $lang_code)
  * @param $lang_id
  * @param $key
  * @param $text
- * @param $table = "translations"
  * @return array $return
  */
 function insertTranslation($dbh, $lang_id, $key, $text)
