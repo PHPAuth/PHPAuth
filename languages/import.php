@@ -59,26 +59,26 @@ if(isset($_POST['db_host']))
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
 
-    <title>PHPAuth - Language importer tool</title>
+    <title>PHPAuth - Language import tool</title>
 
 </head>
 <body data-spy="scroll" data-target="#navbarSupportedContent" data-offset="50">
 
     <div class="container pt-5 text-center">
-        <h1>Language importer tool</h1>
-        <p>A tool to help you populate your translations database for PHPAuth</p>
+        <h1>Language import tool</h1>
+        <p>A tool to help you populate your translations database for <a href="https://github.com/PHPAuth/PHPAuth">PHPAuth</a></p>
     </div>
 
     <div class="container pt-5">
 
         <h3>How to use</h3>
         <ol>
-            <li>Make sure the tables have been created in the database, see <code>database_*.sql</code> for reference.</li>
+            <li>Make sure the tables have been created in the database, refer to the respective <code>database_*.sql</code>-file for reference.</li>
             <li>Enter the connection details for your SQL-server below.</li>
             <li>Chooose wich language files to import, all language-files must be located in the same folder as this script to be shown below.</li>
             <li>Run import, this may take some time depending on your hardware.</li>
             <li>Review the result and make sure there were no errors.</li>
-            <li class="text-danger font-weight-bold">At last, make sure you remove this script from the server when you're done.</li>
+            <li class="text-danger font-weight-bold">Make sure you remove this script from the server when you're done.</li>
         <ol>
 
     </div>
@@ -137,9 +137,8 @@ if(isset($_POST['db_host']))
 
                     $length = count($files);
                     $split = round($length / 5);
-                    $splitcount = 1;
 
-                    for($i = 0; $i < $length; $i++)
+                    for($i = 0, $splitcount = 1; $i < $length; $i++)
                     {
                         if($i == $split * $splitcount)
                         {
