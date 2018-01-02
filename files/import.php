@@ -3,27 +3,58 @@
 /**
  * Inserts a domain into the database
  * @param $dbh
- * @param $domain
+ * @param array $domains
  * @return array $return
  */
-function insertBannedDomain($dbh, $domain)
+function importDomains($dbh, $domains)
+{
+    $return['error'] = true;
+    $return['message'] = "";
+
+    if(count($domains) < 1)
+    {
+        $return['message'] = "Domains array are empty.";
+        return $return;
+    }
+    
+    foreach($domains as $domain)
+    {
+        if(!filter_var("test@" . $domain, FILTER_VALIDATE_EMAIL))
+        {
+            $return['message'] .= "Not a valid domain: " . $domain . " - Skipping \n";
+        }
+
+        $query = $dbh->prepare("INSERT INTO emailBanlist (`domain`) VALUES (?)");
+                
+        if(!$query->execute(array($domain)))
+        {
+            $return['message'] .= "Failed to import domain: " . $domain . "\n";
+        }
+    }
+
+    $return['error'] = false;
+
+    return $return;
+}
+
+/**
+ * Veryfies the file path entered are not pointing to any parent foler
+ * @param $file_path
+ * @return array $return
+ */
+function validateFilePath($file_path)
 {
     $return['error'] = true;
 
-    if(!filter_var("test@" . $domain, FILTER_VALIDATE_EMAIL))
+    $filePath = preg_match("(\.+\/|^\/)", $file_path, $matches);
+
+    if(count($matches) > 0)
     {
-        $return['message'] = "Not a valid domain: " . $domain . " - Skipping";
+        $return['message'] = "Not a valid file path";
         return $return;
     }
 
-    $query = $dbh->prepare("INSERT INTO emailBanlist (`domain`) VALUES (?)");
-                
-    if(!$query->execute(array($domain)))
-    {
-        $return['message'] = "Failed to import domain: " . $domain;
-        return $return;
-    }
-
+    $return['file_path'] = $file_path;
     $return['error'] = false;
 
     return $return;
@@ -38,22 +69,17 @@ if(isset($_POST['db_host']))
 
     $res = "\n";
 
-    $domains = json_decode(file_get_contents($_POST['file_path']));
+    $validateFilePath = validateFilePath($_POST['file_path']);
 
-    if(count($domains) > 1)
+    if($validateFilePath['error'] == true)
     {
-        foreach($domains as $domain)
-        {
-            $res .= "Importing: " . $domain . "\n";
-
-            $insertDomain = insertBannedDomain($dbh, $domain);
-
-            if($insertDomain['error'] == true){
-                $res .= $insertDomain['message'] . "\n";
-            }
-        }
+        $res .= $validateFilePath['message'] . "\n";
     } else {
-        $res .= "\n" . "Could not read file " . $_POST['file_path'] . "\n";
+        $domains = json_decode(file_get_contents($validateFilePath['file_path']));
+
+        $importDomains = importDomains($dbh, $domains);
+
+        $res .= $importDomains['message'];
     }
     
     $res .= "\nImport finished \n";
