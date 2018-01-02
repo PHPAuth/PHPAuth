@@ -40,6 +40,7 @@ function insertLanguage($dbh, $lang_code)
     if(!$query->execute(array($lang_code)))
     {
         $return['message'] = "Failed to import language: " . $lang_code;
+        return $return;
     }
 
     $return['error'] = false;
@@ -66,6 +67,7 @@ function insertTranslation($dbh, $lang_id, $key, $text)
     if(!$query->execute(array($lang_id, $key, $text)))
     {
         $return['message'] = "Failed to import translation key: " . $key;
+        return $return;
     }
 
     $return['error'] = false;
