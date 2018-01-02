@@ -1,50 +1,116 @@
 <?php
 
-$pathparts = explode("/", $_SERVER['PHP_SELF']);
-$filename = $pathparts[count($pathparts) -1];
-$res = "";
-
-// Scan directory for language files.
-foreach(scandir(__DIR__) as $file)
+/**
+ * Returns an array of language files
+ * @param $dir
+ * @return array $files
+ */
+function getLanguageFiles($dir)
 {
-    if(is_file($file) && $file != $filename)
+    $pathparts = explode("/", $_SERVER['PHP_SELF']);
+    $filename = $pathparts[count($pathparts) -1];
+
+    foreach(scandir($dir) as $file)
     {
-        $files[] = explode(".", $file)[0];
+        if(is_file($file) && $file != $filename)
+        {
+            $files[] = explode(".", $file)[0];
+        }
     }
+
+    if(count($files) > 0){
+        return $files;
+    }
+
+    return false;
 }
 
+/**
+ * Inserts a language identifier into the database
+ * @param $dbh
+ * @param $lang_code
+ * @return array $return
+ */
+function insertLanguage($dbh, $lang_code)
+{
+    $return['error'] = true;
+
+    $query = $dbh->prepare("INSERT INTO languages (`lang`) VALUES (?)");
+        
+    if(!$query->execute(array($lang_code)))
+    {
+        $return['message'] = "Failed to import language: " . $lang_code;
+    }
+
+    $return['error'] = false;
+    $return['id'] = $dbh->lastInsertId();
+
+    return $return;
+}
+
+/**
+ * Inserts a translation text into the database
+ * @param $dbh
+ * @param $lang_id
+ * @param $key
+ * @param $text
+ * @param $table = "translations"
+ * @return array $return
+ */
+function insertTranslation($dbh, $lang_id, $key, $text)
+{
+    $return['error'] = true;
+
+    $query = $dbh->prepare("INSERT INTO translations (`lang`, `key`, `text`) VALUES (?, ?, ?)");
+                
+    if(!$query->execute(array($lang_id, $key, $text)))
+    {
+        $return['message'] = "Failed to import translation key: " . $key;
+    }
+
+    $return['error'] = false;
+
+    return $return;
+}
+
+/**
+ * Run import if form has been submitted
+ */
 if(isset($_POST['db_host']))
 {
     $dbh = new PDO('mysql:dbname=' . $_POST['db_name'] . ';host=' . $_POST['db_host'] . ';charset=utf8', $_POST['db_user'], $_POST['db_pass']);
+
+    $res = "\n";
 
     foreach($_POST['languages'] as $lang_code)
     {
         $lang = array();
         require $lang_code . ".php";
-        
-        $query = $dbh->prepare("INSERT INTO languages (`lang`) VALUES (?)");
-        
-        if(true) if($query->execute(array($lang_code)))
-        {
-            $res .= "\n" . "SUCCESS: " . $lang_code . "\n";
-            
-            $lang_codeid = $dbh->lastInsertId();
-            
-            foreach($lang as $key => $text)
-            {
-                $query = $dbh->prepare("INSERT INTO translations (`lang`, `key`, `text`) VALUES (?, ?, ?)");
-                
-                if($query->execute(array($lang_codeid, $key, $text)))
-                {
-                    $res .= "SUCCESS: " . $key . "\n";
-                } else {
-                    $res .= "FAIL: " . $key . "\n";
-                }
-            }
-        } else {
-            $res .= "\n" . "FAIL: " . $lang_code . "\n";
+
+        $res .= "Importing " . $lang_code . "\n";
+
+        $insertLanguage = insertLanguage($dbh, $lang_code);
+
+        if($insertLanguage['error'] == true){
+            $res .= $insertLanguage['message'] . "\n";
+            break;
         }
+
+        foreach($lang as $key => $text)
+        {
+            $res .= "  " . $key . "\n";
+
+            $insertTranslation = insertTranslation($dbh, $insertLanguage['id'], $key, $text);
+
+            if($insertTranslation['error'] == true){
+                $res .= $insertTranslation['message'] . "\n";
+            }
+        }
+
     }
+
+    $res .= "\nImport finished \n";
+
 }
 
 ?>
@@ -135,6 +201,7 @@ if(isset($_POST['db_host']))
 
                     $newcolumn = '</div><div class="col-sm-2">';
 
+                    $files = getLanguageFiles(__DIR__);
                     $length = count($files);
                     $split = round($length / 5);
 
@@ -172,8 +239,8 @@ if(isset($_POST['db_host']))
         <div class="container pt-5 pb-5">
             <div class="row">
                 <div class="col-sm-2">Result</div>
-                <div class="col-sm-10">
-                    <pre class="pre-scrollable bg-light pl-4 pr-4">
+                <div class="col-sm-10 bg-light">
+                    <pre class="pre-scrollable">
                         %s
                     </pre>
                 </div>
