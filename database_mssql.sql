@@ -94,14 +94,14 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
   id int NOT NULL IDENTITY(1,1),
-  lang character varying(5) NOT NULL,
+  code character varying(5) NOT NULL,
   PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS translations;
 CREATE TABLE translations (
   id int NOT NULL IDENTITY(1,1),
-  lang integer NOT NULL,
+  language_id integer NOT NULL,
   "key" character varying(255) NOT NULL,
   text text NOT NULL,
   PRIMARY KEY (id)

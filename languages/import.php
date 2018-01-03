@@ -35,7 +35,7 @@ function insertLanguage($dbh, $lang_code)
 {
     $return['error'] = true;
 
-    $query = $dbh->prepare("INSERT INTO languages (`lang`) VALUES (?)");
+    $query = $dbh->prepare("INSERT INTO languages (`code`) VALUES (?)");
         
     if(!$query->execute(array($lang_code)))
     {
@@ -61,7 +61,7 @@ function insertTranslation($dbh, $lang_id, $key, $text)
 {
     $return['error'] = true;
 
-    $query = $dbh->prepare("INSERT INTO translations (`lang`, `key`, `text`) VALUES (?, ?, ?)");
+    $query = $dbh->prepare("INSERT INTO translations (`language_id`, `key`, `text`) VALUES (?, ?, ?)");
                 
     if(!$query->execute(array($lang_id, $key, $text)))
     {
@@ -82,7 +82,7 @@ function insertTranslation($dbh, $lang_id, $key, $text)
  */
  function languageExist($dbh, $lang_code)
  {
-    $query = $dbh->prepare("SELECT count(*) FROM languages WHERE lang = ?");
+    $query = $dbh->prepare("SELECT count(*) FROM languages WHERE code = ?");
     $query->execute(array($lang_code));
 
     return $query->fetchColumn() > 0;

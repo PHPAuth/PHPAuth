@@ -91,14 +91,14 @@ CREATE TABLE users (
 DROP TABLE languages;
 CREATE TABLE languages (
   id SERIAL,
-  lang varchar(5) NOT NULL,
+  code varchar(5) NOT NULL,
   PRIMARY KEY (id)
 );
 
 DROP TABLE translations;
 CREATE TABLE translations (
   id SERIAL,
-  lang integer NOT NULL,
+  language_id integer NOT NULL,
   "key" varchar(255) NOT NULL,
   text text NOT NULL,
   PRIMARY KEY (id)

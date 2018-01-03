@@ -104,7 +104,7 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `languages`;
 CREATE TABLE `languages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `lang` varchar(5) NOT NULL,
+  `code` varchar(5) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -112,7 +112,7 @@ CREATE TABLE `languages` (
 DROP TABLE IF EXISTS `translations`;
 CREATE TABLE `translations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `lang` int(11) NOT NULL,
+  `language_id` int(11) NOT NULL,
   `key` varchar(255) NOT NULL,
   `text` text NOT NULL,
   PRIMARY KEY (`id`)

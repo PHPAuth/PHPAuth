@@ -94,14 +94,14 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS languages;
 CREATE TABLE languages (
   id SERIAL,
-  lang character varying(5) NOT NULL,
+  code character varying(5) NOT NULL,
   PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS translations;
 CREATE TABLE translations (
   id SERIAL,
-  lang integer NOT NULL,
+  language_id integer NOT NULL,
   "key" character varying(255) NOT NULL,
   text text NOT NULL,
   PRIMARY KEY (id)

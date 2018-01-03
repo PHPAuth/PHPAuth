@@ -57,7 +57,7 @@ class Language
      */
     public function getLangId($code)
     {
-        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_languages} WHERE lang = ?");
+        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_languages} WHERE code = ?");
         $query->execute(array($code));
 
         $data = $query->fetchColumn();
@@ -77,7 +77,7 @@ class Language
      */
     public function getLang($id)
     {
-        $query = $this->dbh->prepare("SELECT `key`, `text` FROM {$this->config->table_translations} WHERE lang = ?");
+        $query = $this->dbh->prepare("SELECT `key`, `text` FROM {$this->config->table_translations} WHERE language_id = ?");
         $query->execute(array($id));
         
         $data = $query->fetchAll(\PDO::FETCH_KEY_PAIR);
