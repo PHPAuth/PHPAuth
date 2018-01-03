@@ -80,12 +80,11 @@ function insertTranslation($dbh, $lang_id, $key, $text)
  * @param $lang_code
  * @return (boolean)
  */
-
  function languageExist($dbh, $lang_code)
  {
     $query = $dbh->prepare("SELECT count(*) FROM languages WHERE lang = ?");
     $query->execute(array($lang_code));
-    
+
     return $query->fetchColumn() > 0;
  }
 
@@ -111,7 +110,7 @@ function importLanguage($dbh, $lang_code)
     }
 
     if(languageExist($dbh, $lang_code)){
-        $return['message'] .= " Language is already imported \n";
+        $return['message'] .= " Language is already imported - skipping\n";
         return $return;
     }
 
@@ -145,7 +144,7 @@ function importLanguage($dbh, $lang_code)
 /**
  * Run import if form has been submitted
  */
-if(!empty($_POST['db_host']))
+if(count($_POST['languages']) > 0)
 {
     $dbh = new PDO('mysql:dbname=' . $_POST['db_name'] . ';host=' . $_POST['db_host'] . ';charset=utf8', $_POST['db_user'], $_POST['db_pass']);
 
