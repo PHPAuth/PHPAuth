@@ -142,10 +142,10 @@ if(isset($_POST['db_host']))
         <ol>
             <li>Make sure the tables have been created in the database, refer to the respective <code>database_*.sql</code>-file for reference.</li>
             <li>Enter the connection details for your SQL-server below.</li>
-            <li>Chooose wich language files to import, all language-files must be located in the same folder as this script to be shown below.</li>
+            <li>Choose wich language files to import, all language-files must be located in the same folder as this script to be listed below.</li>
             <li>Run import, this may take some time depending on your hardware.</li>
-            <li>Review the result and make sure there were no errors.</li>
-            <li class="text-danger font-weight-bold">Make sure you remove this script from the server when you're done.</li>
+            <li>Review the result and make sure there were no errors. If an error occured, make sure to empty <strong>both database tables</strong> and run the procedure again.</li>
+            <li class="text-danger font-weight-bold">Make sure you remove this file from the server when you're done.</li>
         <ol>
 
     </div>
