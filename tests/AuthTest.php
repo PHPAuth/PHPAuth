@@ -228,7 +228,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $i = 0;
         foreach($languages as $language)
         {
-            $lengthThis = self::$dbh->query("SELECT count(*) FROM translations WHERE lang = {$language['id']}")->fetchColumn();
+            $lengthThis = self::$dbh->query("SELECT count(*) FROM translations WHERE language_id = {$language['id']}")->fetchColumn();
             
             if($i > 0){
                 $this->assertEquals($lengthPrev, $lengthThis);
