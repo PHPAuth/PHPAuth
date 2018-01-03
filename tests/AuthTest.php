@@ -223,9 +223,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     public function testLanguageFiles()
     {
-        $query = self::$dbh->prepare("SELECT id FROM languages");
-        self::$query->execute();
-        $languages = self::$query->fetchAll(\PDO::FETCH_ASSOC);
+        $languages = self::$dbh->query("SELECT id FROM languages", PDO::FETCH_ASSOC)->fetchAll();
         
         $lengthPrev = 0;
         $i = 0;
