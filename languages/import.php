@@ -39,7 +39,7 @@ function insertLanguage($dbh, $lang_code)
         
     if(!$query->execute(array($lang_code)))
     {
-        $return['message'] = "Failed to import language: " . $lang_code;
+        $return['message'] = "Failed to insert language entry in database: " . $lang_code;
         return $return;
     }
 
@@ -75,9 +75,77 @@ function insertTranslation($dbh, $lang_id, $key, $text)
 }
 
 /**
+ * Check if a language already exist in the database
+ * @param $dbh
+ * @param $lang_code
+ * @return (boolean)
+ */
+
+ function languageExist($dbh, $lang_code)
+ {
+    $query = $dbh->prepare("SELECT count(*) FROM languages WHERE lang = ?");
+    $query->execute(array($lang_code));
+    
+    return $query->fetchColumn() > 0;
+ }
+
+/**
+ * Import a language file to database
+ * @param $dbh
+ * @param $lang_code
+ * @return array $return
+ */
+function importLanguage($dbh, $lang_code)
+{
+    $return['error'] = true;
+    $return['message'] = "\n";
+
+    $return['message'] .= "Importing " . $lang_code . "\n";
+
+    $lang = array();
+    require $lang_code . ".php";
+
+    if(count($lang) < 1){
+        $return['message'] .= " Language file could not be read: " . $lang_code . ".php \n";
+        return $return;
+    }
+
+    if(languageExist($dbh, $lang_code)){
+        $return['message'] .= " Language is already imported \n";
+        return $return;
+    }
+
+    $insertLanguage = insertLanguage($dbh, $lang_code);
+
+    if($insertLanguage['error'] == true){
+        $return['message'] .= " " . $insertLanguage['message'] . "\n";
+        return $return;
+    }
+
+    $return['message'] .= " Importing translations \n";
+
+    foreach($lang as $key => $text)
+    {
+        $return['message'] .= " " . $key . "\n";
+
+        $insertTranslation = insertTranslation($dbh, $insertLanguage['id'], $key, $text);
+
+        if($insertTranslation['error'] == true){
+            $res .= " " . $insertTranslation['message'] . "\n";
+        }
+    }
+
+    $return['message'] .= "Finished importing " . $lang_code . "\n";
+
+    $return['error'] = false;
+
+    return $return;
+}
+
+/**
  * Run import if form has been submitted
  */
-if(isset($_POST['db_host']))
+if(!empty($_POST['db_host']))
 {
     $dbh = new PDO('mysql:dbname=' . $_POST['db_name'] . ';host=' . $_POST['db_host'] . ';charset=utf8', $_POST['db_user'], $_POST['db_pass']);
 
@@ -85,33 +153,11 @@ if(isset($_POST['db_host']))
 
     foreach($_POST['languages'] as $lang_code)
     {
-        $lang = array();
-        require $lang_code . ".php";
-
-        $res .= "Importing " . $lang_code . "\n";
-
-        $insertLanguage = insertLanguage($dbh, $lang_code);
-
-        if($insertLanguage['error'] == true){
-            $res .= $insertLanguage['message'] . "\n";
-            break;
-        }
-
-        foreach($lang as $key => $text)
-        {
-            $res .= "  " . $key . "\n";
-
-            $insertTranslation = insertTranslation($dbh, $insertLanguage['id'], $key, $text);
-
-            if($insertTranslation['error'] == true){
-                $res .= $insertTranslation['message'] . "\n";
-            }
-        }
-
+        $importLanguage = importLanguage($dbh, $lang_code);
+        $res .= $importLanguage['message'];
     }
 
-    $res .= "\nImport finished \n";
-
+    $res .= "\nImport finished \n\nReview this result to make sure there were \nno errors. If an error occurred, make sure \nyou clean up both database tables before \nyou run the procedure again.";
 }
 
 ?>
@@ -144,7 +190,7 @@ if(isset($_POST['db_host']))
             <li>Enter the connection details for your SQL-server below.</li>
             <li>Choose wich language files to import, all language-files must be located in the same folder as this script to be listed below.</li>
             <li>Run import, this may take some time depending on your hardware.</li>
-            <li>Review the result and make sure there were no errors. If an error occured, make sure to empty <strong>both database tables</strong> and run the procedure again.</li>
+            <li>Review the result and make sure there were no errors.</li>
             <li class="text-danger font-weight-bold">Make sure you remove this file from the server when you're done.</li>
         <ol>
 
@@ -153,33 +199,33 @@ if(isset($_POST['db_host']))
     <div class="container pt-5">
 
         <h3>Import translations</h3>
-        <form action="" method="post">
+        <form action="" method="post" id="needs-validation">
 
             <div class="form-group row pt-2">
                 <label for="db_host" class="col-sm-2 col-form-label">Database host</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="db_host" name="db_host" placeholder="Enter database hostname or ip-address">
+                    <input type="text" class="form-control" id="db_host" name="db_host" required placeholder="Enter database hostname or ip-address">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="db_name" class="col-sm-2 col-form-label">Database name</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="db_name" name="db_name" placeholder="Enter database name">
+                    <input type="text" class="form-control" id="db_name" name="db_name" required placeholder="Enter database name">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="db_user" class="col-sm-2 col-form-label">Database user</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="db_user" name="db_user" placeholder="Enter database username">
+                    <input type="text" class="form-control" id="db_user" name="db_user" required placeholder="Enter database username">
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="db_pass" class="col-sm-2 col-form-label">Database password</label>
                 <div class="col-sm-10">
-                    <input type="password" class="form-control" id="db_pass" name="db_pass" placeholder="Enter database user password">
+                    <input type="password" class="form-control" id="db_pass" name="db_pass" required placeholder="Enter database user password">
                 </div>
             </div>
 
@@ -193,7 +239,7 @@ if(isset($_POST['db_host']))
 
                     $checkbox = '
                     <div class="form-check">
-                        <input class="form-check-input" checked type="checkbox" name="languages[]" value="%s" id="%s">
+                        <input class="form-check-input" type="checkbox" name="languages[]" value="%s" id="%s">
                         <label class="form-check-label" for="%s">
                             %s
                         </label>
@@ -249,7 +295,7 @@ if(isset($_POST['db_host']))
         </div>
         ';
 
-        if(isset($_POST['db_host']))
+        if(isset($res))
         {
             echo sprintf($resultfield, $res);
         }
