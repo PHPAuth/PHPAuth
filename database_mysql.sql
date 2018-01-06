@@ -33,6 +33,7 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('cookie_path', '/'),
 ('cookie_remember', '+1 month'),
 ('cookie_secure', '0'),
+('cookie_renew', '+5 minutes'),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
 ('mail_charset','UTF-8'),
