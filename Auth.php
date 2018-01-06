@@ -462,7 +462,7 @@ class Auth
         $sid = $row['id'];
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
-        $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $currentdate = time();
         $db_ip = $row['ip'];
         $db_agent = $row['agent'];
         $db_cookie = $row['cookie_crc'];
@@ -478,6 +478,12 @@ class Auth
         }
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
+
+            if ($expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
+                $this->deleteExistingSessions($uid);
+                $this->addSession($uid, false);
+            }
+
             return true;
         }
 
