@@ -45,6 +45,7 @@ INSERT INTO `config` (`setting`, `value`) VALUES
 ('site_timezone', 'Europe/Paris'),
 ('site_url',  'https://github.com/PHPAuth/PHPAuth'),
 ('smtp',  '0'),
+('smtp_debug',  '0'),
 ('smtp_auth', '1'),
 ('smtp_host', 'smtp.example.com'),
 ('smtp_password', 'password'),

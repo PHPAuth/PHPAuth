@@ -788,6 +788,9 @@ class Auth
             $mail = new PHPMailer;
 			$mail->CharSet = $this->config->mail_charset;
             if ($this->config->smtp) {
+                if ($this->config->smtp_debug) {
+                    $mail->SMTPDebug = 3;
+                }
                 $mail->isSMTP();
                 $mail->Host = $this->config->smtp_host;
                 $mail->SMTPAuth = $this->config->smtp_auth;
