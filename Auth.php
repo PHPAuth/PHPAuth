@@ -3,6 +3,10 @@
 namespace PHPAuth;
 
 use ZxcvbnPhp\Zxcvbn;
+
+/* Composer will change: use PHPMailer; to: use PHPMailer\PHPMailer\PHPMailer; which causes Fatal errors with PHPAuth.
+Revert it back to: use PHPMailer;
+*/
 use PHPMailer;
 
 /**
