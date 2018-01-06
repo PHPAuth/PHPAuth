@@ -74,6 +74,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
 * `smtp` : `0` to use sendmail for emails, `1` to use SMTP
+* `smtp_debug` : `0` to disable SMTP debugging, `1` to enable SMTP debugging, useful when you are having email/smtp issues
 * `smtp_host` : hostname of the SMTP server
 * `smtp_auth` : `0` if the SMTP server doesn't require authentication, `1` if authentication is required
 * `smtp_username` : the username for the SMTP server
