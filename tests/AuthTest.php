@@ -9,6 +9,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 {
     public static $auth;
     public static $config;
+    public static $lang;
     public static $dbh;
 
     public static function setUpBeforeClass()
@@ -16,10 +17,12 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         require_once __DIR__ . '/../vendor/autoload.php';
         require_once __DIR__ . '/../Auth.php';
         require_once __DIR__ . '/../Config.php';
+        require_once __DIR__ . '/../Language.php';
 
         self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
         self::$config = new PHPAuth\Config(self::$dbh);
-        self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config);
+        self::$lang   = new PHPAuth\Language(self::$dbh, self::$config);
+        self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config, self::$lang);
 
         // Clean up the database
         self::$dbh->exec("DELETE FROM attempts;");
@@ -220,18 +223,19 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     public function testLanguageFiles()
     {
-        // Use the english language file as main reference
-        include __DIR__ . '/../languages/en_GB.php';
-
-        $baseLang = $lang;
-
-        $languageFiles = glob(__DIR__ . '/../languages/*.php');
-
-        foreach($languageFiles as $languageFile) {
-            $languageFile = basename($languageFile);
-
-            include __DIR__ . "/../languages/{$languageFile}";
-            $this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
+        $languages = self::$dbh->query("SELECT id FROM languages;", PDO::FETCH_ASSOC)->fetchAll();
+        
+        $i = 0;
+        foreach($languages as $language)
+        {
+            $lengthThis = self::$dbh->query("SELECT count(*) FROM translations WHERE language_id = {$language['id']}")->fetchColumn();
+            
+            if($i > 0){
+                $this->assertEquals($lengthPrev, $lengthThis);
+            }
+            
+            $lengthPrev = $lengthThis;
+            $i++;
         }
     }
 }

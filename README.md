@@ -81,6 +81,8 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_password` : the password for the SMTP server
 * `smtp_port` : the port for the SMTP server
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
+* `language_preferred` : the preferred language for error and success messages returned by the system. Default: en_GB.
+* `language_fallback` : the fallback language, used only if translation is not available in preferred language. Default: en_GB.
 * `verify_password_min_length` : minimum password length, default is `3`  
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
@@ -103,7 +105,7 @@ For example, if you are using Google's ReCaptcha NoCaptcha, use the following co
 ```php
     private function checkCaptcha($captcha)
     {
- try {
+    try {
 
         $url = 'https://www.google.com/recaptcha/api/siteverify';
         $data = ['secret'   => 'your_secret_here',
@@ -139,12 +141,25 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 <?php
 
 include("Config.php");
+include("Language.php");
 include("Auth.php");
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
 $config = new PHPAuth\Config($dbh);
-$auth   = new PHPAuth\Auth($dbh, $config);
+$lang = new PHPAuth\Language($dbh, $config);
+$auth   = new PHPAuth\Auth($dbh, $config, $lang);
+
+// If not logged in, redirect to login-page.
+
+if (!$auth->isLogged()) {
+    header('Location: /login.php');
+	
+    exit();
+}
+
+// Alternative method.
+// If not logged in, display "Forbidden".
 
 if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
@@ -159,15 +174,13 @@ if (!$auth->isLogged()) {
 Message languages
 ---------------------
 
-The language for error and success messages returned by PHPAuth can be configured by passing in one of
-the available languages as the third parameter to the Auth constructor. If no language parameter is provided
-then the default `en_GB`language is used.
-
-Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
+The language for error and success messages returned by PHPAuth can be configured by setting `language_preferred` 
+and `language_fallback` in the `config`-table. If the specific phrase haven't yet been translated to `language_preferred` 
+the text stored in `language_fallback` is used.
 
 Available languages:
 
-* `ar-TN`
+* `ar_TN`
 * `cs_CZ`
 * `da_DK`
 * `de_DE`
@@ -186,7 +199,7 @@ Available languages:
 * `ps_AF`
 * `pt_BR`
 * `ru_RU`
-* `se_SE`
+* `sv_SE`
 * `sr_RS`
 * `tr_TR`
 * `th_TH`

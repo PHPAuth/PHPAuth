@@ -38,6 +38,10 @@ INSERT INTO config (setting, value) VALUES ('table_attempts',  'attempts');
 INSERT INTO config (setting, value) VALUES ('table_requests',  'requests');
 INSERT INTO config (setting, value) VALUES ('table_sessions',  'sessions');
 INSERT INTO config (setting, value) VALUES ('table_users', 'users');
+INSERT INTO config (setting, value) VALUES ('table_languages',  'languages');
+INSERT INTO config (setting, value) VALUES ('table_translations',  'translations');
+INSERT INTO config (setting, value) VALUES ('language_preferred',  'en_GB');
+INSERT INTO config (setting, value) VALUES ('language_fallback', 'en_GB');
 INSERT INTO config (setting, value) VALUES ('verify_email_max_length', '100');
 INSERT INTO config (setting, value) VALUES ('verify_email_min_length', '5');
 INSERT INTO config (setting, value) VALUES ('verify_email_use_banlist',  '1');
@@ -81,5 +85,21 @@ CREATE TABLE users (
   password varchar(60) DEFAULT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+  PRIMARY KEY (id)
+);
+
+DROP TABLE languages;
+CREATE TABLE languages (
+  id SERIAL,
+  code varchar(5) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+DROP TABLE translations;
+CREATE TABLE translations (
+  id SERIAL,
+  language_id integer NOT NULL,
+  "key" varchar(255) NOT NULL,
+  text text NOT NULL,
   PRIMARY KEY (id)
 );

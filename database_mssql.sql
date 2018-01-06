@@ -42,6 +42,10 @@ INSERT INTO config (setting, value) VALUES
 ('table_requests',  'requests'),
 ('table_sessions',  'sessions'),
 ('table_users', 'users'),
+('table_languages',  'languages'),
+('table_translations',  'translations'),
+('language_preferred',  'en_GB'),
+('language_fallback',  'en_GB'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
@@ -78,7 +82,6 @@ CREATE TABLE sessions (
   PRIMARY KEY (id)
 );
 
-
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id int NOT NULL IDENTITY(1,1),
@@ -86,5 +89,21 @@ CREATE TABLE users (
   password character varying(60) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt datetime2 NOT NULL DEFAULT GETDATE(),
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS languages;
+CREATE TABLE languages (
+  id int NOT NULL IDENTITY(1,1),
+  code character varying(5) NOT NULL,
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS translations;
+CREATE TABLE translations (
+  id int NOT NULL IDENTITY(1,1),
+  language_id integer NOT NULL,
+  "key" character varying(255) NOT NULL,
+  text text NOT NULL,
   PRIMARY KEY (id)
 );
