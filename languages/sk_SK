@@ -8,21 +8,21 @@ $lang['email_password_invalid'] = "Neplatná e-mailová adresa alebo heslo.";
 $lang['email_password_incorrect'] = "Nesprávná e-mailová adresa alebo heslo.";
 $lang['remember_me_invalid'] = "Neplatná hodnota políčka zapamätať si ma.";
 
-$lang['password_short'] = "Heslo je príliž krátké.";
-$lang['password_weak'] = "Heslo je príliž slabé.";
+$lang['password_short'] = "Heslo je príliš krátké.";
+$lang['password_weak'] = "Heslo je príliš slabé.";
 $lang['password_nomatch'] = "Hesla nie su zhodné.";
 $lang['password_changed'] = "Heslo úspešne zmenené.";
 $lang['password_incorrect'] = "Súčasné heslo je nesprávné.";
 $lang['password_notvalid'] = "Heslo je neplatné.";
 
-$lang['newpassword_short'] = "Nové heslo je príliž krátké.";
-$lang['newpassword_long'] = "Nové heslo je príliž dlhé.";
+$lang['newpassword_short'] = "Nové heslo je príliš krátké.";
+$lang['newpassword_long'] = "Nové heslo je príliš dlhé.";
 $lang['newpassword_invalid'] = "Nové heslo musí obsahovať aspoň jedno velké písmeno, aspoň jedno malé písmeno a aspoň jednu číslicu.";
 $lang['newpassword_nomatch'] = "Nová hesla nie su zhodné.";
 $lang['newpassword_match'] = "Nové heslo je rovnaké ako staré heslo.";
 
-$lang['email_short'] = "E-mailová adresa je príliž krátká.";
-$lang['email_long'] = "E-mailová adresa je príliž dlhá.";
+$lang['email_short'] = "E-mailová adresa je príliš krátká.";
+$lang['email_long'] = "E-mailová adresa je príliš dlhá.";
 $lang['email_invalid'] = "E-mailová adresa je neplatná.";
 $lang['email_incorrect'] = "E-mailová adresa je nesprávná.";
 $lang['email_banned'] = "Tato e-mailová adresa je zakázána.";
