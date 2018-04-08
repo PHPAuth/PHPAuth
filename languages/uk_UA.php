@@ -1,7 +1,7 @@
 <?php
 $lang = array();
 
-$lang['user_blocked'] = "Ваш аккаунт заблокований.";
+$lang['user_blocked'] = "В даний час ви заблоковані системою.";
 $lang['user_verify_failed'] = "Захисний код недійсний.";
 
 $lang['email_password_invalid'] = "Неприпустимі поштова адреса або пароль.";
