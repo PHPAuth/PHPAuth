@@ -11,7 +11,7 @@ INSERT INTO config (setting, value) VALUES
 ('attack_mitigation_time',  '+30 minutes'),
 ('attempts_before_ban', '30'),
 ('attempts_before_verify',  '5'),
-('bcrypt_cost', '10'),
+('password_hashOptions', '{"cost": 10}'),
 ('cookie_domain', NULL),
 ('cookie_forget', '+30 minutes'),
 ('cookie_http', '0'),
@@ -83,7 +83,7 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id int NOT NULL IDENTITY(1,1),
   email character varying(100) DEFAULT NULL,
-  password character varying(60) DEFAULT NULL,
+  password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt datetime2 NOT NULL DEFAULT GETDATE(),
   PRIMARY KEY (id)

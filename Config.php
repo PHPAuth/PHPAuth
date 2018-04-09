@@ -41,6 +41,11 @@ class Config
      */
     public function __get($setting)
     {
+        $data = json_decode($this->config[$setting]);
+        if(json_last_error() == JSON_ERROR_NONE){
+            return $data;
+        }
+
         return $this->config[$setting];
     }
 
@@ -137,3 +142,5 @@ class Config
 	
 
 }
+
+?>

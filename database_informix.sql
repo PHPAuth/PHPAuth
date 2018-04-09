@@ -8,7 +8,7 @@ CREATE TABLE config (
 INSERT INTO config (setting, value) VALUES ('attack_mitigation_time',  '+30 minutes');
 INSERT INTO config (setting, value) VALUES ('attempts_before_ban', '30');
 INSERT INTO config (setting, value) VALUES ('attempts_before_verify',  '5');
-INSERT INTO config (setting, value) VALUES ('bcrypt_cost', '10');
+INSERT INTO config (setting, value) VALUES ('password_hashOptions', '{"cost": 10}'),
 INSERT INTO config (setting, value) VALUES ('cookie_domain', NULL);
 INSERT INTO config (setting, value) VALUES ('cookie_forget', '+30 minutes');
 INSERT INTO config (setting, value) VALUES ('cookie_http', '0');
@@ -79,7 +79,7 @@ DROP TABLE users;
 CREATE TABLE users (
   id SERIAL,
   email varchar(100) DEFAULT NULL,
-  password varchar(60) DEFAULT NULL,
+  password varchar(255) DEFAULT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
   PRIMARY KEY (id)
