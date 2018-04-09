@@ -42,6 +42,7 @@ INSERT INTO config (setting, value) VALUES
 ('table_requests',  'requests'),
 ('table_sessions',  'sessions'),
 ('table_users', 'users'),
+('table_emailBanlist', 'emailBanlist'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
@@ -78,7 +79,6 @@ CREATE TABLE sessions (
   PRIMARY KEY (id)
 );
 
-
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id int NOT NULL IDENTITY(1,1),
@@ -86,5 +86,12 @@ CREATE TABLE users (
   password character varying(60) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt datetime2 NOT NULL DEFAULT GETDATE(),
+  PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS emailBanlist;
+CREATE TABLE emailBanlist (
+  id int NOT NULL IDENTITY(1,1),
+  domain character varying(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );

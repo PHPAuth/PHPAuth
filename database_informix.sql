@@ -38,6 +38,7 @@ INSERT INTO config (setting, value) VALUES ('table_attempts',  'attempts');
 INSERT INTO config (setting, value) VALUES ('table_requests',  'requests');
 INSERT INTO config (setting, value) VALUES ('table_sessions',  'sessions');
 INSERT INTO config (setting, value) VALUES ('table_users', 'users');
+INSERT INTO config (setting, value) VALUES ('table_emailBanlist', 'emailBanlist');
 INSERT INTO config (setting, value) VALUES ('verify_email_max_length', '100');
 INSERT INTO config (setting, value) VALUES ('verify_email_min_length', '5');
 INSERT INTO config (setting, value) VALUES ('verify_email_use_banlist',  '1');
@@ -81,5 +82,12 @@ CREATE TABLE users (
   password varchar(60) DEFAULT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
+  PRIMARY KEY (id)
+);
+
+DROP TABLE emailBanlist;
+CREATE TABLE emailBanlist (
+  id serial NOT NULL,
+  domain character varying(100) DEFAULT NULL,
   PRIMARY KEY (id)
 );

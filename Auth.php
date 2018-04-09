@@ -521,6 +521,24 @@ class Auth
     }
 
     /**
+    * Checks if an email is banned
+    * @param string $email
+    * @return boolean
+    */
+
+    public function isEmailBanned($email)
+    {
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emailBanlist} WHERE domain = ?");
+        $query->execute(array(strtolower(explode('@', $email)[1])));
+
+        if ($query->fetchColumn() == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
     * Adds a new user to database
     * @param string $email      -- email
     * @param string $password   -- password
@@ -928,15 +946,12 @@ class Auth
 
             return $return;
         }
+        
+        if ($this->isEmailBanned($email) && (int)$this->config->verify_email_use_banlist) {
+            $this->addAttempt();
+            $return['message'] = $this->lang["email_banned"];
 
-        if ( (int)$this->config->verify_email_use_banlist ) {
-            $bannedEmails = json_decode(file_get_contents(__DIR__ . "/files/domains.json"));
-
-            if (in_array(strtolower(explode('@', $email)[1]), $bannedEmails)) {
-                $return['message'] = $this->lang["email_banned"];
-
-                return $return;
-            }
+            return $return;
         }
 
         $return['error'] = false;
