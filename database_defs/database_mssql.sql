@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS config;
-CREATE TABLE config (
+DROP TABLE IF EXISTS phpauth_config;
+CREATE TABLE phpauth_config (
   id int NOT NULL IDENTITY(1,1),
   setting character varying(100) NOT NULL,
   value character varying(100) DEFAULT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE config (
   UNIQUE (setting)
 );
 
-INSERT INTO config (setting, value) VALUES
+INSERT INTO phpauth_config (setting, value) VALUES
 ('attack_mitigation_time',  '+30 minutes'),
 ('attempts_before_ban', '30'),
 ('attempts_before_verify',  '5'),
@@ -30,6 +30,7 @@ INSERT INTO config (setting, value) VALUES
 ('site_password_reset_page',  'reset'),
 ('site_timezone', 'Europe/Paris'),
 ('site_url',  'https://github.com/PHPAuth/PHPAuth'),
+('site_language', 'en_GB'),
 ('smtp',  '0'),
 ('smtp_debug',  '0'),
 ('smtp_auth', '1'),
@@ -38,27 +39,29 @@ INSERT INTO config (setting, value) VALUES
 ('smtp_port', '25'),
 ('smtp_security', NULL),
 ('smtp_username', 'email@example.com'),
-('table_attempts',  'attempts'),
-('table_requests',  'requests'),
-('table_sessions',  'sessions'),
-('table_users', 'users'),
-('table_emailBanlist', 'emailBanlist'),
+('table_attempts',  'phpauth_attempts'),
+('table_requests',  'phpauth_requests'),
+('table_sessions',  'phpauth_sessions'),
+('table_users', 'phpauth_users'),
+('table_emailBanlist', 'phpauth_emails_banned'),
+('table_translations', 'phpauth_translations')
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
 ('verify_password_min_length',  '3'),
-('request_key_expiration', '+10 minutes');
+('request_key_expiration', '+10 minutes'),
+('core_translation_source', 'php');
 
-DROP TABLE IF EXISTS attempts;
-CREATE TABLE attempts (
+DROP TABLE IF EXISTS phpauth_attempts;
+CREATE TABLE phpauth_attempts (
   id int NOT NULL IDENTITY(1,1),
   ip character varying(39) NOT NULL,
   expiredate datetime2 NOT NULL,
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS requests;
-CREATE TABLE requests (
+DROP TABLE IF EXISTS phpauth_requests;
+CREATE TABLE phpauth_requests (
   id int NOT NULL IDENTITY(1,1),
   uid integer NOT NULL,
   rkey character varying (20) NOT NULL,
@@ -67,8 +70,8 @@ CREATE TABLE requests (
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS sessions;
-CREATE TABLE sessions (
+DROP TABLE IF EXISTS phpauth_sessions;
+CREATE TABLE phpauth_sessions (
   id int NOT NULL IDENTITY(1,1),
   uid integer NOT NULL,
   hash character varying(40) NOT NULL,
@@ -79,8 +82,8 @@ CREATE TABLE sessions (
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
+DROP TABLE IF EXISTS phpauth_users;
+CREATE TABLE phpauth_users (
   id int NOT NULL IDENTITY(1,1),
   email character varying(100) DEFAULT NULL,
   password character varying(60) DEFAULT NULL,
@@ -89,8 +92,8 @@ CREATE TABLE users (
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS emailBanlist;
-CREATE TABLE emailBanlist (
+DROP TABLE IF EXISTS phpauth_emails_banned;
+CREATE TABLE phpauth_emails_banned (
   id int NOT NULL IDENTITY(1,1),
   domain character varying(100) DEFAULT NULL,
   PRIMARY KEY (id)
