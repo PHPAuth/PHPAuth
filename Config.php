@@ -14,38 +14,64 @@ class Config
     protected $dictionary = [];
 
     /**
-     *
      * Config::__construct()
      *
      * @param \PDO $dbh
      * @param string $config_table
+     * @param string $config_site_language
      */
-    public function __construct(\PDO $dbh, $config_table = 'phpauth_config')
+    public function __construct(\PDO $dbh, $config_table = '', $config_site_language = '')
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
         }
 
-        $this->dbh = $dbh;
-
-        if (func_num_args() > 1) {
-            $this->config_table = $config_table;
-        }
-
         $this->config = array();
+        $this->dbh = $dbh;
+        $this->config_table = (empty($config_table)) ? 'phpauth_config' : $config_table;
 
         // check config table exists
         if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config_table}'")->fetchAll() ) {
-            die("PHPAuth: {$this->config_table} NOT PRESENT in given database" . PHP_EOL);
+            die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
         };
 
-        $query = $this->dbh->query("SELECT * FROM {$this->config_table}");
-        $this->config = $query->fetchAll(\PDO::FETCH_KEY_PAIR);
+        // load configuration
+        $this->config = $this->dbh->query("SELECT * FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         $this->setForgottenDefaults(); // Danger foreseen is half avoided.
 
-        // Load language
-        $site_language = isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB';
+        // Check required tables exists
+
+        // check table_attempts
+        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_attempts']}'")->fetchAll() ) {
+            die("PHPAuth: Table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
+        };
+
+        // check table requests
+        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_requests']}'")->fetchAll() ) {
+            die("PHPAuth: Table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
+        };
+
+        // check table sessions
+        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_sessions']}'")->fetchAll() ) {
+            die("PHPAuth: Table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
+        };
+
+        // check table users
+        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_users']}'")->fetchAll() ) {
+            die("PHPAuth: Table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
+        };
+
+        // Determine site language
+        /*if ($config_site_language !== '') {
+            $site_language = $config_site_language;
+        } else {
+            $site_language = isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB';
+        }*/
+
+        $site_language = (empty($config_site_language))
+            ? isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB'
+            : $config_site_language;
 
         $dictionary = [];
 
@@ -56,7 +82,7 @@ class Config
 
                     // check file exist
                     if (is_file("languages/{$site_language}.php")) {
-                        $dictionary = include "languages/{$site_language}.php";
+                        $dictionary = include dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.php";
                     } else {
                         $dictionary = $this->setForgottenDictionary();
                     }

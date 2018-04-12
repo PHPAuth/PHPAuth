@@ -519,7 +519,11 @@ class Auth
     */
     public function isEmailBanned($email)
     {
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emailBanlist} WHERE domain = ?");
+        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config->table_emails_banned}'")->fetchAll() ) {
+            return false;
+        };
+
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = ?");
         $query->execute(array(strtolower(explode('@', $email)[1])));
 
         if ($query->fetchColumn() == 0) {
@@ -1295,28 +1299,29 @@ class Auth
     /**
     * Deletes all attempts for a given IP from database
     * @param string $ip
-        * @param boolean $all = false
+    * @param boolean $all = false
     * @return boolean
     */
     protected function deleteAttempts($ip, $all = false)
     {
         if ($all==true) {
             $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
-
             return $query->execute(array($ip));
         }
+
+        $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
 
         $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
         $query->execute(array($ip));
 
         while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
             $expiredate = strtotime($row['expiredate']);
-            $currentdate = strtotime(date("Y-m-d H:i:s"));
             if ($currentdate > $expiredate) {
-                $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
                 $queryDel->execute(array($row['id']));
             }
         }
+        return true;
     }
 
     /**

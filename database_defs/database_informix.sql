@@ -39,7 +39,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('table_attempts',  'phpauth_
 INSERT INTO phpauth_config (setting, value) VALUES ('table_requests',  'phpauth_requests');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_sessions',  'phpauth_sessions');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_users', 'phpauth_users');
-INSERT INTO phpauth_config (setting, value) VALUES ('table_emailBanlist', 'phpauth_emails_banned');
+INSERT INTO phpauth_config (setting, value) VALUES ('table_emails_banned', 'phpauth_emails_banned');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_translations', 'phpauth_translations'),
 INSERT INTO phpauth_config (setting, value) VALUES ('verify_email_max_length', '100');
 INSERT INTO phpauth_config (setting, value) VALUES ('verify_email_min_length', '5');
