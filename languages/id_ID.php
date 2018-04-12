@@ -71,3 +71,5 @@ $lang['email_reset_altbody'] = 'Hello, ' . "\n\n" . 'Untuk melakukan reset passw
 
 $lang['account_deleted'] = "Akun sukses dihapus.";
 $lang['function_disabled'] = "Fungsi ini tidak di aktifkan.";
+
+return $lang;

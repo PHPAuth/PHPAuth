@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Hej, ' . "\n\n" . 'Klicka på följande länk f�
 
 $lang['account_deleted'] = "Borttagning av kontot lyckades.";
 $lang['function_disabled'] = "Denna funktion har inaktiverats.";
+
+return $lang;

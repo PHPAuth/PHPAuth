@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Olá, ' . "\n\n" . 'Para você redefinir sua sen
 
 $lang['account_deleted'] = "Conta deletada com sucesso.";
 $lang['function_disabled'] = "Esta função foi desabilitada.";
+
+return $lang;

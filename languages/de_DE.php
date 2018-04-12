@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Hallo,' . "\n\n" . 'um dein Passwort zurückzuse
 
 $lang['account_deleted'] = "Benutzerkonto wurde erfolgreich gelöscht.";
 $lang['function_disabled'] = "Diese Funktion wurde deaktiviert.";
+
+return $lang;
