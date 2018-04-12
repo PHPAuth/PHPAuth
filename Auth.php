@@ -4,10 +4,7 @@ namespace PHPAuth;
 
 use ZxcvbnPhp\Zxcvbn;
 
-/* Composer will change: use PHPMailer; to: use PHPMailer\PHPMailer\PHPMailer; which causes Fatal errors with PHPAuth.
-Revert it back to: use PHPMailer;
-*/
-use PHPMailer;
+use PHPMailer\PHPMailer\PHPMailer;
 
 /**
  * Auth class
@@ -791,49 +788,14 @@ class Auth
         $request_id = $this->dbh->lastInsertId();
 
         if ($sendmail === true) {
-            // Check configuration for SMTP parameters
-            $mail = new PHPMailer;
-			$mail->CharSet = $this->config->mail_charset;
-            if ($this->config->smtp) {
-                if ($this->config->smtp_debug) {
-                    $mail->SMTPDebug = 3;
-                }
-                $mail->isSMTP();
-                $mail->Host = $this->config->smtp_host;
-                $mail->SMTPAuth = $this->config->smtp_auth;
-                if (!is_null($this->config->smtp_auth)) {
-                    $mail->Username = $this->config->smtp_username;
-                    $mail->Password = $this->config->smtp_password;
-                }
-                $mail->Port = $this->config->smtp_port;
+            $sendmail_status = $this->do_SendMail($email, $type, $key);
 
-                if (!is_null($this->config->smtp_security)) {
-                    $mail->SMTPSecure = $this->config->smtp_security;
-                }
-            }
-
-            $mail->From = $this->config->site_email;
-            $mail->FromName = $this->config->site_name;
-            $mail->addAddress($email);
-            $mail->isHTML(true);
-
-            if ($type == "activation") {
-                    $mail->Subject = sprintf($this->lang['email_activation_subject'], $this->config->site_name);
-                    $mail->Body = sprintf($this->lang['email_activation_body'], $this->config->site_url, $this->config->site_activation_page, $key);
-                    $mail->AltBody = sprintf($this->lang['email_activation_altbody'], $this->config->site_url, $this->config->site_activation_page, $key);
-            } else {
-                $mail->Subject = sprintf($this->lang['email_reset_subject'], $this->config->site_name);
-                $mail->Body = sprintf($this->lang['email_reset_body'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-                $mail->AltBody = sprintf($this->lang['email_reset_altbody'], $this->config->site_url, $this->config->site_password_reset_page, $key);
-            }
-
-            if (!$mail->send()) {
+            if ($sendmail_status['error']) {
                 $this->deleteRequest($request_id);
-                $return['message'] = $this->lang["system_error"] . " #10";
 
+                $return['message'] = $this->lang["system_error"] . $sendmail_status['message'] . " #10";
                 return $return;
             }
-
         }
 
         $return['error'] = false;
@@ -1485,7 +1447,82 @@ class Auth
     }
 
 
+    /**
+     * Send email via PHPMailer
+     *
+     * @param $email
+     * @param $type
+     * @param $key
+     * @return array $return (contains error code and error message)
+     */
+    public function do_SendMail($email, $type, $key)
+    {
+        $return = [
+            'error' => true
+        ];
+        $mail = new PHPMailer();
 
+        // Check configuration for SMTP parameters
+        try {
+            // Server settings
+            if ($this->config->smtp) {
+
+                if ($this->config->smtp_debug) {
+                    $mail->SMTPDebug = $this->config->smtp_debug;
+                }
+
+                $mail->isSMTP();
+
+                $mail->Host = $this->config->smtp_host;
+                $mail->SMTPAuth = $this->config->smtp_auth;
+
+                // set SMTP auth username/password
+                if (!is_null($this->config->smtp_auth)) {
+                    $mail->Username = $this->config->smtp_username;
+                    $mail->Password = $this->config->smtp_password;
+                }
+
+                // set SMTPSecure (tls|ssl)
+                if (!is_null($this->config->smtp_security)) {
+                    $mail->SMTPSecure = $this->config->smtp_security;
+                }
+
+                $mail->Port = $this->config->smtp_port;
+
+            }
+
+            //Recipients
+            $mail->setFrom($this->config->site_email, $this->config->site_name);
+            $mail->addAddress($email);
+
+            $mail->CharSet = 'UTF-8';
+
+            //Content
+            $mail->isHTML(true);
+
+            if ($type == 'activation') {
+                $mail->Subject = sprintf($this->__lang('email_activation_subject'), $this->config->site_name);
+                $mail->Body = sprintf($this->__lang('email_activation_body'), $this->config->site_url, $this->config->site_activation_page, $key);
+                $mail->AltBody = sprintf($this->__lang('email_activation_altbody'), $this->config->site_url, $this->config->site_activation_page, $key);
+            } elseif ($type == 'reset') {
+                $mail->Subject = sprintf($this->__lang('email_reset_subject'), $this->config->site_name);
+                $mail->Body = sprintf($this->__lang('email_reset_body'), $this->config->site_url, $this->config->site_password_reset_page, $key);
+                $mail->AltBody = sprintf($this->__lang('email_reset_altbody'), $this->config->site_url, $this->config->site_password_reset_page, $key);
+            } else {
+                return false;
+            }
+
+            if (!$mail->send())
+                throw new \Exception($mail->ErrorInfo);
+
+            $return['error'] = false;
+
+        } catch (\Exception $e) {
+            $return['message'] = $mail->ErrorInfo;
+        }
+
+        return $return;
+    }
 
 
 }
