@@ -16,27 +16,34 @@ use PHPMailer;
 
 class Auth
 {
+    const HASH_LENGTH = 40;
+    const TOKEN_LENGTH = 20;
+
     protected $dbh;
     public $config;
     public $lang;
     protected $islogged = NULL;
     protected $currentuser = NULL;
 
+    public $messages_dictionary = [];
+
     /**
      * Initiates database connection
+     *
+     * @param \PDO $dbh
+     * @param $config
      */
-    public function __construct(\PDO $dbh, $config, $language = "en_GB")
+    public function __construct(\PDO $dbh, $config)
     {
-        $this->dbh = $dbh;
-        $this->config = $config;
-
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHP 5.6.0 required for PHPAuth engine!');
         }
 
-        // Load language
-        require "languages/{$language}.php";
-        $this->lang = $lang;
+        $this->dbh = $dbh;
+        $this->config = $config;
+
+        $this->lang = $this->config->dictionary;
+        $this->messages_dictionary = $this->config->dictionary;
 
         date_default_timezone_set($this->config->site_timezone);
     }
@@ -142,7 +149,6 @@ class Auth
     * @param bool $sendmail = NULL
     * @return array $return
     */
-
     public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL, $sendmail = NULL)
     {
         $return['error'] = true;
@@ -220,7 +226,6 @@ class Auth
     * @param string $key
     * @return array $return
     */
-
     public function activate($key)
     {
         $return['error'] = true;
@@ -232,7 +237,7 @@ class Auth
             return $return;
         }
 
-        if (strlen($key) !== 20) {
+        if (strlen($key) !== self::TOKEN_LENGTH) {
             $this->addAttempt();
             $return['message'] = $this->lang["activationkey_invalid"];
 
@@ -271,7 +276,6 @@ class Auth
     * @param string $email
     * @return array $return
     */
-
     public function requestReset($email, $sendmail = NULL)
     {
         $return['error'] = true;
@@ -322,10 +326,9 @@ class Auth
     * @param string $hash
     * @return boolean
     */
-
     public function logout($hash)
     {
-        if (strlen($hash) != 40) {
+        if (strlen($hash) != self::HASH_LENGTH) {
             return false;
         }
 
@@ -338,7 +341,6 @@ class Auth
     * @param string $password
     * @return string
     */
-
     public function getHash($password)
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
@@ -347,10 +349,8 @@ class Auth
     /**
     * Gets UID for a given email address and returns an array
     * @param string $email
-    * @return array $uid
+    * @return int $uid
     */
-
-
     public function getUID($email)
     {
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
@@ -369,7 +369,6 @@ class Auth
     * @param boolean $remember
     * @return array $data
     */
-
     protected function addSession($uid, $remember)
     {
         $ip = $this->getIp();
@@ -409,7 +408,6 @@ class Auth
     * @param int $uid
     * @return boolean
     */
-
     protected function deleteExistingSessions($uid)
     {
         $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
@@ -437,7 +435,6 @@ class Auth
     * @param string $hash
     * @return boolean
     */
-
     public function checkSession($hash)
     {
         $ip = $this->getIp();
@@ -448,7 +445,7 @@ class Auth
             return false;
         }
 
-        if (strlen($hash) != 40) {
+        if (strlen($hash) != self::HASH_LENGTH) {
             return false;
         }
 
@@ -489,7 +486,6 @@ class Auth
     * @param string $hash
     * @return int $uid
     */
-
     public function getSessionUID($hash)
     {
         $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
@@ -507,7 +503,6 @@ class Auth
     * @param string $email
     * @return boolean
     */
-
     public function isEmailTaken($email)
     {
         $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = ?");
@@ -525,7 +520,6 @@ class Auth
     * @param string $email
     * @return boolean
     */
-
     public function isEmailBanned($email)
     {
         $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emailBanlist} WHERE domain = ?");
@@ -546,7 +540,6 @@ class Auth
     * @param boolean $sendmail  -- activate email confirm or not
     * @return int $uid
     */
-
     protected function addUser($email, $password, $params = array(), &$sendmail)
     {
         $return['error'] = true;
@@ -612,7 +605,6 @@ class Auth
     * @param int $uid
     * @return array $data
     */
-
     protected function getBaseUser($uid)
     {
         $query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
@@ -634,7 +626,6 @@ class Auth
     * @param int $uid
     * @return array $data
     */
-
     public function getUser($uid)
     {
         $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = ?");
@@ -660,7 +651,6 @@ class Auth
     * @param string $captcha = NULL
     * @return array $return
     */
-
     public function deleteUser($uid, $password, $captcha = NULL)
     {
         $return['error'] = true;
@@ -736,7 +726,6 @@ class Auth
     * @param boolean $sendmail
     * @return boolean
     */
-
     protected function addRequest($uid, $email, $type, &$sendmail)
     {
         $return['error'] = true;
@@ -788,7 +777,7 @@ class Auth
             return $return;
         }
 
-        $key = $this->getRandomKey(20);
+        $key = $this->getRandomKey(self::TOKEN_LENGTH);
         $expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
 
         $query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, rkey, expire, type) VALUES (?, ?, ?, ?)");
@@ -858,7 +847,6 @@ class Auth
     * @param string $type
     * @return array $return
     */
-
     public function getRequest($key, $type)
     {
         $return['error'] = true;
@@ -896,7 +884,6 @@ class Auth
     * @param int $id
     * @return boolean
     */
-
     protected function deleteRequest($id)
     {
         $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE id = ?");
@@ -909,7 +896,6 @@ class Auth
     * @param string $password
     * @return array $return
     */
-
     protected function validatePassword($password) {
         $return['error'] = true;
 
@@ -929,7 +915,6 @@ class Auth
     * @param string $email
     * @return array $return
     */
-
     protected function validateEmail($email) {
         $return['error'] = true;
 
@@ -968,7 +953,6 @@ class Auth
     * @param string $captcha = NULL
     * @return array $return
     */
-
     public function resetPass($key, $password, $repeatpassword, $captcha = NULL)
     {
         $return['error'] = true;
@@ -988,7 +972,7 @@ class Auth
             return $return;
         }
 
-        if (strlen($key) != 20) {
+        if (strlen($key) != self::TOKEN_LENGTH) {
             $return['message'] = $this->lang["resetkey_invalid"];
 
             return $return;
@@ -1071,7 +1055,6 @@ class Auth
     * @param string $email
     * @return array $return
     */
-
     public function resendActivation($email, $sendmail = NULL)
     {
         $return['error'] = true;
@@ -1219,7 +1202,6 @@ class Auth
     * @param string $captcha = NULL
     * @return array $return
     */
-
     public function changeEmail($uid, $email, $password, $captcha = NULL)
     {
         $return['error'] = true;
@@ -1304,7 +1286,6 @@ class Auth
     * Informs if a user is locked out
     * @return string
     */
-
     public function isBlocked()
     {
         $ip = $this->getIp();
@@ -1355,7 +1336,6 @@ class Auth
         * @param boolean $all = false
     * @return boolean
     */
-
     protected function deleteAttempts($ip, $all = false)
     {
         if ($all==true) {
@@ -1382,7 +1362,7 @@ class Auth
     * @param int $length
     * @return string $key
     */
-    public function getRandomKey($length = 20)
+    public function getRandomKey($length = self::TOKEN_LENGTH)
     {
         $chars = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6";
         $key = "";
@@ -1432,7 +1412,6 @@ class Auth
     * @return array $data
     * @return boolean false if no current user
     */
-
     public function getCurrentUser()
     {
         if ($this->currentuser === NULL) {
@@ -1493,4 +1472,20 @@ class Auth
     
         return true;
     }
+
+    /**
+     * Translates key-message to defined language
+     *
+     * @param $key
+     * @return mixed
+     */
+    private function __lang($key)
+    {
+        return array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
+    }
+
+
+
+
+
 }
