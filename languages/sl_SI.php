@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Živjo, ' . "\n\n" . 'Da ponastavite geslo klikn
 
 $lang['account_deleted'] = "Račun je uspešno izbrisan.";
 $lang['function_disabled'] = "Ta funkcija je onemogočena.";
+
+return $lang;

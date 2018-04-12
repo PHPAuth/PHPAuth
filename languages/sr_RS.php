@@ -70,3 +70,5 @@ $lang['email_reset_altbody'] = 'Poštovani, ' . "\n\n" . 'Da biste resetovali lo
 
 $lang['account_deleted'] = "Nalog je uspešno obrisan.";
 $lang['function_disabled'] = "Ova opcija nije dostupna.";
+
+return $lang;

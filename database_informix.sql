@@ -16,7 +16,6 @@ INSERT INTO config (setting, value) VALUES ('cookie_name', 'authID');
 INSERT INTO config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO config (setting, value) VALUES ('cookie_remember', '+1 month');
 INSERT INTO config (setting, value) VALUES ('cookie_secure', '0');
-INSERT INTO config (setting, value) VALUES ('cookie_renew', '+5 minutes');
 INSERT INTO config (setting, value) VALUES ('emailmessage_suppress_activation',  '0');
 INSERT INTO config (setting, value) VALUES ('emailmessage_suppress_reset', '0');
 INSERT INTO config (setting, value) VALUES ('mail_charset','UTF-8');

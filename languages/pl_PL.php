@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Czesć, ' . "\n\n" . 'Aby zresetować hasło kl
 
 $lang['account_deleted'] = "Pomyślnie usunięto konto.";
 $lang['function_disabled'] = "Ta funkcja jest wyłączona.";
+
+return $lang;
