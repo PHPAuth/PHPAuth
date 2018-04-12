@@ -22,10 +22,10 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config);
 
         // Clean up the database
-        self::$dbh->exec("DELETE FROM attempts;");
-        self::$dbh->exec("DELETE FROM users;");
-        self::$dbh->exec("DELETE FROM sessions;");
-        self::$dbh->exec("DELETE FROM requests;");
+        self::$dbh->exec("DELETE FROM phpauth_attempts;");
+        self::$dbh->exec("DELETE FROM phpauth_users;");
+        self::$dbh->exec("DELETE FROM phpauth_sessions;");
+        self::$dbh->exec("DELETE FROM phpauth_requests;");
     }
 
     public function testRegister()
@@ -49,7 +49,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogin()
     {
         // Empty attempts table
-        self::$dbh->exec("DELETE FROM attempts;");
+        self::$dbh->exec("DELETE FROM phpauth_attempts;");
 
         // Successful login
         $this->assertFalse(self::$auth->login("test@email.com", 'T3H-1337-P@$$')['error']);
@@ -67,7 +67,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testCheckSession()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful checkSession
         $this->assertTrue(self::$auth->checkSession($hash));
@@ -84,8 +84,8 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSessionUID()
     {
-        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
-        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = {$uid};", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = {$uid};", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful getSessionUID
         $this->assertEquals($uid, self::$auth->getSessionUID($hash));
@@ -114,7 +114,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetUser()
     {
-        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful getUser
         $this->assertEquals("test@email.com", self::$auth->getUser($uid)['email']);
@@ -128,7 +128,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testChangePassword()
     {
-        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful changePassword
         $this->assertFalse(self::$auth->changePassword($uid, 'T3H-1337-P@$$', 'T3H-1337-P@$$2', 'T3H-1337-P@$$2')['error']);
@@ -154,7 +154,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public function testChangeEmail()
     {
-        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Successful changeEmail
         $this->assertFalse(self::$auth->changeEmail($uid, "test2@email.com", 'T3H-1337-P@$$2')['error']);
@@ -181,7 +181,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogout()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = self::$dbh->query("SELECT hash FROM sessions WHERE uid = (SELECT id FROM users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful logout
         $this->assertTrue(self::$auth->logout($hash));
@@ -201,9 +201,9 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testDeleteUser()
     {
         // Empty attempts table
-        self::$dbh->exec("DELETE FROM attempts;");
+        self::$dbh->exec("DELETE FROM phpauth_attempts;");
 
-        $uid = self::$dbh->query("SELECT id FROM users WHERE email = 'test2@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test2@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
 
         // Failed deleteUser: invalid password
         $this->assertTrue(self::$auth->deleteUser($uid, "lamepass")['error']);

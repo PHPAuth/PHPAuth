@@ -9,7 +9,7 @@ php:
 before_script:
   - composer install
   - mysql -e 'create database phpauthtest;'
-  - mysql -u root phpauthtest < database_mysql.sql
+  - mysql -u root phpauthtest < database_defs/database_mysql.sql
 
 script:
     - phpunit --stderr

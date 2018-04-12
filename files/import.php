@@ -24,7 +24,7 @@ function importDomains($dbh, $domains)
             $return['message'] .= "Not a valid domain: " . $domain . " - Skipping \n";
         }
 
-        $query = $dbh->prepare("INSERT INTO emailBanlist (`domain`) VALUES (?)");
+        $query = $dbh->prepare("INSERT INTO phpauth_emails_banned (`domain`) VALUES (?)");
                 
         if(!$query->execute(array($domain)))
         {
@@ -117,7 +117,7 @@ if(isset($_POST['db_host']))
             <li>Run import, this may take some time depending on your hardware.</li>
             <li>Review the result and make sure there were no errors.</li>
             <li class="text-danger font-weight-bold">Make sure you remove this script from the server when you're done.</li>
-        <ol>
+        </ol>
 
     </div>
 

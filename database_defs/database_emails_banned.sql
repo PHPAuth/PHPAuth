@@ -2,7 +2,7 @@
 -- Data in table emailBanlist
 --
 
-INSERT INTO `emailBanlist` (`id`, `domain`) VALUES
+INSERT INTO `phpauth_emails_banned` (`id`, `domain`) VALUES
 (1, '0-mail.com'),
 (2, '027168.com'),
 (3, '0815.ru'),
@@ -2247,7 +2247,8 @@ INSERT INTO `emailBanlist` (`id`, `domain`) VALUES
 (2242, 'x.ip6.li'),
 (2243, 'x1x22716.com'),
 (2244, 'x24.com');
-INSERT INTO `emailBanlist` (`id`, `domain`) VALUES
+
+INSERT INTO `phpauth_emails_banned` (`id`, `domain`) VALUES
 (2245, 'x4y.club'),
 (2246, 'x5a9m8ugq.com'),
 (2247, 'x8h8x941l.com'),

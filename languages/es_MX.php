@@ -69,3 +69,5 @@ $lang['email_reset_altbody'] = 'Hola, ' . "\n\n" . 'Para reiniciar tu contraseñ
 
 $lang['account_deleted'] = "La cuenta se ha borrado con éxito.";
 $lang['function_disabled'] = "Esta función ha sido desactivada.";
+
+return $lang;
