@@ -181,7 +181,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLogout()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful logout
         $this->assertTrue(self::$auth->logout($hash));
