@@ -36,7 +36,7 @@ class Config
         };
 
         // load configuration
-        $this->config = $this->dbh->query("SELECT * FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
 
         $this->setForgottenDefaults(); // Danger foreseen is half avoided.
 
