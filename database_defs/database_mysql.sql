@@ -58,7 +58,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('verify_email_use_banlist',  '1'),
   ('verify_password_min_length',  '3'),
   ('request_key_expiration', '+10 minutes'),
-  ('core_translation_source', 'php'),
+  ('translation_source', 'php'),
   ('recaptcha_enabled', 0),
   ('recaptcha_site_key', ''),
   ('recaptcha_secret_key', '');

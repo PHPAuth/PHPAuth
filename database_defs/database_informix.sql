@@ -47,7 +47,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('verify_email_min_length', '
 INSERT INTO phpauth_config (setting, value) VALUES ('verify_email_use_banlist',  '1');
 INSERT INTO phpauth_config (setting, value) VALUES ('verify_password_min_length',  '3');
 INSERT INTO phpauth_config (setting, value) VALUES ('request_key_expiration', '+10 minutes');
-INSERT INTO phpauth_config (setting, value) VALUES ('core_translation_source', 'php');
+INSERT INTO phpauth_config (setting, value) VALUES ('translation_source', 'php');
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_enabled', 0);
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_site_key', '');
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_secret_key', 'php');
