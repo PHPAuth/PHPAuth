@@ -122,14 +122,16 @@ class Config
 
         $dictionary = [];
 
-        if (isset($this->config['core_translation_source'])) {
+        if (isset($this->config['translation_source'])) {
 
-            switch ($this->config['core_translation_source']) {
+            switch ($this->config['translation_source']) {
                 case 'php': {
 
+                    $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.php";
+
                     // check file exist
-                    if (is_file("languages/{$site_language}.php")) {
-                        $dictionary = include dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.php";
+                    if (is_file($lang_file)) {
+                        $dictionary = include $lang_file;
                     } else {
                         $dictionary = $this->setForgottenDictionary();
                     }
@@ -138,9 +140,11 @@ class Config
                 }
                 case 'ini': {
 
+                    $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.ini";
+
                     // check file exist
-                    if (is_file("languages/{$site_language}.ini")) {
-                        $dictionary = parse_ini_file("languages/{$site_language}.ini");
+                    if (is_file($lang_file)) {
+                        $dictionary = parse_ini_file($lang_file);
                     } else {
                         $dictionary = $this->setForgottenDictionary();
                     }
