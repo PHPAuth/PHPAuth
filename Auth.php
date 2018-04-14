@@ -3,8 +3,8 @@
 namespace PHPAuth;
 
 use ZxcvbnPhp\Zxcvbn;
-
 use PHPMailer\PHPMailer\PHPMailer;
+use ReCaptcha\ReCaptcha;
 
 /**
  * Auth class
@@ -17,13 +17,30 @@ class Auth
     const HASH_LENGTH = 40;
     const TOKEN_LENGTH = 20;
 
+    /**
+     * @var \PDO $dbh
+     */
     protected $dbh;
+
+    /**
+     * @var \stdClass Config
+     */
     public $config;
-    public $lang;
+
+
     protected $islogged = NULL;
     protected $currentuser = NULL;
 
+    /**
+     * @var \stdClass $messages_dictionary
+     */
     public $messages_dictionary = [];
+
+    /**
+     * @var \stdClass $recaptcha_config
+     */
+    protected $recaptcha_config = [];
+
 
     /**
      * Initiates database connection
@@ -31,7 +48,7 @@ class Auth
      * @param \PDO $dbh
      * @param $config
      */
-    public function __construct(\PDO $dbh, $config)
+    public function __construct(\PDO $dbh, Config $config)
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHP 5.6.0 required for PHPAuth engine!');
@@ -40,7 +57,7 @@ class Auth
         $this->dbh = $dbh;
         $this->config = $config;
 
-        $this->lang = $this->config->dictionary;
+        $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
         date_default_timezone_set($this->config->site_timezone);
@@ -51,17 +68,17 @@ class Auth
      * @param string $email
      * @param string $password
      * @param int $remember
-     * @param string $captcha = NULL
+     * @param string $captcha_response = NULL
      * @return array $return
      */
-    public function login($email, $password, $remember = 0, $captcha = NULL)
+    public function login($email, $password, $remember = 0, $captcha_response = NULL)
     {
         $return['error'] = true;
 
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
 
                 return $return;
@@ -143,17 +160,17 @@ class Auth
     * @param string $password
     * @param string $repeatpassword
     * @param array  $params
-    * @param string $captcha = NULL
-    * @param bool $sendmail = NULL
+    * @param string $captcha_response = NULL
+    * @param bool $use_email_activation = NULL
     * @return array $return
     */
-    public function register($email, $password, $repeatpassword, $params = Array(), $captcha = NULL, $sendmail = NULL)
+    public function register($email, $password, $repeatpassword, $params = Array(), $captcha_response = NULL, $use_email_activation = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
 
                 return $return;
@@ -205,7 +222,7 @@ class Auth
             return $return;
         }
 
-        $addUser = $this->addUser($email, $password, $params, $sendmail);
+        $addUser = $this->addUser($email, $password, $params, $use_email_activation);
 
         if ($addUser['error'] != 0) {
             $return['message'] = $addUser['message'];
@@ -214,7 +231,7 @@ class Auth
         }
 
         $return['error'] = false;
-        $return['message'] = ($sendmail == true ? $this->__lang("register_success") : $this->__lang('register_success_emailmessage_suppressed') );
+        $return['message'] = ($use_email_activation == true ? $this->__lang("register_success") : $this->__lang('register_success_emailmessage_suppressed') );
 
         return $return;
     }
@@ -258,8 +275,12 @@ class Auth
             return $return;
         }
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET isactive = ? WHERE id = ?");
-        $query->execute(array(1, $getRequest['uid']));
+        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET isactive = :isactive WHERE id = :id");
+        $query_params = [
+            'isactive' => 1,
+            'id' => $getRequest['uid']
+        ];
+        $query->execute($query_params);
 
         $this->deleteRequest($getRequest['id']);
 
@@ -270,11 +291,12 @@ class Auth
     }
 
     /**
-    * Creates a reset key for an email address and sends email
-    * @param string $email
-    * @return array $return
-    */
-    public function requestReset($email, $sendmail = NULL)
+     * Creates a reset key for an email address and sends email
+     * @param string $email
+     * @param null $use_email_activation
+     * @return array $return
+     */
+    public function requestReset($email, $use_email_activation = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -296,7 +318,8 @@ class Auth
         $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
         $query->execute(array($email));
 
-		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        $row = $query->fetch(\PDO::FETCH_ASSOC);
+		if (!$row) {
             $this->addAttempt();
 
             $return['message'] = $this->__lang("email_incorrect");
@@ -304,7 +327,7 @@ class Auth
             return $return;
         }
 
-        $addRequest = $this->addRequest($row['id'], $email, "reset", $sendmail);
+        $addRequest = $this->addRequest($row['id'], $email, "reset", $use_email_activation);
 
         if ($addRequest['error'] == 1) {
             $this->addAttempt();
@@ -314,7 +337,7 @@ class Auth
         }
 
         $return['error'] = false;
-        $return['message'] = ($sendmail == true ? $this->__lang("reset_requested") : $this->__lang('reset_requested_emailmessage_suppressed'));
+        $return['message'] = ($use_email_activation == true ? $this->__lang("reset_requested") : $this->__lang('reset_requested_emailmessage_suppressed'));
 
         return $return;
     }
@@ -351,14 +374,14 @@ class Auth
     */
     public function getUID($email)
     {
-        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
-        $query->execute(array($email));
+        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = :email");
+        $query->execute(['email' => $email]);
 
-        if(!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        if ($query->rowCount() == 0) {
             return false;
         }
 
-        return $row['id'];
+        return $query->fetchColumn();
     }
 
     /**
@@ -389,9 +412,21 @@ class Auth
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_sessions} (uid, hash, expiredate, ip, agent, cookie_crc) VALUES (?, ?, ?, ?, ?, ?)");
+        $query = $this->dbh->prepare("
+INSERT INTO {$this->config->table_sessions}
+(uid, hash, expiredate, ip, agent, cookie_crc)
+VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
+");
+        $query_params = [
+            'uid'       => $uid,
+            'hash'      => $data['hash'],
+            'expiredate'=> date("Y-m-d H:i:s", $data['expire']),
+            'ip'        => $ip,
+            'agent'     => $agent,
+            'cookie_crc'=> $data['cookie_crc']
+        ];
 
-        if (!$query->execute(array($uid, $data['hash'], date("Y-m-d H:i:s", $data['expire']), $ip, $agent, $data['cookie_crc']))) {
+        if (!$query->execute($query_params)) {
             return false;
         }
 
@@ -408,8 +443,8 @@ class Auth
     */
     protected function deleteExistingSessions($uid)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
-        $query->execute(array($uid));
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = :uid");
+        $query->execute(['uid' => $uid]);
 
         return $query->rowCount() == 1;
     }
@@ -422,9 +457,8 @@ class Auth
 
     protected function deleteSession($hash)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = ?");
-        $query->execute(array($hash));
-
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query->execute(['hash' => $hash]);
         return $query->rowCount() == 1;
     }
 
@@ -447,19 +481,24 @@ class Auth
             return false;
         }
 
-        $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = ?");
-        $query->execute(array($hash));
+        $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query_params = [
+            'hash' => $hash
+        ];
+        $query->execute($query_params);
 
-		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
-			return false;
-		}
+        if ($query->rowCount() == 0) {
+            return false;
+        }
 
-        $sid = $row['id'];
+        $row = $query->fetch(\PDO::FETCH_ASSOC);
+
+        // $sid = $row['id'];
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
-        $db_agent = $row['agent'];
+        // $db_agent = $row['agent'];
         $db_cookie = $row['cookie_crc'];
 
         if ($currentdate > $expiredate) {
@@ -490,14 +529,17 @@ class Auth
     */
     public function getSessionUID($hash)
     {
-        $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
-        $query->execute(array($hash));
-		
-		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
-			return false;
-		}
+        $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query_params = [
+            'hash' => $hash
+        ];
+        $query->execute($query_params);
 
-		return $row['uid'];
+        if ($query->rowCount() == 0) {
+            return false;
+        }
+
+        return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
     }
 
     /**
@@ -507,8 +549,8 @@ class Auth
     */
     public function isEmailTaken($email)
     {
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = ?");
-        $query->execute(array($email));
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = :email");
+        $query->execute(['email' => $email]);
 
         if ($query->fetchColumn() == 0) {
             return false;
@@ -528,8 +570,10 @@ class Auth
             return false;
         };
 
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = ?");
-        $query->execute(array(strtolower(explode('@', $email)[1])));
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = :domain");
+        $query->execute([
+            'domain' => (strtolower(explode('@', $email)[1]))
+        ]);
 
         if ($query->fetchColumn() == 0) {
             return false;
@@ -543,10 +587,10 @@ class Auth
     * @param string $email      -- email
     * @param string $password   -- password
     * @param array $params      -- additional params
-    * @param boolean $sendmail  -- activate email confirm or not
+    * @param boolean $use_email_activation  -- activate email confirm or not
     * @return int $uid
     */
-    protected function addUser($email, $password, $params = array(), &$sendmail)
+    protected function addUser($email, $password, $params = array(), &$use_email_activation)
     {
         $return['error'] = true;
 
@@ -560,14 +604,17 @@ class Auth
         $uid = $this->dbh->lastInsertId("{$this->config->table_users}_id_seq");
         $email = htmlentities(strtolower($email));
 
-        if ($sendmail) {
-            $addRequest = $this->addRequest($uid, $email, "activation", $sendmail);
+        if ($use_email_activation) {
+            $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
 
             if ($addRequest['error'] == 1) {
-                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
-                $query->execute(array($uid));
-                $return['message'] = $addRequest['message'];
+                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = :id");
+                $query_params = [
+                    'id' => $uid
+                ];
+                $query->execute($query_params);
 
+                $return['message'] = $addRequest['message'];
                 return $return;
             }
 
@@ -613,8 +660,8 @@ class Auth
     */
     protected function getBaseUser($uid)
     {
-        $query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = ?");
-        $query->execute(array($uid));
+        $query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id");
+        $query->execute(['id' => $uid]);
 
         $data = $query->fetch(\PDO::FETCH_ASSOC);
 
@@ -628,14 +675,16 @@ class Auth
     }
 
     /**
-    * Gets public user data for a given UID and returns an array, password is not returned
+    * Gets public user data for a given UID and returns an array, password will be returned if
+    * param $withpassword is TRUE
     * @param int $uid
+    * @param bool|false $withpassword
     * @return array $data
     */
-    public function getUser($uid)
+    public function getUser($uid, $withpassword = false)
     {
-        $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = ?");
-        $query->execute(array($uid));
+        $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = :id");
+        $query->execute(['id' => $uid]);
 
         $data = $query->fetch(\PDO::FETCH_ASSOC);
 
@@ -644,7 +693,9 @@ class Auth
         }
 
         $data['uid'] = $uid;
-        unset($data['password']);
+
+        if (!$withpassword)
+            unset($data['password']);
 
         return $data;
     }
@@ -654,16 +705,16 @@ class Auth
     * Allows a user to delete their account
     * @param int $uid
     * @param string $password
-    * @param string $captcha = NULL
+    * @param string $captcha_response = NULL
     * @return array $return
     */
-    public function deleteUser($uid, $password, $captcha = NULL)
+    public function deleteUser($uid, $password, $captcha_response = NULL)
     {
         $return['error'] = true;
 
         $block_status = $this->isBlocked();
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
 
                 return $return;
@@ -713,7 +764,7 @@ class Auth
         $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = ?");
 
         if (!$query->execute(array($uid))) {
-            $return['message'] = $this->lang["system_error"] . " #07";
+            $return['message'] = $this->__lang("system_error") . " #07";
 
             return $return;
         }
@@ -729,10 +780,10 @@ class Auth
     * @param int $uid
     * @param string $email
     * @param string $type
-    * @param boolean $sendmail
+    * @param boolean $use_email_activation
     * @return boolean
     */
-    protected function addRequest($uid, $email, $type, &$sendmail)
+    protected function addRequest($uid, $email, $type, &$use_email_activation)
     {
         $return['error'] = true;
 
@@ -743,27 +794,28 @@ class Auth
         }
 
         // if not set manually, check config data
-        if ($sendmail === NULL) {
-            $sendmail = true;
+        if ($use_email_activation === NULL) {
+            $use_email_activation = true;
             if ($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
-                $sendmail = false;
+                $use_email_activation = false;
                 $return['error'] = false;
 
                 return $return;
             }
 
             if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
-                $sendmail = false;
+                $use_email_activation = false;
                 $return['error'] = false;
 
                 return $return;
             }
         }
 
-        $query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = ? AND type = ?");
-        $query->execute(array($uid, $type));
+        $query = $this->dbh->prepare("SELECT id, expire FROM {$this->config->table_requests} WHERE uid = :uid AND type = :type");
+        $query->execute(['uid' => $uid, 'type' => $type]);
 
-        if ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        if ($query->rowCount() > 0) {
+            $row = $query->fetch(\PDO::FETCH_ASSOC);
 
             $expiredate = strtotime($row['expire']);
             $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -786,9 +838,16 @@ class Auth
         $key = $this->getRandomKey(self::TOKEN_LENGTH);
         $expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, rkey, expire, type) VALUES (?, ?, ?, ?)");
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, token, expire, type) VALUES (:uid, :token, :expire, :type)");
 
-        if (!$query->execute(array($uid, $key, $expire, $type))) {
+        $query_params = [
+            'uid' => $uid,
+            'token' => $key,
+            'expire' => $expire,
+            'type' => $type
+        ];
+
+        if (!$query->execute($query_params)) {
             $return['message'] = $this->__lang("system_error") . " #09";
 
             return $return;
@@ -796,7 +855,7 @@ class Auth
 
         $request_id = $this->dbh->lastInsertId();
 
-        if ($sendmail === true) {
+        if ($use_email_activation === true) {
             $sendmail_status = $this->do_SendMail($email, $type, $key);
 
             if ($sendmail_status['error']) {
@@ -822,15 +881,17 @@ class Auth
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE rkey = ? AND type = ?");
+        $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?");
         $query->execute(array($key, $type));
 
-        if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        if ($query->rowCount() === 0) {
             $this->addAttempt();
             $return['message'] = $this->__lang( $type."key_incorrect" );
 
             return $return;
         }
+
+        $row = $query->fetch(\PDO::FETCH_ASSOC);
 
         $expiredate = strtotime($row['expire']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -857,9 +918,8 @@ class Auth
     */
     protected function deleteRequest($id)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE id = ?");
-
-        return $query->execute(array($id));
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE id = :id");
+        return $query->execute(['id' => $id]);
     }
 
     /**
@@ -903,9 +963,9 @@ class Auth
             return $return;
         }
         
-        if ($this->isEmailBanned($email) && (int)$this->config->verify_email_use_banlist) {
+        if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
-            $return['message'] = $this->lang["email_banned"];
+            $return['message'] = $this->__lang("email_banned");
 
             return $return;
         }
@@ -921,16 +981,16 @@ class Auth
     * @param string $key
     * @param string $password
     * @param string $repeatpassword
-    * @param string $captcha = NULL
+    * @param string $captcha_response = NULL
     * @return array $return
     */
-    public function resetPass($key, $password, $repeatpassword, $captcha = NULL)
+    public function resetPass($key, $password, $repeatpassword, $captcha_response = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
 
                 return $return;
@@ -1005,8 +1065,13 @@ class Auth
         }
 
         $password = $this->getHash($password);
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
-        $query->execute(array($password, $data['uid']));
+
+        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = :password WHERE id = :id");
+        $query_params = [
+            'password' => $password,
+            'id' => $data['uid']
+        ];
+        $query->execute($query_params);
 
         if ($query->rowCount() == 0) {
             $return['message'] = $this->__lang("system_error") . " #12";
@@ -1024,9 +1089,10 @@ class Auth
     /**
     * Recreates activation email for a given email and sends
     * @param string $email
+    * @param null $use_email_activation
     * @return array $return
     */
-    public function resendActivation($email, $sendmail = NULL)
+    public function resendActivation($email, $use_email_activation = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -1037,7 +1103,7 @@ class Auth
             return $return;
         }
 
-        if ($sendmail == NULL) {
+        if ($use_email_activation == NULL) {
             $return['message'] = $this->__lang('function_disabled');
 
             return $return;
@@ -1068,7 +1134,7 @@ class Auth
             return $return;
         }
 
-        $addRequest = $this->addRequest($row['id'], $email, "activation", $sendmail);
+        $addRequest = $this->addRequest($row['id'], $email, "activation", $use_email_activation);
 
         if ($addRequest['error'] == 1) {
             $this->addAttempt();
@@ -1088,16 +1154,16 @@ class Auth
     * @param string $currpass
     * @param string $newpass
     * @param string $repeatnewpass
-    * @param string $captcha = NULL
+    * @param string $captcha_response = NULL
     * @return array $return
     */
-    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha = NULL)
+    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha_response = NULL)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
                 return $return;
             }
@@ -1261,8 +1327,9 @@ class Auth
     {
         $ip = $this->getIp();
         $this->deleteAttempts($ip, false);
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = ?");
-        $query->execute(array($ip));
+
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip"); // INET_ATON(:ip)
+        $query->execute(['ip' => $ip]);
         $attempts = $query->fetchColumn();
 
         if ($attempts < intval($this->config->attempts_before_verify)) {
@@ -1287,6 +1354,35 @@ class Auth
         return true;
     }
 
+
+    /**
+     * Check Google Recaptcha code.
+     * If reCaptcha disabled in config or config not defined - return TRUE (captcha passed)
+     *
+     * @param $captcha_response
+     * @return bool
+     */
+    protected function checkReCaptcha($captcha_response)
+    {
+        if (empty($this->recaptcha_config)) return true;
+
+        if ($this->recaptcha_config['recaptcha_enabled']) {
+
+            if (empty($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('No secret provided');
+            if (!is_string($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('The provided secret must be a string');
+
+            $recaptcha = new ReCaptcha($this->recaptcha_config['recaptcha_secret_key']);
+            $checkout = $recaptcha->verify($captcha_response, $this->getIp());
+
+            if (!$checkout->isSuccess()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
     /**
     * Adds an attempt to database
     * @return boolean
@@ -1296,9 +1392,12 @@ class Auth
     {
         $ip = $this->getIp();
         $attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (?, ?)");
 
-        return $query->execute(array($ip, $attempt_expiredate));
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)"); // INET_ATON(:ip)
+        return $query->execute([
+            'ip'         => $ip,
+            'expiredate' => $attempt_expiredate
+        ]);
     }
 
     /**
@@ -1307,7 +1406,7 @@ class Auth
     * @param boolean $all = false
     * @return boolean
     */
-    protected function deleteAttempts($ip, $all = false)
+    protected function deleteAttempts_OLD($ip, $all = false)
     {
         if ($all==true) {
             $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
@@ -1327,6 +1426,26 @@ class Auth
             }
         }
         return true;
+    }
+
+    /**
+     * Deletes all attempts for a given IP from database
+     *
+     * @param string $ip
+     * @param bool|false $all
+     * @return bool
+     */
+    protected function deleteAttempts($ip, $all = false)
+    {
+        // NEXT : 'ip = INET_ATON(:ip)'
+        $query = ($all)
+            ? "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip"
+            : "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip AND NOW() > expiredate ";
+
+        $sth = $this->dbh->prepare($query);
+        return $sth->execute([
+            'ip' => $ip
+        ]);
     }
 
     /**
@@ -1352,11 +1471,23 @@ class Auth
      */
     protected function getIp()
     {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
-           return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        if (getenv('HTTP_CLIENT_IP')) {
+            $ipAddress = getenv('HTTP_CLIENT_IP');
+        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+            $ipAddress = getenv('HTTP_X_FORWARDED_FOR');
+        } elseif (getenv('HTTP_X_FORWARDED')) {
+            $ipAddress = getenv('HTTP_X_FORWARDED');
+        } elseif (getenv('HTTP_FORWARDED_FOR')) {
+            $ipAddress = getenv('HTTP_FORWARDED_FOR');
+        } elseif (getenv('HTTP_FORWARDED')) {
+            $ipAddress = getenv('HTTP_FORWARDED');
+        } elseif (getenv('REMOTE_ADDR')) {
+            $ipAddress = getenv('REMOTE_ADDR');
         } else {
-           return $_SERVER['REMOTE_ADDR'];
+            $ipAddress = '127.0.0.1';
         }
+
+        return $ipAddress;
     }
 
     /**
@@ -1366,6 +1497,8 @@ class Auth
      */
     public function getSessionHash(){
         return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
+
+        // PHP7+ : return $_COOKIE[$this->config->cookie_name] ?? null;
     }
 
     /**
@@ -1451,7 +1584,7 @@ class Auth
      * @param $key
      * @return mixed
      */
-    private function __lang($key)
+    public function __lang($key)
     {
         return array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
     }
@@ -1532,6 +1665,49 @@ class Auth
         }
 
         return $return;
+    }
+
+    /**
+     * Update userinfo for user with given id = $uid
+     * @param int $uid
+     * @param array $params
+     * @return array $return[error/message]
+     */
+    protected function updateUser($uid, $params)
+    {
+        $setParams = '';
+        if (is_array($params) && count($params) > 0) {
+            $customParamsQueryArray = Array();
+
+            foreach ($params as $paramKey => $paramValue) {
+                $customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+            }
+
+            $setParams = implode(', ', array_map(function ($entry) {
+                return $entry['value'];
+            }, $customParamsQueryArray));
+        }
+        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?");
+        $bindParams = array_values(array_merge($params, array($uid)));
+
+        if (!$query->execute($bindParams)) {
+            $return['message'] = $this->__lang("system_error") . " #04";
+            return $return;
+        }
+        $return['error'] = false;
+        $return['message'] = 'Ok.';
+        return $return;
+    }
+
+    /**
+     * Returns current user UID if logged or FALSE otherwise. Not optimised method.
+     * @todo: optimise
+     *
+     * @return int
+     */
+    public function getCurrentUID()
+    {
+        return $this->getSessionUID($this->getSessionHash());
     }
 
 

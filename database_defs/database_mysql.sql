@@ -58,7 +58,10 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('verify_email_use_banlist',  '1'),
   ('verify_password_min_length',  '3'),
   ('request_key_expiration', '+10 minutes'),
-  ('core_translation_source', 'php');
+  ('core_translation_source', 'php'),
+  ('recaptcha_enabled', 0),
+  ('recaptcha_site_key', ''),
+  ('recaptcha_secret_key', '');
 
 -- Attempts table
 
@@ -77,7 +80,7 @@ DROP TABLE IF EXISTS `phpauth_requests`;
 CREATE TABLE `phpauth_requests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
-  `rkey` varchar(20) NOT NULL,
+  `token` varchar(20) NOT NULL,
   `expire` datetime NOT NULL,
   `type` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
@@ -103,7 +106,7 @@ DROP TABLE IF EXISTS `phpauth_users`;
 CREATE TABLE `phpauth_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
-  `password` varchar(60) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
