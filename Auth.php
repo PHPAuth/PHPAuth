@@ -34,7 +34,7 @@ class Auth
     /**
      * @var \stdClass $messages_dictionary
      */
-    protected $messages_dictionary = [];
+    public $messages_dictionary = [];
 
     /**
      * @var \stdClass $recaptcha_config
@@ -1366,12 +1366,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         if (empty($this->recaptcha_config)) return true;
 
-        if ($this->recaptcha_config['enable']) {
+        if ($this->recaptcha_config['recaptcha_enabled']) {
 
-            if (empty($this->recaptcha_config['secret_key'])) throw new \RuntimeException('No secret provided');
-            if (!is_string($this->recaptcha_config['secret_key'])) throw new \RuntimeException('The provided secret must be a string');
+            if (empty($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('No secret provided');
+            if (!is_string($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('The provided secret must be a string');
 
-            $recaptcha = new ReCaptcha($this->recaptcha_config['secret_key']);
+            $recaptcha = new ReCaptcha($this->recaptcha_config['recaptcha_secret_key']);
             $checkout = $recaptcha->verify($captcha_response, $this->getIp());
 
             if (!$checkout->isSuccess()) {
@@ -1584,7 +1584,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param $key
      * @return mixed
      */
-    private function __lang($key)
+    public function __lang($key)
     {
         return array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
     }

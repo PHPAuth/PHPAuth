@@ -8,20 +8,28 @@ namespace PHPAuth;
 class Config
 {
     protected $dbh;
-    protected $config;
-    protected $config_table = 'phpauth_config';
-
-    public $dictionary = [];
+    public $config;
+    public $config_table = 'phpauth_config';
 
     /**
      * Config::__construct()
      *
+     * Create config class for PHPAuth\Auth.
+     * Examples:
+     *
+     * new Config($dbh) -- Defaults will be used: load config from SQL table phpauth_config, language is 'en_GB'
+     * new Config($dbh, '', 'config_table') -- 2nd argument may be 'sql' or '', 3rd argument determines config table
+     * new Config($dbh, 'ini', '$/config/phpauth.ini') -- configuration will be loaded from INI file, '$' means Application basedir
+     * new Config($dbh, 'array', $CONFIG_ARRAY) -- configuration must be defined in $CONFIG_ARRAY value
+     *
+     * in any case, 4th argument defines site language as locale code
+     *
      * @param \PDO $dbh
-     * @param string $config_table
-     * @param string $config_site_language
-     * @param array $config_recaptcha
+     * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
+     * @param string $config_source -- declare source of config - table name, filepath or data-array
+     * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(\PDO $dbh, $config_table = '', $config_site_language = '', $config_recaptcha = [])
+    public function __construct(\PDO $dbh, $config_type = '', $config_source = '', $config_site_language = '')
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
@@ -29,15 +37,59 @@ class Config
 
         $this->config = array();
         $this->dbh = $dbh;
-        $this->config_table = (empty($config_table)) ? 'phpauth_config' : $config_table;
 
-        // check config table exists
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config_table}'")->fetchAll() ) {
-            die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
-        };
+        switch ($config_type) {
+            case 'ini': {
 
-        // load configuration
-        $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
+                // check valid keys
+                if (empty($config_source)) die('PHPAuth: config type is FILE, but no source file declared!'); //@todo: \Exception
+
+                // replace beginner '$' in filepath to application root directory
+                $source = preg_replace('/^\$/', getcwd(), $config_source);
+
+                // check ini-config is readable
+                if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
+
+                // load configuration
+                $this->config = parse_ini_file($source);
+
+                break;
+            }
+            case 'array': {
+                // check data is valid
+                if (empty($config_source)) die('PHPAuth: config type is ARRAY, but source config is EMPTY'); //@todo: \Exception
+
+                // get configuration from given array
+                $this->config = $config_source;
+
+                break;
+            }
+            case 'json': {
+                break;
+            }
+            case 'yml': {
+                break;
+            }
+            case 'xml': {
+                break;
+            }
+            default: {
+                // is 'SQL' or EMPTY value
+                //
+                // determine config table
+                $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
+
+                // check config table exists
+                if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config_table}'")->fetchAll() ) {
+                    die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
+                };
+
+                // load configuration
+                $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+                break;
+            }
+        } // end switch
 
         $this->setForgottenDefaults(); // Danger foreseen is half avoided.
 
@@ -64,12 +116,6 @@ class Config
         };
 
         // Determine site language
-        /*if ($config_site_language !== '') {
-            $site_language = $config_site_language;
-        } else {
-            $site_language = isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB';
-        }*/
-
         $site_language = (empty($config_site_language))
             ? isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB'
             : $config_site_language;
@@ -100,7 +146,7 @@ class Config
                     }
                     break;
                 }
-                case 'database': {
+                case 'sql': {
 
                     // check field `table_translations` present
                     if (empty($this->config['table_translations'])) {
@@ -133,13 +179,20 @@ class Config
         } else {
             $dictionary = $this->setForgottenDictionary();
         }
+
         // set dictionary
         $this->config['dictionary'] = $dictionary;
 
         // set reCaptcha config
+        $config_recaptcha = [];
+
+        if (array_key_exists('recaptcha_enabled', $this->config)) {
+            $config_recaptcha['recaptcha_enabled'] = true;
+            $config_recaptcha['recaptcha_site_key'] = 0;
+            $config_recaptcha['recaptcha_secret_key'] = 0;
+        }
+
         $this->config['recaptcha'] = $config_recaptcha;
-
-
     }
 
     /**

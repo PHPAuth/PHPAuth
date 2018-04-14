@@ -90,6 +90,16 @@ The database table `config` contains multiple parameters allowing you to configu
 * `attempts_before_verify` : maximum amount of attempts to be made within `attack_mitigation_time` before requiring captcha. Default is `5`
 * `attempt_before_ban` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Default is `30`
 * `password_min_score` : the minimum score given by [zxcvbn](https://github.com/bjeavons/zxcvbn-php) that is allowed. Default is `3`
+* `core_translation_source`: source of translation, possible values: 'sql' (data from <table_translations> will be used), 'php' (default, translations will be loaded from languages/*.php), 'ini' (will be used languages/*.ini files)
+* `table_translations` : name of table with translation for all messages
+* `table_attempts` : name of table with all attempts (default is 'phpauth_attempts')
+* `table_requests` : name of table with all requests (default is 'phpauth_requests')
+* `table_sessions` : name of table with all sessions (default is 'phpauth_sessions')
+* `table_users` : name of table with all users (default is 'phpauth_users')
+* `table_emails_banned` : name of table with all banned email domains (default is 'phpauth_emails_banned')
+* `recaptcha_enabled`: 1 for Google reCaptcha enabled, 0 - disabled (default)
+* `recaptcha_site_key`: string, contains public reCaptcha key (for javascripts)
+* `recaptcha_secret_key`: string, contains secret reCaptcha key
 
 The rest of the parameters generally do not need changing.
 
@@ -131,6 +141,8 @@ For example, if you are using Google's ReCaptcha NoCaptcha, use the following co
 
 If a CAPTCHA is not to be used, please ensure to set `attempt_before_block` to the same value as `attempts_before_verify`.
 
+Also, `Auth::checkReCaptcha()` method can be called.
+
 How to secure a page
 ---------------
 
@@ -156,6 +168,69 @@ if (!$auth->isLogged()) {
 
 ?>
 ```
+
+or
+
+install composer package: `composer require phpauth/phpauth:dev-master`
+
+```php
+<?php
+
+require_once 'vendor/autoload.php';
+
+use PHPAuth\Config as PHPAuthConfig;
+use PHPAuth\Auth as PHPAuth;
+
+$dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
+
+$config = new PHPAuthConfig($dbh);
+$auth = new PHPAuth($dbh, $config);
+
+if (!$auth->isLogged()) {
+    header('HTTP/1.0 403 Forbidden');
+    echo "Forbidden";
+
+    exit();
+}
+
+?>
+```
+
+Custom config sources
+---------------------
+
+By default, config defined at `phpauth_config` data table.
+
+It is possible to define custom config from other sources: ini-file, other SQL-table or php-variable:
+
+```
+Config($dbh, $config_type, $config_source, $config_language)
+```
+* `config_type`:
+  * 'sql' (or empty value) - load config from database,
+  * 'ini' - config must be declared in INI file (sections can be used for better readability, but will not be parsed)
+  * 'array' - config will be loaded from $config_source (type of array)
+* `config_source` -
+  * for 'sql': name of custom table with configuration
+  * for 'ini': path and name of INI file (for example: '$/config/config.ini', '$' means application root)
+  * for 'array': it is a array with configuration
+* `config_language` - custom language for site as locale value (default is 'en_GB')
+
+Examples:
+
+```
+new Config($dbh); // load config from SQL table 'phpauth_config', language is 'en_GB'
+
+new Config($dbh, '', 'my_config'); // load config from SQL table 'my_config', language is 'en_GB'
+
+new Config($dbh, 'ini', '$/config/phpauth.ini'); // configuration will be loaded from INI file, '$' means Application basedir
+
+new Config($dbh, 'array', $CONFIG_ARRAY); // configuration must be defined in $CONFIG_ARRAY value
+
+new Config($dbh, '', '', 'ru_RU'); // load configuration from default SQL table and use ru_RU locale
+```
+
+
 
 Message languages
 ---------------------
