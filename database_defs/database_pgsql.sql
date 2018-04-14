@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS phpauth_requests;
 CREATE TABLE phpauth_requests (
   id serial NOT NULL,
   uid integer NOT NULL,
-  rkey character varying (20) NOT NULL,
+  token character varying (20) NOT NULL,
   expire timestamp without time zone NOT NULL,
   type character varying (20) NOT NULL,
   PRIMARY KEY (id)
@@ -87,7 +87,7 @@ DROP TABLE IF EXISTS phpauth_users;
 CREATE TABLE phpauth_users (
   id serial NOT NULL,
   email character varying(100) DEFAULT NULL,
-  password character varying(60) DEFAULT NULL,
+  password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)

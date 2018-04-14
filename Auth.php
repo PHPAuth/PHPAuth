@@ -17,13 +17,30 @@ class Auth
     const HASH_LENGTH = 40;
     const TOKEN_LENGTH = 20;
 
+    /**
+     * @var \PDO $dbh
+     */
     protected $dbh;
+
+    /**
+     * @var \stdClass Config
+     */
     public $config;
-    public $lang;
+
+
     protected $islogged = NULL;
     protected $currentuser = NULL;
 
-    public $messages_dictionary = [];
+    /**
+     * @var \stdClass $messages_dictionary
+     */
+    protected $messages_dictionary = [];
+
+    /**
+     * @var \stdClass $recaptcha_config
+     */
+    protected $recaptcha_config = [];
+
 
     /**
      * Initiates database connection
@@ -31,7 +48,7 @@ class Auth
      * @param \PDO $dbh
      * @param $config
      */
-    public function __construct(\PDO $dbh, $config)
+    public function __construct(\PDO $dbh, Config $config)
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHP 5.6.0 required for PHPAuth engine!');
@@ -40,7 +57,7 @@ class Auth
         $this->dbh = $dbh;
         $this->config = $config;
 
-        $this->lang = $this->config->dictionary;
+        $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
         date_default_timezone_set($this->config->site_timezone);
@@ -351,14 +368,14 @@ class Auth
     */
     public function getUID($email)
     {
-        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = ?");
-        $query->execute(array($email));
+        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = :email");
+        $query->execute(['email' => $email]);
 
-        if(!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
+        if ($query->rowCount() == 0) {
             return false;
         }
 
-        return $row['id'];
+        return $query->fetchColumn();
     }
 
     /**
@@ -382,9 +399,9 @@ class Auth
         $this->deleteExistingSessions($uid);
 
         if ($remember == true) {
-            $data['expire'] = strtotime($this->config->cookie_remember);
+            $data['expire'] = strtotime($this->config->cookie_remember); // $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember)); // with strict type
         } else {
-            $data['expire'] = strtotime($this->config->cookie_forget);
+            $data['expire'] = strtotime($this->config->cookie_forget);  // $data['expire'] = date("Y-m-d H:i:s", strtotime($this->config->cookie_forget)); // with strict type
         }
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
@@ -454,12 +471,12 @@ class Auth
 			return false;
 		}
 
-        $sid = $row['id'];
+        // $sid = $row['id'];
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
-        $db_agent = $row['agent'];
+        // $db_agent = $row['agent'];
         $db_cookie = $row['cookie_crc'];
 
         if ($currentdate > $expiredate) {
@@ -490,14 +507,17 @@ class Auth
     */
     public function getSessionUID($hash)
     {
-        $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = ?");
-        $query->execute(array($hash));
-		
-		if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
-			return false;
-		}
+        $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query_params = [
+            'hash' => $hash
+        ];
+        $query->execute($query_params);
 
-		return $row['uid'];
+        if ($query->rowCount() == 0) {
+            return false;
+        }
+
+        return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
     }
 
     /**
@@ -713,7 +733,7 @@ class Auth
         $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = ?");
 
         if (!$query->execute(array($uid))) {
-            $return['message'] = $this->lang["system_error"] . " #07";
+            $return['message'] = $this->__lang("system_error") . " #07";
 
             return $return;
         }
@@ -786,7 +806,7 @@ class Auth
         $key = $this->getRandomKey(self::TOKEN_LENGTH);
         $expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, rkey, expire, type) VALUES (?, ?, ?, ?)");
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_requests} (uid, token, expire, type) VALUES (?, ?, ?, ?)");
 
         if (!$query->execute(array($uid, $key, $expire, $type))) {
             $return['message'] = $this->__lang("system_error") . " #09";
@@ -822,7 +842,7 @@ class Auth
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE rkey = ? AND type = ?");
+        $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?");
         $query->execute(array($key, $type));
 
         if (!$row = $query->fetch(\PDO::FETCH_ASSOC)) {
@@ -905,7 +925,7 @@ class Auth
         
         if ($this->isEmailBanned($email) && (int)$this->config->verify_email_use_banlist) {
             $this->addAttempt();
-            $return['message'] = $this->lang["email_banned"];
+            $return['message'] = $this->__lang("email_banned");
 
             return $return;
         }
@@ -1261,6 +1281,7 @@ class Auth
     {
         $ip = $this->getIp();
         $this->deleteAttempts($ip, false);
+
         $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = ?");
         $query->execute(array($ip));
         $attempts = $query->fetchColumn();
@@ -1307,7 +1328,7 @@ class Auth
     * @param boolean $all = false
     * @return boolean
     */
-    protected function deleteAttempts($ip, $all = false)
+    protected function deleteAttempts_OLD($ip, $all = false)
     {
         if ($all==true) {
             $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
@@ -1327,6 +1348,26 @@ class Auth
             }
         }
         return true;
+    }
+
+    /**
+     * Deletes all attempts for a given IP from database
+     *
+     * @param string $ip
+     * @param bool|false $all
+     * @return bool
+     */
+    protected function deleteAttempts($ip, $all = false)
+    {
+        // NEXT : 'ip = INET_ATON(:ip)'
+        $query = ($all)
+            ? "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip"
+            : "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip AND NOW() > expiredate ";
+
+        $sth = $this->dbh->prepare($query);
+        return $sth->execute([
+            'ip' => $ip
+        ]);
     }
 
     /**
@@ -1352,11 +1393,23 @@ class Auth
      */
     protected function getIp()
     {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
-           return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        if (getenv('HTTP_CLIENT_IP')) {
+            $ipAddress = getenv('HTTP_CLIENT_IP');
+        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+            $ipAddress = getenv('HTTP_X_FORWARDED_FOR');
+        } elseif (getenv('HTTP_X_FORWARDED')) {
+            $ipAddress = getenv('HTTP_X_FORWARDED');
+        } elseif (getenv('HTTP_FORWARDED_FOR')) {
+            $ipAddress = getenv('HTTP_FORWARDED_FOR');
+        } elseif (getenv('HTTP_FORWARDED')) {
+            $ipAddress = getenv('HTTP_FORWARDED');
+        } elseif (getenv('REMOTE_ADDR')) {
+            $ipAddress = getenv('REMOTE_ADDR');
         } else {
-           return $_SERVER['REMOTE_ADDR'];
+            $ipAddress = '127.0.0.1';
         }
+
+        return $ipAddress;
     }
 
     /**
@@ -1366,6 +1419,8 @@ class Auth
      */
     public function getSessionHash(){
         return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
+
+        // PHP7+ : return $_COOKIE[$this->config->cookie_name] ?? null;
     }
 
     /**

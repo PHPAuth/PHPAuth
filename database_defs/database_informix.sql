@@ -61,7 +61,7 @@ DROP TABLE phpauth_requests;
 CREATE TABLE phpauth_requests (
   id SERIAL,
   uid integer NOT NULL,
-  rkey varchar(20) NOT NULL,
+  token varchar(20) NOT NULL,
   expire DATETIME YEAR TO SECOND,
   type varchar(20) NOT NULL,
   PRIMARY KEY (id)
@@ -83,7 +83,7 @@ DROP TABLE phpauth_users;
 CREATE TABLE phpauth_users (
   id SERIAL,
   email varchar(100) DEFAULT NULL,
-  password varchar(60) DEFAULT NULL,
+  password varchar(255) DEFAULT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
   PRIMARY KEY (id)

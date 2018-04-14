@@ -11,7 +11,7 @@ class Config
     protected $config;
     protected $config_table = 'phpauth_config';
 
-    protected $dictionary = [];
+    public $dictionary = [];
 
     /**
      * Config::__construct()
@@ -19,8 +19,9 @@ class Config
      * @param \PDO $dbh
      * @param string $config_table
      * @param string $config_site_language
+     * @param array $config_recaptcha
      */
-    public function __construct(\PDO $dbh, $config_table = '', $config_site_language = '')
+    public function __construct(\PDO $dbh, $config_table = '', $config_site_language = '', $config_recaptcha = [])
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
@@ -132,8 +133,12 @@ class Config
         } else {
             $dictionary = $this->setForgottenDictionary();
         }
-
+        // set dictionary
         $this->config['dictionary'] = $dictionary;
+
+        // set reCaptcha config
+        $this->config['recaptcha'] = $config_recaptcha;
+
 
     }
 
