@@ -365,6 +365,7 @@ class Auth
     public function getHash($password)
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
+        // return password_hash($password, PASSWORD_DEFAULT, $this->config->password_hashOptions);
     }
 
     /**
