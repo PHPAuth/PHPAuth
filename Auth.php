@@ -413,6 +413,7 @@ class Auth
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
+        // INET_ATON(:ip)
         $query = $this->dbh->prepare("
 INSERT INTO {$this->config->table_sessions}
 (uid, hash, expiredate, ip, agent, cookie_crc)
@@ -482,6 +483,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
+        // INET_NTOA(ip)
         $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
         $query_params = [
             'hash' => $hash
@@ -1329,6 +1331,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $ip = $this->getIp();
         $this->deleteAttempts($ip, false);
 
+        // INET_ATON
         $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip"); // INET_ATON(:ip)
         $query->execute(['ip' => $ip]);
         $attempts = $query->fetchColumn();
