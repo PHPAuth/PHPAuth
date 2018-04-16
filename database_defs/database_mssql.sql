@@ -15,7 +15,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('cookie_domain', NULL),
 ('cookie_forget', '+30 minutes'),
 ('cookie_http', '0'),
-('cookie_name', 'authID'),
+('cookie_name', 'phpauth_session_cookie'),
 ('cookie_path', '/'),
 ('cookie_remember', '+1 month'),
 ('cookie_secure', '0'),
@@ -59,7 +59,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 DROP TABLE IF EXISTS phpauth_attempts;
 CREATE TABLE phpauth_attempts (
   id int NOT NULL IDENTITY(1,1),
-  ip character varying(39) NOT NULL,
+  ip character(39) NOT NULL,
   expiredate datetime2 NOT NULL,
   PRIMARY KEY (id)
 );
@@ -68,7 +68,7 @@ DROP TABLE IF EXISTS phpauth_requests;
 CREATE TABLE phpauth_requests (
   id int NOT NULL IDENTITY(1,1),
   uid integer NOT NULL,
-  token character varying (20) NOT NULL,
+  token character (20) NOT NULL,
   expire datetime2 NOT NULL,
   type character varying (20) NOT NULL,
   PRIMARY KEY (id)
@@ -82,7 +82,7 @@ CREATE TABLE phpauth_sessions (
   expiredate datetime2 NOT NULL,
   ip character varying(39) NOT NULL,
   agent character varying(200) NOT NULL,
-  cookie_crc character varying(40) NOT NULL,
+  cookie_crc character (40) NOT NULL,
   PRIMARY KEY (id)
 );
 

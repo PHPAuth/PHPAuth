@@ -22,7 +22,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('cookie_domain', NULL),
   ('cookie_forget', '+30 minutes'),
   ('cookie_http', '0'),
-  ('cookie_name', 'authID'),
+  ('cookie_name', 'phpauth_session_cookie'),
   ('cookie_path', '/'),
   ('cookie_remember', '+1 month'),
   ('cookie_secure', '0'),
@@ -68,11 +68,11 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
 DROP TABLE IF EXISTS `phpauth_attempts`;
 CREATE TABLE `phpauth_attempts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip` varchar(39) NOT NULL,
+  `ip` char(39) NOT NULL,
   `expiredate` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `ip` (`ip`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Requests table
 
@@ -80,11 +80,14 @@ DROP TABLE IF EXISTS `phpauth_requests`;
 CREATE TABLE `phpauth_requests` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
-  `token` varchar(20) NOT NULL,
+  `token` CHAR(20) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `expire` datetime NOT NULL,
-  `type` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `type` ENUM('activation','reset') CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `type` (`type`),
+  KEY `token` (`token`),
+  KEY `uid` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Sessions table
 
@@ -92,11 +95,11 @@ DROP TABLE IF EXISTS `phpauth_sessions`;
 CREATE TABLE `phpauth_sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
-  `hash` varchar(40) NOT NULL,
+  `hash` char(40) NOT NULL,
   `expiredate` datetime NOT NULL,
   `ip` varchar(39) NOT NULL,
   `agent` varchar(200) NOT NULL,
-  `cookie_crc` varchar(40) NOT NULL,
+  `cookie_crc` char(40) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -106,10 +109,11 @@ DROP TABLE IF EXISTS `phpauth_users`;
 CREATE TABLE `phpauth_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
+  `password` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Banned emails reference

@@ -34,7 +34,7 @@ class Auth
     /**
      * @var \stdClass $messages_dictionary
      */
-    public $messages_dictionary = [];
+    protected $messages_dictionary = [];
 
     /**
      * @var \stdClass $recaptcha_config
@@ -413,6 +413,7 @@ class Auth
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
+        // INET_ATON(:ip)
         $query = $this->dbh->prepare("
 INSERT INTO {$this->config->table_sessions}
 (uid, hash, expiredate, ip, agent, cookie_crc)
@@ -482,6 +483,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
+        // INET_NTOA(ip)
         $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
         $query_params = [
             'hash' => $hash
@@ -1329,6 +1331,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $ip = $this->getIp();
         $this->deleteAttempts($ip, false);
 
+        // INET_ATON
         $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip"); // INET_ATON(:ip)
         $query->execute(['ip' => $ip]);
         $attempts = $query->fetchColumn();
@@ -1399,34 +1402,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             'ip'         => $ip,
             'expiredate' => $attempt_expiredate
         ]);
-    }
-
-    /**
-    * Deletes all attempts for a given IP from database
-    * @param string $ip
-    * @param boolean $all = false
-    * @return boolean
-    */
-    protected function deleteAttempts_OLD($ip, $all = false)
-    {
-        if ($all==true) {
-            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
-            return $query->execute(array($ip));
-        }
-
-        $currentdate = strtotime(date("Y-m-d H:i:s"));
-        $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
-
-        $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
-        $query->execute(array($ip));
-
-        while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
-            $expiredate = strtotime($row['expiredate']);
-            if ($currentdate > $expiredate) {
-                $queryDel->execute(array($row['id']));
-            }
-        }
-        return true;
     }
 
     /**
@@ -1639,7 +1614,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $mail->setFrom($this->config->site_email, $this->config->site_name);
             $mail->addAddress($email);
 
-            $mail->CharSet = 'UTF-8';
+            $mail->CharSet = $this->config->mail_charset;
 
             //Content
             $mail->isHTML(true);
