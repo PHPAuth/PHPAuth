@@ -34,7 +34,7 @@ class Auth
     /**
      * @var \stdClass $messages_dictionary
      */
-    public $messages_dictionary = [];
+    protected $messages_dictionary = [];
 
     /**
      * @var \stdClass $recaptcha_config
@@ -1639,7 +1639,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $mail->setFrom($this->config->site_email, $this->config->site_name);
             $mail->addAddress($email);
 
-            $mail->CharSet = 'UTF-8';
+            $mail->CharSet = $this->config->mail_charset;
 
             //Content
             $mail->isHTML(true);

@@ -22,7 +22,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('cookie_domain', NULL),
   ('cookie_forget', '+30 minutes'),
   ('cookie_http', '0'),
-  ('cookie_name', 'authID'),
+  ('cookie_name', 'phpauth_session_cookie'),
   ('cookie_path', '/'),
   ('cookie_remember', '+1 month'),
   ('cookie_secure', '0'),

@@ -12,7 +12,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('bcrypt_cost', '10');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_domain', NULL);
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_forget', '+30 minutes');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_http', '0');
-INSERT INTO phpauth_config (setting, value) VALUES ('cookie_name', 'authID');
+INSERT INTO phpauth_config (setting, value) VALUES ('cookie_name', 'phpauth_session_cookie');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_remember', '+1 month');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_secure', '0');
@@ -22,7 +22,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_reset
 INSERT INTO phpauth_config (setting, value) VALUES ('mail_charset','UTF-8');
 INSERT INTO phpauth_config (setting, value) VALUES ('password_min_score',  '3');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_activation_page',  'activate');
-INSERT INTO phpauth_config (setting, value) VALUES ('site_email',  'no-reply@phpauth.cuonic.com');
+INSERT INTO phpauth_config (setting, value) VALUES ('site_email',  'no-reply@example.com');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_key',  'fghuior.)/!/jdUkd8s2!7HVHG7777ghg');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_name', 'PHPAuth');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_password_reset_page',  'reset');

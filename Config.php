@@ -129,8 +129,7 @@ class Config
 
                     $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.php";
 
-                    // check file exist
-                    if (is_file($lang_file)) {
+                    if (is_readable($lang_file)) {
                         $dictionary = include $lang_file;
                     } else {
                         $dictionary = $this->setForgottenDictionary();
@@ -142,8 +141,7 @@ class Config
 
                     $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . "languages" . DIRECTORY_SEPARATOR . "{$site_language}.ini";
 
-                    // check file exist
-                    if (is_file($lang_file)) {
+                    if (is_readable($lang_file)) {
                         $dictionary = parse_ini_file($lang_file);
                     } else {
                         $dictionary = $this->setForgottenDictionary();
@@ -192,8 +190,8 @@ class Config
 
         if (array_key_exists('recaptcha_enabled', $this->config)) {
             $config_recaptcha['recaptcha_enabled'] = true;
-            $config_recaptcha['recaptcha_site_key'] = 0;
-            $config_recaptcha['recaptcha_secret_key'] = 0;
+            $config_recaptcha['recaptcha_site_key'] = $this->config['recaptcha_site_key'];
+            $config_recaptcha['recaptcha_secret_key'] = $this->config['recaptcha_secret_key'];
         }
 
         $this->config['recaptcha'] = $config_recaptcha;
@@ -207,7 +205,7 @@ class Config
      */
     public function __get($setting)
     {
-        return $this->config[$setting];
+        return array_key_exists($setting, $this->config) ? $this->config[$setting] : NULL;
     }
 
     /**
@@ -260,46 +258,46 @@ class Config
      */
     protected function setForgottenDefaults()
     {
-        // verify* values.
+        $this->repairConfigValue('bcrypt_cost', 10);
 
-        if (!isset($this->config['verify_password_min_length'])) {
-            $this->config['verify_password_min_length'] = 3;
-        }
+        // cookies* values
+        $this->repairConfigValue('cookie_name', 'phpauth_session_cookie');
 
-        if (!isset($this->config['verify_password_max_length'])) {
-            $this->config['verify_password_max_length'] = 150;
-        }
+        // verify* values
 
-        if (!isset($this->config['verify_password_strong_requirements'])) {
-            $this->config['verify_password_strong_requirements'] = 1;
-        }
+        $this->repairConfigValue('verify_password_min_length', 3);
 
-        if (!isset($this->config['verify_email_min_length'])) {
-            $this->config['verify_email_min_length'] = 5;
-        }
+        $this->repairConfigValue('verify_password_max_length', 150);
 
-        if (!isset($this->config['verify_email_max_length'])) {
-            $this->config['verify_email_max_length'] = 100;
-        }
+        $this->repairConfigValue('verify_password_strong_requirements', 1);
 
-        if (!isset($this->config['verify_email_use_banlist'])) {
-            $this->config['verify_email_use_banlist'] = 1;
-        }
+        $this->repairConfigValue('verify_email_min_length', 5);
+
+        $this->repairConfigValue('verify_email_max_length', 100);
+
+        $this->repairConfigValue('verify_email_use_banlist', 1);
 
         // emailmessage* values
 
-        if (!isset($this->config['emailmessage_suppress_activation'])) {
-            $this->config['emailmessage_suppress_activation'] = 0;
-        }
+        $this->repairConfigValue('emailmessage_suppress_activation', 0);
 
-        if (!isset($this->config['emailmessage_suppress_reset'])) {
-            $this->config['emailmessage_suppress_reset'] = 0;
-        }
-		
-		if (!isset($this->config['mail_charset'])) {
-            $this->config['mail_charset'] = "UTF-8";
-        }
+        $this->repairConfigValue('emailmessage_suppress_reset', 0);
+
+        $this->repairConfigValue('mail_charset', "UTF-8");
+
+        // $this->repairConfigValue();
 	}
+
+    /**
+     * Set configuration value if it is not present.
+     * @param $setting
+     * @param $default_value
+     */
+    protected function repairConfigValue($setting, $default_value)
+    {
+        if (!isset($this->config[$setting]))
+            $this->config[$setting] = $default_value;
+    }
 
     /**
      * Returns forgotten translation dictionary
