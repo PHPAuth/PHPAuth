@@ -1402,34 +1402,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     }
 
     /**
-    * Deletes all attempts for a given IP from database
-    * @param string $ip
-    * @param boolean $all = false
-    * @return boolean
-    */
-    protected function deleteAttempts_OLD($ip, $all = false)
-    {
-        if ($all==true) {
-            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE ip = ?");
-            return $query->execute(array($ip));
-        }
-
-        $currentdate = strtotime(date("Y-m-d H:i:s"));
-        $queryDel = $this->dbh->prepare("DELETE FROM {$this->config->table_attempts} WHERE id = ?");
-
-        $query = $this->dbh->prepare("SELECT id, expiredate FROM {$this->config->table_attempts} WHERE ip = ?");
-        $query->execute(array($ip));
-
-        while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
-            $expiredate = strtotime($row['expiredate']);
-            if ($currentdate > $expiredate) {
-                $queryDel->execute(array($row['id']));
-            }
-        }
-        return true;
-    }
-
-    /**
      * Deletes all attempts for a given IP from database
      *
      * @param string $ip

@@ -264,12 +264,7 @@ class Config
         $this->repairConfigValue('cookie_name', 'phpauth_session_cookie');
 
         // verify* values
-
         $this->repairConfigValue('verify_password_min_length', 3);
-
-        $this->repairConfigValue('verify_password_max_length', 150);
-
-        $this->repairConfigValue('verify_password_strong_requirements', 1);
 
         $this->repairConfigValue('verify_email_min_length', 5);
 

@@ -59,18 +59,20 @@ INSERT INTO phpauth_config (setting, value) VALUES
 DROP TABLE IF EXISTS phpauth_attempts;
 CREATE TABLE phpauth_attempts (
   id serial NOT NULL,
-  ip character varying(39) NOT NULL,
+  ip character(39) NOT NULL,
   expiredate timestamp without time zone NOT NULL,
   PRIMARY KEY (id)
 );
+
+CREATE TYPE request_type AS ENUM('activation','reset');
 
 DROP TABLE IF EXISTS phpauth_requests;
 CREATE TABLE phpauth_requests (
   id serial NOT NULL,
   uid integer NOT NULL,
-  token character varying (20) NOT NULL,
+  token character (20) NOT NULL,
   expire timestamp without time zone NOT NULL,
-  type character varying (20) NOT NULL,
+  type request_type NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -78,11 +80,11 @@ DROP TABLE IF EXISTS phpauth_sessions;
 CREATE TABLE phpauth_sessions (
   id serial NOT NULL,
   uid integer NOT NULL,
-  hash character varying(40) NOT NULL,
+  hash character (40) NOT NULL,
   expiredate timestamp without time zone NOT NULL,
   ip character varying(39) NOT NULL,
   agent character varying(200) NOT NULL,
-  cookie_crc character varying(40) NOT NULL,
+  cookie_crc character (40) NOT NULL,
   PRIMARY KEY (id)
 );
 
