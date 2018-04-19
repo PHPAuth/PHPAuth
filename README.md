@@ -49,7 +49,7 @@ Composer Support
 ---------------
 PHPAuth can now be installed with the following command:
 
-`composer require phpauth/phpauth`
+`composer require phpauth/phpauth:dev-master`
 
 Then: `require 'vendor/autoload.php';`
 
@@ -171,8 +171,6 @@ if (!$auth->isLogged()) {
 
 or
 
-install composer package: `composer require phpauth/phpauth:dev-master`
-
 ```php
 <?php
 
@@ -195,13 +193,15 @@ if (!$auth->isLogged()) {
 
 ?>
 ```
+**NB:** required package installed via composer: `composer require phpauth/phpauth:dev-master`!!!
+
 
 Custom config sources
 ---------------------
 
 By default, config defined at `phpauth_config` data table.
 
-It is possible to define custom config from other sources: ini-file, other SQL-table or php-variable:
+It is possible to define custom config from other sources: ini-file, other SQL-table or php-array:
 
 ```
 Config($dbh, $config_type, $config_source, $config_language)
