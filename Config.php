@@ -25,11 +25,11 @@ class Config
      * in any case, 4th argument defines site language as locale code
      *
      * @param \PDO $dbh
-     * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_source -- declare source of config - table name, filepath or data-array
+     * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(\PDO $dbh, $config_type = '', $config_source = '', $config_site_language = '')
+    public function __construct(\PDO $dbh,  $config_source = '', $config_type = '', $config_site_language = '')
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
