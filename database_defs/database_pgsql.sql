@@ -45,7 +45,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('table_sessions',  'phpauth_sessions'),
 ('table_users', 'phpauth_users'),
 ('table_emails_banned', 'phpauth_emails_banned'),
-('table_translations', 'phpauth_translations'),
+('table_translations', 'phpauth_translation_dictionary'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
 ('verify_email_use_banlist',  '1'),
