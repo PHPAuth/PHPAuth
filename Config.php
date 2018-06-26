@@ -225,9 +225,9 @@ class Config
      */
     public function __set($setting, $value)
     {
-        $query = $this->dbh->prepare("UPDATE {$this->config_table} SET value = ? WHERE setting = ?");
+        $query_prepared = $this->dbh->prepare("UPDATE {$this->config_table} SET value = :value WHERE setting = :setting");
 
-        if ($query->execute(array($value, $setting))) {
+        if ($query_prepared->execute(['value' => $value, 'setting' => $setting])) {
             $this->config[$setting] = $value;
 
             return true;

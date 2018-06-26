@@ -11,7 +11,6 @@ use ReCaptcha\ReCaptcha;
  * Required PHP 5.6 and above.
  *
  */
-
 class Auth
 {
     const HASH_LENGTH = 40;
@@ -231,7 +230,10 @@ class Auth
         }
 
         $return['error'] = false;
-        $return['message'] = ($use_email_activation == true ? $this->__lang("register_success") : $this->__lang('register_success_emailmessage_suppressed') );
+        $return['message'] =
+            ($use_email_activation == true
+            ? $this->__lang("register_success")
+            : $this->__lang('register_success_emailmessage_suppressed') );
 
         return $return;
     }
@@ -597,9 +599,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_users} (isactive) VALUES (0)");
+        $query = "INSERT INTO {$this->config->table_users} (isactive) VALUES (0)";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute()) {
+        if (!$query_prepared->execute()) {
             $return['message'] = $this->__lang("system_error") . " #03";
             return $return;
         }
@@ -611,11 +614,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
 
             if ($addRequest['error'] == 1) {
-                $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = :id");
+                $query = "DELETE FROM {$this->config->table_users} WHERE id = :id";
+                $query_prepared = $this->dbh->prepare($query);
                 $query_params = [
                     'id' => $uid
                 ];
-                $query->execute($query_params);
+                $query_prepared->execute($query_params);
 
                 $return['message'] = $addRequest['message'];
                 return $return;
@@ -640,13 +644,16 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }, $customParamsQueryArray));
         } else { $setParams = ''; }
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?");
+        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
+        $query_prepared = $this->dbh->prepare($query);
 
         $bindParams = array_values(array_merge(array($email, $password, $isactive), $params, array($uid)));
 
-        if (!$query->execute($bindParams)) {
-            $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
-            $query->execute(array($uid));
+        if (!$query_prepared->execute($bindParams)) {
+            $query = "DELETE FROM {$this->config->table_users} WHERE id = ?";
+            $query_prepared = $this->dbh->prepare($query);
+
+            $query_prepared->execute(array($uid));
             $return['message'] = $this->__lang("system_error") . " #04";
 
             return $return;
@@ -779,6 +786,46 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     }
 
     /**
+     * Force delete user without password or captcha verification.
+     *
+     * @param $uid
+     * @return mixed
+     */
+    public function deleteUserForced($uid)
+    {
+        $return['error'] = true;
+
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = :uid");
+
+        if (!$query->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #05";
+
+            return $return;
+        }
+
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = :uid");
+
+        if (!$query->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #06";
+
+            return $return;
+        }
+
+        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = :uid");
+
+        if (!$query->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #07";
+
+            return $return;
+        }
+
+        $return['error'] = false;
+        $return['message'] = $this->__lang("account_deleted");
+
+        return $return;
+    }
+
+    /**
     * Creates an activation entry and sends email to user
     * @param int $uid
     * @param string $email
@@ -864,7 +911,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             if ($sendmail_status['error']) {
                 $this->deleteRequest($request_id);
 
-                $return['message'] = $this->__lang("system_error") . $sendmail_status['message'] . " #10";
+                $return['message'] = $this->__lang("system_error") . ' ' . $sendmail_status['message'] . " #10";
                 return $return;
             }
         }
@@ -1649,22 +1696,22 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param array $params
      * @return array $return[error/message]
      */
-    protected function updateUser($uid, $params)
+    public function updateUser($uid, $params)
     {
         $setParams = '';
         if (is_array($params) && count($params) > 0) {
-            $customParamsQueryArray = Array();
+            $customParamsQueryArray = [];
 
             foreach ($params as $paramKey => $paramValue) {
-                $customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+                $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
             }
 
             $setParams = implode(', ', array_map(function ($entry) {
                 return $entry['value'];
             }, $customParamsQueryArray));
         }
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?");
-        $bindParams = array_values(array_merge($params, array($uid)));
+        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET {$setParams} WHERE id = :uid");
+        $bindParams = array_values(array_merge($params, ['uid' => $uid]));
 
         if (!$query->execute($bindParams)) {
             $return['message'] = $this->__lang("system_error") . " #04";
