@@ -6,14 +6,14 @@ use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
 
-// require_once 'AuthInterface.php';
+/*require_once 'AuthInterface.php';*/
 
 /**
  * Auth class
  * Required PHP 5.6 and above.
  *
  */
-class Auth /* implements AuthInterface */
+class Auth/* implements AuthInterface*/
 {
     const HASH_LENGTH = 40;
     const TOKEN_LENGTH = 20;
@@ -29,7 +29,15 @@ class Auth /* implements AuthInterface */
     public $config;
 
 
-    protected $isAuthenticated = FALSE;
+    /**
+     * Public 'is_logged' field
+     * @var bool
+     */
+    public $isAuthenticated = FALSE;
+
+    /**
+     * @var null
+     */
     protected $currentuser = NULL;
 
     /**
@@ -62,6 +70,8 @@ class Auth /* implements AuthInterface */
         $this->messages_dictionary = $this->config->dictionary;
 
         date_default_timezone_set($this->config->site_timezone);
+
+        $this->isAuthenticated = $this->isLogged();
     }
 
     /**
@@ -325,7 +335,7 @@ class Auth /* implements AuthInterface */
             return $state;
         }
 
-        $query = "SELECT id, email, isactive FROM {$this->config->table_users} WHERE email = :email";
+        $query = "SELECT id, email FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
@@ -364,6 +374,8 @@ class Auth /* implements AuthInterface */
             return false;
         }
 
+        $this->isAuthenticated = false;
+
         return $this->deleteSession($hash);
     }
 
@@ -376,7 +388,6 @@ class Auth /* implements AuthInterface */
     public function getHash($password)
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
-        // return password_hash($password, PASSWORD_DEFAULT, $this->config->password_hashOptions);
     }
 
     /**
@@ -863,14 +874,24 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $return['error'] = true;
 
-        if ($type != "activation" && $type != "reset") {
+        $dictionary_key__request_exists = '';
+
+        if ($type == 'activation') {
+
+            $dictionary_key__request_exists = 'activation_exists';
+
+        } elseif ($type == 'reset') {
+
+            $dictionary_key__request_exists = 'reset_exists';
+
+        } else {
             $return['message'] = $this->__lang("system_error") . " #08";
 
             return $return;
         }
 
-        // if not set manually, check config data
-        if ($use_email_activation === NULL) {
+        // if not set up manually, check config data
+        if ($use_email_activation === null) {
             $use_email_activation = true;
 
             if ($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
@@ -898,24 +919,26 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
-            $expiredate = strtotime($row['expire']);
+            $expiredate  = strtotime($row['expire']);
             $currentdate = strtotime(date("Y-m-d H:i:s"));
 
             if ($currentdate < $expiredate) {
-                $return['message'] = $this->__lang("activation_exists", date("Y-m-d H:i:s", $expiredate));
+                $return['message'] = $this->__lang($dictionary_key__request_exists, date("Y-m-d H:i:s", $expiredate));
                 return $return;
             }
 
             $this->deleteRequest($row['id']);
         }
 
-        if ($type == "activation" && $this->getBaseUser($uid)['isactive'] == 1) { // uneffective call. And, never be called, 'cause "Activation key is incorrect." throwen before
+        /*// uneffective call. And, never be called, 'cause "Activation key is incorrect." throwen before
+        if ($type == "activation" && $this->getBaseUser($uid)['isactive'] == 1) {
             $return['message'] = $this->__lang("already_activated");
 
             return $return;
         }
+        */
 
-        $key = $this->getRandomKey(self::TOKEN_LENGTH); // use GUID ?
+        $token = $this->getRandomKey(self::TOKEN_LENGTH); // use GUID for tokens?
         $expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
 
         $query = "INSERT INTO {$this->config->table_requests} (uid, token, expire, type) VALUES (:uid, :token, :expire, :type)";
@@ -923,7 +946,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $query_params = [
             'uid' => $uid,
-            'token' => $key,
+            'token' => $token,
             'expire' => $expire,
             'type' => $type
         ];
@@ -937,7 +960,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $request_id = $this->dbh->lastInsertId();
 
         if ($use_email_activation === true) {
-            $sendmail_status = $this->do_SendMail($email, $type, $key);
+            $sendmail_status = $this->do_SendMail($email, $type, $token);
 
             if ($sendmail_status['error']) {
                 $this->deleteRequest($request_id);
@@ -1749,7 +1772,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $setParams = '';
 
         if (is_array($params) && count($params) > 0) {
-            $customParamsQueryArray = [];
+            /*$customParamsQueryArray = [];
 
             foreach ($params as $paramKey => $paramValue) {
                 $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
@@ -1757,10 +1780,16 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             $setParams = implode(', ', array_map(function ($entry) {
                 return $entry['value'];
-            }, $customParamsQueryArray));
+            }, $customParamsQueryArray));*/
+
+            $setParams = implode(', ', array_map( function($key, $value){
+                return $key . ' = ?';
+            }, array_keys($params), $params ));
         }
 
         $query = "UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?";
+
+        //NB: There is NO possible SQL-injection here, 'cause $setParams will be like 'name = ?, age = ?'
 
         $query_prepared = $this->dbh->prepare($query);
         $bindParams = array_values(array_merge($params, [$uid]));
