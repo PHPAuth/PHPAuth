@@ -18,8 +18,5 @@
 		"psr-4": {
 			"PHPAuth\\": "/"
 		}
-	},
-	"require-dev": {
-		"phpunit/phpunit": "^6"
 	}
 }

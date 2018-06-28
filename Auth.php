@@ -6,14 +6,14 @@ use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
 
-require_once 'AuthInterface.php';
+// require_once 'AuthInterface.php';
 
 /**
  * Auth class
  * Required PHP 5.6 and above.
  *
  */
-class Auth implements AuthInterface
+class Auth /* implements AuthInterface */
 {
     const HASH_LENGTH = 40;
     const TOKEN_LENGTH = 20;
