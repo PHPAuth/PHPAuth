@@ -284,12 +284,13 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET isactive = :isactive WHERE id = :id");
+        $query = "UPDATE {$this->config->table_users} SET isactive = :isactive WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'isactive' => 1,
             'id' => $getRequest['uid']
         ];
-        $query->execute($query_params);
+        $query_prepared->execute($query_params);
 
         $this->deleteRequest($getRequest['id']);
 
@@ -324,10 +325,11 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = :email");
-        $query->execute(['email' => $email]);
+        $query = "SELECT id, email, isactive FROM {$this->config->table_users} WHERE email = :email";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['email' => $email]);
 
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 		if (!$row) {
             $this->addAttempt();
 
@@ -384,14 +386,15 @@ class Auth implements AuthInterface
     */
     public function getUID($email)
     {
-        $query = $this->dbh->prepare("SELECT id FROM {$this->config->table_users} WHERE email = :email");
-        $query->execute(['email' => $email]);
+        $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['email' => $email]);
 
-        if ($query->rowCount() == 0) {
+        if ($query_prepared->rowCount() == 0) {
             return false;
         }
 
-        return $query->fetchColumn();
+        return $query_prepared->fetchColumn();
     }
 
     /**
@@ -423,11 +426,12 @@ class Auth implements AuthInterface
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
         // INET_ATON(:ip)
-        $query = $this->dbh->prepare("
+        $query = "
 INSERT INTO {$this->config->table_sessions}
 (uid, hash, expiredate, ip, agent, cookie_crc)
 VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
-");
+";
+        $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'uid'       => $uid,
             'hash'      => $data['hash'],
@@ -437,7 +441,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             'cookie_crc'=> $data['cookie_crc']
         ];
 
-        if (!$query->execute($query_params)) {
+        if (!$query_prepared->execute($query_params)) {
             return false;
         }
 
@@ -454,10 +458,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     protected function deleteExistingSessions($uid)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = :uid");
-        $query->execute(['uid' => $uid]);
+        $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['uid' => $uid]);
 
-        return $query->rowCount() == 1;
+        return $query_prepared->rowCount() == 1;
     }
 
     /**
@@ -468,9 +473,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
     protected function deleteSession($hash)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE hash = :hash");
-        $query->execute(['hash' => $hash]);
-        return $query->rowCount() == 1;
+        $query = "DELETE FROM {$this->config->table_sessions} WHERE hash = :hash";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['hash' => $hash]);
+        return $query_prepared->rowCount() == 1;
     }
 
     /**
@@ -493,17 +499,18 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         // INET_NTOA(ip)
-        $query = $this->dbh->prepare("SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash";
+        $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'hash' => $hash
         ];
-        $query->execute($query_params);
+        $query_prepared->execute($query_params);
 
-        if ($query->rowCount() == 0) {
+        if ($query_prepared->rowCount() == 0) {
             return false;
         }
 
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
         // $sid = $row['id'];
         $uid = $row['uid'];
@@ -541,17 +548,18 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function getSessionUID($hash)
     {
-        $query = $this->dbh->prepare("SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash");
+        $query = "SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash";
+        $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'hash' => $hash
         ];
-        $query->execute($query_params);
+        $query_prepared->execute($query_params);
 
-        if ($query->rowCount() == 0) {
+        if ($query_prepared->rowCount() == 0) {
             return false;
         }
 
-        return $query->fetch(\PDO::FETCH_ASSOC)['uid'];
+        return $query_prepared->fetch(\PDO::FETCH_ASSOC)['uid'];
     }
 
     /**
@@ -561,10 +569,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function isEmailTaken($email)
     {
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_users} WHERE email = :email");
-        $query->execute(['email' => $email]);
+        $query = "SELECT count(*) FROM {$this->config->table_users} WHERE email = :email";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['email' => $email]);
 
-        if ($query->fetchColumn() == 0) {
+        if ($query_prepared->fetchColumn() == 0) {
             return false;
         }
 
@@ -582,12 +591,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         };
 
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = :domain");
-        $query->execute([
+        $query = "SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = :domain";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute([
             'domain' => (strtolower(explode('@', $email)[1]))
         ]);
 
-        if ($query->fetchColumn() == 0) {
+        if ($query_prepared->fetchColumn() == 0) {
             return false;
         }
 
@@ -677,10 +687,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     protected function getBaseUser($uid)
     {
-        $query = $this->dbh->prepare("SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id");
-        $query->execute(['id' => $uid]);
+        $query = "SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['id' => $uid]);
 
-        $data = $query->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -699,10 +710,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function getUser($uid, $withpassword = false)
     {
-        $query = $this->dbh->prepare("SELECT * FROM {$this->config->table_users} WHERE id = :id");
-        $query->execute(['id' => $uid]);
+        $query = "SELECT * FROM {$this->config->table_users} WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['id' => $uid]);
 
-        $data = $query->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -761,25 +773,28 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = ?");
+        $query = "DELETE FROM {$this->config->table_users} WHERE id = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(array($uid))) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #05";
 
             return $return;
         }
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = ?");
+        $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(array($uid))) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #06";
 
             return $return;
         }
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = ?");
+        $query = "DELETE FROM {$this->config->table_requests} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(array($uid))) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #07";
 
             return $return;
@@ -801,25 +816,28 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_users} WHERE id = :uid");
+        $query = "DELETE FROM {$this->config->table_users} WHERE id = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(['uid' => $uid])) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #05";
 
             return $return;
         }
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_sessions} WHERE uid = :uid");
+        $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(['uid' => $uid])) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #06";
 
             return $return;
         }
 
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE uid = :uid");
+        $query = "DELETE FROM {$this->config->table_requests} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
 
-        if (!$query->execute(['uid' => $uid])) {
+        if (!$query_prepared->execute(['uid' => $uid])) {
             $return['message'] = $this->__lang("system_error") . " #07";
 
             return $return;
@@ -830,6 +848,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         return $return;
     }
+
+    // protected function add
 
     /**
     * Creates an activation entry and sends email to user
@@ -942,17 +962,18 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $return['error'] = true;
 
-        $query = $this->dbh->prepare("SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?");
-        $query->execute(array($key, $type));
+        $query = "SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(array($key, $type));
 
-        if ($query->rowCount() === 0) {
+        if ($query_prepared->rowCount() === 0) {
             $this->addAttempt();
             $return['message'] = $this->__lang( $type."key_incorrect" );
 
             return $return;
         }
 
-        $row = $query->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
         $expiredate = strtotime($row['expire']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -979,8 +1000,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     protected function deleteRequest($id)
     {
-        $query = $this->dbh->prepare("DELETE FROM {$this->config->table_requests} WHERE id = :id");
-        return $query->execute(['id' => $id]);
+        $query = "DELETE FROM {$this->config->table_requests} WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
+        return $query_prepared->execute(['id' => $id]);
     }
 
     /**
@@ -1127,14 +1149,15 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $password = $this->getHash($password);
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = :password WHERE id = :id");
+        $query = "UPDATE {$this->config->table_users} SET password = :password WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'password' => $password,
             'id' => $data['uid']
         ];
-        $query->execute($query_params);
+        $query_prepared->execute($query_params);
 
-        if ($query->rowCount() == 0) {
+        if ($query_prepared->rowCount() == 0) {
             $state['message'] = $this->__lang("system_error") . " #12";
 
             return $state;
@@ -1291,8 +1314,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $newpass = $this->getHash($newpass);
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
-        $query->execute(array($newpass, $uid));
+        $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(array($newpass, $uid));
 
         $return['error'] = false;
         $return['message'] = $this->__lang("password_changed");
@@ -1373,10 +1397,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET email = ? WHERE id = ?");
-        $query->execute(array($email, $uid));
+        $query = "UPDATE {$this->config->table_users} SET email = ? WHERE id = ?";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(array($email, $uid));
 
-        if ($query->rowCount() == 0) {
+        if ($query_prepared->rowCount() == 0) {
             $return['message'] = $this->__lang("system_error") . " #15";
 
             return $return;
@@ -1398,9 +1423,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $this->deleteAttempts($ip, false);
 
         // INET_ATON
-        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip"); // INET_ATON(:ip)
-        $query->execute(['ip' => $ip]);
-        $attempts = $query->fetchColumn();
+        $query = "SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip";
+        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
+        $query_prepared->execute(['ip' => $ip]);
+        $attempts = $query_prepared->fetchColumn();
 
         if ($attempts < intval($this->config->attempts_before_verify)) {
             return "allow";
@@ -1463,8 +1489,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $ip = $this->getIp();
         $attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
 
-        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)"); // INET_ATON(:ip)
-        return $query->execute([
+        $query = "INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)";
+        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
+        return $query_prepared->execute([
             'ip'         => $ip,
             'expiredate' => $attempt_expiredate
         ]);
@@ -1583,10 +1610,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      */
     public function comparePasswords($userid, $password_for_check)
     {
-        $query = $this->dbh->prepare("SELECT password FROM {$this->config->table_users} WHERE id = ?");
-        $query->execute(array($userid));
+        $query = "SELECT password FROM {$this->config->table_users} WHERE id = ?";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(array($userid));
 
-        $data = $query->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -1610,9 +1638,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     
         if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
             $hash = $this->getHash($password);
-    
-            $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET password = ? WHERE id = ?");
-            $query->execute(array($hash, $uid));
+
+            $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
+            $query_prepared = $this->dbh->prepare($query);
+            $query_prepared->execute(array($hash, $uid));
         }
     
         return true;
@@ -1689,18 +1718,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
                 $mail->Subject  = $this->__lang('email_activation_subject', $this->config->site_name);
                 $mail->Body     = $this->__lang('email_activation_body', $this->config->site_url, $this->config->site_activation_page, $key);
                 $mail->AltBody  = $this->__lang('email_activation_altbody', $this->config->site_url, $this->config->site_activation_page, $key);
-
-                // $mail->Subject = sprintf($this->__lang('email_activation_subject'), $this->config->site_name);
-                // $mail->Body = sprintf($this->__lang('email_activation_body'), $this->config->site_url, $this->config->site_activation_page, $key);
-                // $mail->AltBody = sprintf($this->__lang('email_activation_altbody'), $this->config->site_url, $this->config->site_activation_page, $key);
             } elseif ($type == 'reset') {
                 $mail->Subject  = $this->__lang('email_reset_subject', $this->config->site_name);
                 $mail->Body     = $this->__lang('email_reset_body', $this->config->site_url, $this->config->site_password_reset_page, $key);
                 $mail->AltBody  = $this->__lang('email_reset_altbody', $this->config->site_url, $this->config->site_password_reset_page, $key);
-
-                // $mail->Subject = sprintf($this->__lang('email_reset_subject'), $this->config->site_name);
-                // $mail->Body = sprintf($this->__lang('email_reset_body'), $this->config->site_url, $this->config->site_password_reset_page, $key);
-                // $mail->AltBody = sprintf($this->__lang('email_reset_altbody'), $this->config->site_url, $this->config->site_password_reset_page, $key);
             } else {
                 return false;
             }
@@ -1739,10 +1760,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }, $customParamsQueryArray));
         }
 
-        $query = $this->dbh->prepare("UPDATE {$this->config->table_users} SET {$setParams} WHERE id = :uid");
-        $bindParams = array_values(array_merge($params, ['uid' => $uid]));
+        $query = "UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?";
 
-        if (!$query->execute($bindParams)) {
+        $query_prepared = $this->dbh->prepare($query);
+        $bindParams = array_values(array_merge($params, [$uid]));
+
+        if (!$query_prepared->execute($bindParams)) {
             $return['message'] = $this->__lang("system_error") . " #04";
             return $return;
         }
