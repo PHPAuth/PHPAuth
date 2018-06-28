@@ -18,9 +18,9 @@ class Config
      * Examples:
      *
      * new Config($dbh) -- Defaults will be used: load config from SQL table phpauth_config, language is 'en_GB'
-     * new Config($dbh, '', 'config_table') -- 2nd argument may be 'sql' or '', 3rd argument determines config table
-     * new Config($dbh, 'ini', '$/config/phpauth.ini') -- configuration will be loaded from INI file, '$' means Application basedir
-     * new Config($dbh, 'array', $CONFIG_ARRAY) -- configuration must be defined in $CONFIG_ARRAY value
+     * new Config($dbh, 'config_table', '') -- 3rd argument is 'sql' or '' => 2rd argument determines config table in DB, default 'phpauth_config'
+     * new Config($dbh, '$/config/phpauth.ini', 'ini') -- configuration will be loaded from INI file, '$' means Application basedir
+     * new Config($dbh, $CONFIG_ARRAY, 'array') -- configuration must be defined in $CONFIG_ARRAY value
      *
      * in any case, 4th argument defines site language as locale code
      *
@@ -29,8 +29,10 @@ class Config
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(\PDO $dbh,  $config_source = '', $config_type = '', $config_site_language = '')
+    public function __construct(\PDO $dbh, $config_source = NULL, $config_type = '', $config_site_language = '')
     {
+        $config_type = strtolower($config_type);
+
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
         }
@@ -258,6 +260,12 @@ class Config
      */
     protected function setForgottenDefaults()
     {
+        // ==== Critical Values ====
+
+
+
+        // ==== unchecked values ====
+
         $this->repairConfigValue('bcrypt_cost', 10);
 
         // cookies* values

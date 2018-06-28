@@ -7,8 +7,19 @@ if (!class_exists('\PHPUnit\Framework\TestCase') && class_exists('\PHPUnit_Frame
 
 class AuthTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var PHPAuth\Auth
+     */
     public static $auth;
+
+    /**
+     * @var PHPAuth\Config;
+     */
     public static $config;
+
+    /**
+     * @var \PDO
+     */
     public static $dbh;
 
     public static function setUpBeforeClass()
@@ -221,9 +232,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testLanguageFiles()
     {
         // Use the english language file as main reference
-        include __DIR__ . '/../languages/en_GB.php';
-
-        $baseLang = $lang;
+        $baseLang = $lang = (include __DIR__ . '/../languages/en_GB.php');
 
         $languageFiles = glob(__DIR__ . '/../languages/*.php');
 
