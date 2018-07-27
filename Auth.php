@@ -33,12 +33,12 @@ class Auth/* implements AuthInterface*/
      * Public 'is_logged' field
      * @var bool
      */
-    public $isAuthenticated = FALSE;
+    public $isAuthenticated = false;
 
     /**
      * @var null
      */
-    protected $currentuser = NULL;
+    protected $currentuser = null;
 
     /**
      * @var \stdClass $messages_dictionary
@@ -79,11 +79,11 @@ class Auth/* implements AuthInterface*/
      * @param string $email
      * @param string $password
      * @param int $remember
-     * @param string $captcha_response = NULL
+     * @param string $captcha_response = null
      * @return array $return
      */
     //@todo: => loginUser
-    public function login($email, $password, $remember = 0, $captcha_response = NULL)
+    public function login($email, $password, $remember = 0, $captcha_response = null)
     {
         $return['error'] = true;
 
@@ -107,17 +107,17 @@ class Auth/* implements AuthInterface*/
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_password_invalid");
+            $return['message'] = $validateEmail['message'] ?? $this->__lang("account_email_invalid");
 
             return $return;
         } elseif ($validatePassword['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_password_invalid");
+            $return['message'] = $validatePassword['message'] ?? $this->__lang("account_password_invalid");
 
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("remember_me_invalid");
+            $return['message'] = $this->__lang("remember_me_invalid");      //@todo => login_remember_me_invalid
 
             return $return;
         }
@@ -126,7 +126,7 @@ class Auth/* implements AuthInterface*/
 
         if (!$uid) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_password_incorrect");
+            $return['message'] = $this->__lang("account_not_found");
 
             return $return;
         }
@@ -172,12 +172,12 @@ class Auth/* implements AuthInterface*/
     * @param string $password
     * @param string $repeatpassword
     * @param array  $params
-    * @param string $captcha_response = NULL
-    * @param bool $use_email_activation = NULL
+    * @param string $captcha_response = null
+    * @param bool $use_email_activation = null
     * @return array $return
     */
     //@todo: => registerUserAccount
-    public function register($email, $password, $repeatpassword, $params = [], $captcha_response = NULL, $use_email_activation = NULL)
+    public function register($email, $password, $repeatpassword, $params = [], $captcha_response = null, $use_email_activation = null)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -278,17 +278,17 @@ class Auth/* implements AuthInterface*/
         // 'user is already activated' will never triggered, because after successful activation token removed from DB
         // NOW is no any way to determine, is this token used for activation or not?
 
-        $getRequest = $this->getRequest($activate_token, "activation");
+        $request_result = $this->getRequest($activate_token, "activation");
 
-        if ($getRequest['error']) {
-            $return['message'] = $getRequest['message'];
+        if ($request_result['error']) {
+            $return['message'] = $request_result['message'];
 
             return $return;
         }
 
-        if ($this->getBaseUser($getRequest['uid'])['isactive'] == 1) {
+        if ($this->getBaseUser($request_result['uid'])['isactive'] == 1) {
             $this->addAttempt();
-            $this->deleteRequest($getRequest['id']);
+            $this->deleteRequest($request_result['id']);
             $return['message'] = $this->__lang("system_error") . " #02"; // user activated, but activate token not expired
 
             return $return;
@@ -298,11 +298,11 @@ class Auth/* implements AuthInterface*/
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'isactive' => 1,
-            'id' => $getRequest['uid']
+            'id' => $request_result['uid']
         ];
         $query_prepared->execute($query_params);
 
-        $this->deleteRequest($getRequest['id']);
+        $this->deleteRequest($request_result['id']);
 
         $return['error'] = false;
         $return['message'] = $this->__lang("account_activated");
@@ -316,7 +316,7 @@ class Auth/* implements AuthInterface*/
      * @param null $use_email_activation
      * @return array $return
      */
-    public function requestReset($email, $use_email_activation = NULL)
+    public function requestReset($email, $use_email_activation = null)
     {
         $state['error'] = true;
         $block_status = $this->isBlocked();
@@ -375,6 +375,7 @@ class Auth/* implements AuthInterface*/
         }
 
         $this->isAuthenticated = false;
+        $this->currentuser = null;
 
         return $this->deleteSession($hash);
     }
@@ -391,7 +392,7 @@ class Auth/* implements AuthInterface*/
     }
 
     /**
-    * Gets UID for a given email address and returns an array
+    * Gets UID for a given email address, return int
     * @param string $email
     * @return int $uid
     */
@@ -436,7 +437,7 @@ class Auth/* implements AuthInterface*/
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
-        // INET_ATON(:ip)
+        // don't use INET_ATON(:ip), use ip2long(), 'cause SQLite or PosgreSQL does not have INET_ATON() function
         $query = "
 INSERT INTO {$this->config->table_sessions}
 (uid, hash, expiredate, ip, agent, cookie_crc)
@@ -461,6 +462,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         return $data;
     }
+
+    //@todo: delete cookie at deleteSession
 
     /**
     * Removes all existing sessions for a given UID
@@ -523,12 +526,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
-        // $sid = $row['id'];
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
-        // $db_agent = $row['agent'];
         $db_cookie = $row['cookie_crc'];
 
         if ($currentdate > $expiredate) {
@@ -744,10 +745,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * Allows a user to delete their account
     * @param int $uid
     * @param string $password
-    * @param string $captcha_response = NULL
+    * @param string $captcha_response = null
     * @return array $return
     */
-    public function deleteUser($uid, $password, $captcha_response = NULL)
+    public function deleteUser($uid, $password, $captcha_response = null)
     {
         $return['error'] = true;
 
@@ -1029,7 +1030,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     }
 
     /**
-    * Verifies that a password is valid and respects security requirements
+    * Verifies that a password is greater than minimal length
+    *
+    * security requirements (ZxcvbnPhp\Zxcvbn) not checked now.
     * @param string $password
     * @return array $return ['error', 'message']
     */
@@ -1056,15 +1059,15 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $state['error'] = true;
 
         if (strlen($email) < (int)$this->config->verify_email_min_length ) {
-            $state['message'] = $this->__lang("email_short");
+            $state['message'] = $this->__lang("email_short", (int)$this->config->verify_email_min_length);
 
             return $state;
         } elseif (strlen($email) > (int)$this->config->verify_email_max_length ) {
-            $state['message'] = $this->__lang("email_long");
+            $state['message'] = $this->__lang("email_long", (int)$this->config->verify_email_max_length);
 
             return $state;
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $state['message'] = $this->__lang("email_invalid");
+            $state['message'] = $this->__lang("email_invalid", $email);
 
             return $state;
         }
@@ -1087,10 +1090,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $key
     * @param string $password
     * @param string $repeatpassword
-    * @param string $captcha_response = NULL
+    * @param string $captcha_response = null
     * @return array $return
     */
-    public function resetPass($key, $password, $repeatpassword, $captcha_response = NULL)
+    public function resetPass($key, $password, $repeatpassword, $captcha_response = null)
     {
         $state['error'] = true;
         $block_status = $this->isBlocked();
@@ -1199,7 +1202,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param null $use_email_activation
     * @return array $return
     */
-    public function resendActivation($email, $use_email_activation = NULL)
+    public function resendActivation($email, $use_email_activation = null)
     {
         $state['error'] = true;
         $block_status = $this->isBlocked();
@@ -1210,7 +1213,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $state;
         }
 
-        if ($use_email_activation == NULL) {
+        if ($use_email_activation == null) {
             $state['message'] = $this->__lang('function_disabled');
 
             return $state;
@@ -1269,10 +1272,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $currpass
     * @param string $newpass
     * @param string $repeatnewpass
-    * @param string $captcha_response = NULL
+    * @param string $captcha_response = null
     * @return array $return
     */
-    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha_response = NULL)
+    public function changePassword($uid, $currpass, $newpass, $repeatnewpass, $captcha_response = null)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -1352,10 +1355,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param int $uid
     * @param string $email
     * @param string $password
-    * @param string $captcha = NULL
+    * @param string $captcha = null
     * @return array $return
     */
-    public function changeEmail($uid, $email, $password, $captcha = NULL)
+    public function changeEmail($uid, $email, $password, $captcha = null)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -1596,7 +1599,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @return boolean
      */
     public function isLogged() {
-        if ($this->isAuthenticated === NULL) {
+        if ($this->isAuthenticated === false) {
             $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
         }
         return $this->isAuthenticated;
@@ -1609,7 +1612,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function getCurrentUser()
     {
-        if ($this->currentuser === NULL) {
+        if ($this->currentuser === null) {
             $hash = $this->getCurrentSessionHash();
             if ($hash === false) {
                 return false;
@@ -1679,9 +1682,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     public function __lang($key, ...$args)
     {
         $string = array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
-        return (func_get_args() > 1) ? vsprintf($string, $args) : $string;
-
-        // return vsprintf($string, $args); // may be simple vspintf(), need testing
+        return (func_num_args() > 1) ? vsprintf($string, $args) : $string;
     }
 
 
@@ -1772,16 +1773,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $setParams = '';
 
         if (is_array($params) && count($params) > 0) {
-            /*$customParamsQueryArray = [];
-
-            foreach ($params as $paramKey => $paramValue) {
-                $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
-            }
-
-            $setParams = implode(', ', array_map(function ($entry) {
-                return $entry['value'];
-            }, $customParamsQueryArray));*/
-
             $setParams = implode(', ', array_map( function($key, $value){
                 return $key . ' = ?';
             }, array_keys($params), $params ));

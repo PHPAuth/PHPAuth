@@ -260,12 +260,7 @@ class Config
      */
     protected function setForgottenDefaults()
     {
-        // ==== Critical Values ====
-
-
-
         // ==== unchecked values ====
-
         $this->repairConfigValue('bcrypt_cost', 10);
 
         // cookies* values
@@ -314,8 +309,20 @@ class Config
         $lang['user_blocked'] = "You are currently locked out of the system.";
         $lang['user_verify_failed'] = "Captcha Code was invalid.";
 
+        //new
+        $lang['account_email_invalid']  = "Email address is incorrect or banned";
+
+        //new
+        $lang['account_password_invalid'] = "Password is invalid";
+
+        //new
+        $lang['account_not_found']          = "Account with given email not found.";
+
+
+        $lang['login_remember_me_invalid'] = "The remember me field is invalid.";
+
         $lang['email_password_invalid'] = "Email address / password are invalid.";
-        $lang['email_password_incorrect'] = "Email address / password are incorrect.";
+        $lang['email_password_incorrect'] = "Password are incorrect for given EMail.";
         $lang['remember_me_invalid'] = "The remember me field is invalid.";
 
         $lang['password_short'] = "Password is too short.";
@@ -333,7 +340,7 @@ class Config
 
         $lang['email_short'] = "Email address is too short.";
         $lang['email_long'] = "Email address is too long.";
-        $lang['email_invalid'] = "Email address is invalid.";
+        $lang['email_invalid'] = "It is not a correct Email address.";
         $lang['email_incorrect'] = "Email address is incorrect.";
         $lang['email_banned'] = "This email address is not allowed.";
         $lang['email_changed'] = "Email address changed successfully.";

@@ -53,11 +53,11 @@ $lang['activationkey_expired'] = "Activation key has expired.";
 
 $lang['reset_requested'] = "Password reset request sent to email address.";
 $lang['reset_requested_emailmessage_suppressed'] = "Password reset request is created.";
-$lang['reset_exists'] = "A reset request already exists.";
+$lang['reset_exists'] = "A reset request already exists. Next reset password request will available at %s";             //@todo: updated 2018-06-28
 
 $lang['already_activated'] = "Account is already activated.";
 $lang['activation_sent'] = "Activation email has been sent.";
-$lang['activation_exists'] = "An activation email has already been sent.";
+$lang['activation_exists'] = "An activation email has already been sent. Next reactivation will available at %s";       //@todo: updated 2018-06-28
 
 $lang['email_activation_subject'] = '%s - Activate account';
 $lang['email_activation_body'] = 'Hello,<br/><br/> To be able to log in to your account you first need to activate your account by clicking on the following link : <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> You then need to use the following activation key: <strong>%3$s</strong><br/><br/> If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
