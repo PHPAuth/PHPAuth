@@ -95,11 +95,11 @@ DROP TABLE IF EXISTS `phpauth_sessions`;
 CREATE TABLE `phpauth_sessions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) NOT NULL,
-  `hash` char(40) NOT NULL CHARACTER SET latin1 COLLATE latin1_general_ci,
+  `hash` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `expiredate` datetime NOT NULL,
   `ip` varchar(39) NOT NULL,
   `agent` varchar(200) NOT NULL,
-  `cookie_crc` char(40) NOT NULL CHARACTER SET latin1 COLLATE latin1_general_ci,
+  `cookie_crc` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

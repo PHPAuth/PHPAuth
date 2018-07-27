@@ -8,6 +8,7 @@ php:
     
 before_script:
   - composer install
+  - mysql --version
   - mysql -e 'create database phpauthtest;'
   - mysql -u root phpauthtest < database_defs/database_mysql.sql
 
