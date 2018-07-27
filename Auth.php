@@ -107,12 +107,12 @@ class Auth/* implements AuthInterface*/
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $validateEmail['message'] ?? $this->__lang("account_email_invalid");
+            $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
 
             return $return;
         } elseif ($validatePassword['error'] == 1) {
             $this->addAttempt();
-            $return['message'] = $validatePassword['message'] ?? $this->__lang("account_password_invalid");
+            $return['message'] = $validatePassword['message']; // ?? $this->__lang("account_password_invalid");
 
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
