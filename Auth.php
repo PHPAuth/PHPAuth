@@ -103,16 +103,10 @@ class Auth/* implements AuthInterface*/
         }
 
         $validateEmail = $this->validateEmail($email);
-        $validatePassword = $this->validatePassword($password);
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
             $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
-
-            return $return;
-        } elseif ($validatePassword['error'] == 1) {
-            $this->addAttempt();
-            $return['message'] = $validatePassword['message']; // ?? $this->__lang("account_password_invalid");
 
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
@@ -767,15 +761,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $validatePassword = $this->validatePassword($password);
-
-        if ($validatePassword['error'] == 1) {
-            $this->addAttempt();
-            $return['message'] = $validatePassword['message'];
-
-            return $return;
-        }
-
         $user = $this->getBaseUser($uid);
 
         if (!password_verify($password, $user['password'])) {
@@ -1293,15 +1278,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $validatePassword = $this->validatePassword($currpass);
-
-        if ($validatePassword['error'] == 1) {
-            $this->addAttempt();
-            $return['message'] = $validatePassword['message'];
-
-            return $return;
-        }
-
         $validatePassword = $this->validatePassword($newpass);
 
         if ($validatePassword['error'] == 1) {
@@ -1355,16 +1331,16 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param int $uid
     * @param string $email
     * @param string $password
-    * @param string $captcha = null
+    * @param string $captcha_response = null
     * @return array $return
     */
-    public function changeEmail($uid, $email, $password, $captcha = null)
+    public function changeEmail($uid, $email, $password, $captcha_response = null)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
         if ($block_status == "verify") {
-            if ($this->checkCaptcha($captcha) == false) {
+            if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
 
                 return $return;
@@ -1388,14 +1364,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if ($this->isEmailTaken($email)) {
             $this->addAttempt();
             $return['message'] = $this->__lang("email_taken");
-
-            return $return;
-        }
-
-        $validatePassword = $this->validatePassword($password);
-
-        if ($validatePassword['error'] == 1) {
-            $return['message'] = $this->__lang("password_notvalid");
 
             return $return;
         }
@@ -1468,10 +1436,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
     /**
      * Verifies a captcha code
-     * @param string $captcha
+     * @param string $captcha_response
      * @return boolean
      */
-    protected function checkCaptcha($captcha)
+    protected function checkCaptcha($captcha_response)
     {
         return true;
     }
