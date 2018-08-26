@@ -262,6 +262,7 @@ Available languages:
 * `pt_BR`
 * `ru_RU`
 * `se_SE`
+* `sl_SI`
 * `sr_RS`
 * `tr_TR`
 * `th_TH`
