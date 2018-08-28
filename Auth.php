@@ -427,7 +427,9 @@ class Auth/* implements AuthInterface*/
         $data['hash'] = sha1($this->config->site_key . microtime());
         $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-        $this->deleteExistingSessions($uid);
+        if (!$this->config->allow_concurrent_sessions) {
+            $this->deleteExistingSessions($uid);
+        }
 
         if ($remember == true) {
             $data['expire'] = strtotime($this->config->cookie_remember);

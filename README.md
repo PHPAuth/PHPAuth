@@ -72,6 +72,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_renew` : the maximum time difference between session expiration and last page load before allowing the session to be renewed. Must respect PHP`s [strtotime](http://php.net/manual/en/function.strtotime.php) format.
+* `allow_concurrent_sessions` : Allow a user to have multiple active sessions (boolean). If false (default), logging in will end any existing sessions.
 * `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
 * `smtp` : `0` to use sendmail for emails, `1` to use SMTP
 * `smtp_debug` : `0` to disable SMTP debugging, `1` to enable SMTP debugging, useful when you are having email/smtp issues
