@@ -20,6 +20,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('cookie_remember', '+1 month'),
 ('cookie_secure', '0'),
 ('cookie_renew', '+5 minutes'),
+('allow_concurrent_sessions', FALSE),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
 ('mail_charset','UTF-8'),
