@@ -93,32 +93,6 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     /**
      * @depends testLogin
      */
-    public function testConcurrentSessions()
-    {
-        // Get the current session
-        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
-        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetch()['hash'];
-        // Add a new session
-        $hash2 = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
-        // Verify that the existing session was replaced
-        $this->assertFalse(self::$auth->checkSession($hash));
-        $this->assertTrue(self::$auth->checkSession($hash2));
-        // Try again with allow_concurrent_sessions
-        self::$auth->config->allow_concurrent_sessions = true;
-        $hash3 = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
-        // Verify both sessions active
-        $this->assertTrue(self::$auth->checkSession($hash2));
-        $this->assertTrue(self::$auth->checkSession($hash3));
-        // Reset to starting state
-        self::$auth->config->allow_concurrent_sessions = false;
-        $hash = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
-        $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetchAll();
-        $this->assertTrue(count($sessions) == 1);
-    }
-
-    /**
-     * @depends testLogin
-     */
     public function testGetSessionUID()
     {
         $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];

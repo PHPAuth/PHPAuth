@@ -17,7 +17,6 @@ INSERT INTO phpauth_config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_remember', '+1 month');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_secure', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_renew', '+5 minutes');
-INSERT INTO phpauth_config (setting, value) VALUES ('allow_concurrent_sessions', FALSE);
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_activation',  '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_reset', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('mail_charset','UTF-8');

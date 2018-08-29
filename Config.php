@@ -283,8 +283,7 @@ class Config
 
         $this->repairConfigValue('mail_charset', "UTF-8");
 
-        // others
-        $this->repairConfigValue('allow_concurrent_sessions', false);
+        // $this->repairConfigValue();
 	}
 
     /**
