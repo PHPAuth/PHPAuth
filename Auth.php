@@ -381,6 +381,19 @@ class Auth/* implements AuthInterface*/
     }
 
     /**
+    * Logs out of all sessions for specified uid
+    * @param int $uid
+    * @return boolean
+    */
+    public function logoutAll($uid)
+    {
+        $this->isAuthenticated = false;
+        $this->currentuser = null;
+
+        return $this->deleteExistingSessions($uid);
+    }
+
+    /**
     * Hashes provided password with Bcrypt
     * @param string $password
     * @param string $password
@@ -478,7 +491,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['uid' => $uid]);
 
-        return $query_prepared->rowCount() == 1;
+        return $query_prepared->rowCount() > 0;
     }
 
     /**
@@ -535,7 +548,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $db_cookie = $row['cookie_crc'];
 
         if ($currentdate > $expiredate) {
-            $this->deleteExistingSessions($uid);
+            $this->deleteSession($hash);
 
             return false;
         }
@@ -546,7 +559,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
             if ($expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
-                $this->deleteExistingSessions($uid);
+                $this->deleteSession($hash);
                 $this->addSession($uid, false);
             }
             return true;

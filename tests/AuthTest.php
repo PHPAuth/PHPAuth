@@ -80,14 +80,38 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         // Get the user's (created and logged in as earlier) session hash
         $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
 
-        // Successful checkSession
+        // Successful checkSession, outside of renew time
+        self::$auth->config->cookie_renew = "+0 minutes";
         $this->assertTrue(self::$auth->checkSession($hash));
+        $this->assertTrue(self::$auth->checkSession($hash)); // still valid
+
+        // Successful checkSession, inside renew time
+        self::$auth->config->cookie_renew = "+60 minutes";
+        $this->assertTrue(self::$auth->checkSession($hash)); // will rotate hash
+        $this->assertFalse(self::$auth->checkSession($hash));
+        // A new valid hash
+        $sessions = self::$dbh->query("SELECT * FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertEquals(count($sessions), 1);
 
         // Failed checkSession: invalid session hash
         $this->assertFalse(self::$auth->checkSession("invalidhash"));
 
         // Failed checkSession: inexistant session hash
         $this->assertFalse(self::$auth->checkSession("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+
+        // Failed checkSession: IP mismatch
+        $hash = $sessions[0]['hash'];
+        $ip = $sessions[0]['ip'];
+        self::$dbh->exec("UPDATE phpauth_sessions SET ip = '1.2.3.4' WHERE hash='".$hash."';");
+        $this->assertFalse(self::$auth->checkSession($hash));
+        self::$dbh->exec("UPDATE phpauth_sessions SET ip = '".$ip."' WHERE hash='".$hash."';");  // reset
+
+        // Failed checkSession: expired session
+        self::$dbh->exec("UPDATE phpauth_sessions SET expiredate = '2000-01-01 00:00:00' WHERE hash='".$hash."';");
+        $this->assertFalse(self::$auth->checkSession($hash));
+        // Check that session was removed
+        $sessions = self::$dbh->query("SELECT * FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test@email.com');", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertEquals(count($sessions), 0);
     }
 
     /**
@@ -99,8 +123,10 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
         $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetch()['hash'];
         // Add a new session
+        self::$auth->config->allow_concurrent_sessions = false;
         $hash2 = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
         // Verify that the existing session was replaced
+        self::$auth->config->cookie_renew = "+0 minutes";  // Don't rotate hashes during test
         $this->assertFalse(self::$auth->checkSession($hash));
         $this->assertTrue(self::$auth->checkSession($hash2));
         // Try again with allow_concurrent_sessions
@@ -109,11 +135,18 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         // Verify both sessions active
         $this->assertTrue(self::$auth->checkSession($hash2));
         $this->assertTrue(self::$auth->checkSession($hash3));
+
+        // Test one session expiring while other still active
+        self::$dbh->exec("UPDATE phpauth_sessions SET expiredate = '2000-01-01 00:00:00' WHERE hash='".$hash2."';");
+        $this->assertFalse(self::$auth->checkSession($hash2));
+        $this->assertTrue(self::$auth->checkSession($hash3));
+
+        $sessions = self::$dbh->query("SELECT * FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertTrue(count($sessions) == 1);
+
         // Reset to starting state
         self::$auth->config->allow_concurrent_sessions = false;
-        $hash = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
-        $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetchAll();
-        $this->assertTrue(count($sessions) == 1);
+        self::$auth->config->cookie_renew = "+60 minutes";
     }
 
     /**
@@ -213,7 +246,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @depends testCheckSession
+     * @depends testChangeEmail
      */
     public function testLogout()
     {
@@ -232,6 +265,49 @@ class AuthTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @depends testLogout
+     */
+    public function testLogoutAll()
+    {
+        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test2@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        // Clear sessions
+        self::$auth->logoutAll($uid);
+        // Check no sessions
+        $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertSame(count($sessions), 0);
+        // Allow concurrent sessions
+        self::$auth->config->allow_concurrent_sessions = true;
+        self::$auth->config->cookie_renew = "+0 minutes";  // Don't rotate hashes during test
+        // Add a trio of sessions
+        $hash1 = self::$auth->login("test2@email.com", 'T3H-1337-P@$$2')['hash'];
+        $hash2 = self::$auth->login("test2@email.com", 'T3H-1337-P@$$2')['hash'];
+        $hash3 = self::$auth->login("test2@email.com", 'T3H-1337-P@$$2')['hash'];
+        $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertSame(count($sessions), 3);
+        // Logout one
+        $this->assertTrue(self::$auth->logout($hash1));
+        $this->assertFalse(self::$auth->checkSession($hash1));
+        $this->assertTrue(self::$auth->checkSession($hash2));
+        $this->assertTrue(self::$auth->checkSession($hash3));
+        // Logout all
+        $this->assertTrue(self::$auth->logoutAll($uid));
+        $this->assertFalse(self::$auth->checkSession($hash2));
+        $this->assertFalse(self::$auth->checkSession($hash3));
+        $this->assertFalse(self::$auth->isLogged());
+        $this->assertSame(self::$auth->getCurrentUser(), false);
+        // Check no sessions
+        $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetchAll();
+        $this->assertSame(count($sessions), 0);
+        // logoutAll will now return False since we have no active sessions
+        $this->assertFalse(self::$auth->logoutAll($uid));
+        // Fails with non-existent uid
+        $this->assertFalse(self::$auth->logoutAll(111));
+        // reset
+        self::$auth->config->allow_concurrent_sessions = false;
+        self::$auth->config->cookie_renew = "+60 minutes";
+    }
+
+    /**
+     * @depends testLogoutAll
      * @depends testChangePassword
      * @depends testChangeEmail
      */
@@ -269,4 +345,5 @@ class AuthTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals(0, count(array_diff_key($baseLang, $lang)));
         }
     }
+
 }
