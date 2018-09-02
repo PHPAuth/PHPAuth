@@ -65,7 +65,7 @@ $lang['email_activation_altbody'] = 'Pozdravljeni, ' . "\n\n" . 'Za prijavo v ra
 
 $lang['email_reset_subject'] = '%s - Zahteva na ponastavitev gesla';
 $lang['email_reset_body'] = 'Pozdravljeni,<br/><br/>Za ponastavitev gesla obiščite sledečo povezavo:<br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Nato morate uporabiti sledeči aktivacijslki ključ <strong>%3$s</strong><br/><br/>Če na %1$s gesla niste želeli ponastaviti, je to sporočilo napaka in ga ignorirajte.';
-$lang['email_reset_altbody'] = 'Pozdravljeni, ' . "\n\n" . 'Za ponastavitev gesla obiščite sledečo povezavo:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Nato morate uporabiti sledeči aktivacijslki ključ: %3$s' . "\n\n" . 'Če na %1$s gesla niste želeli ponastaviti, je to sporočilo napaka in ga ignorirajte.
+$lang['email_reset_altbody'] = 'Pozdravljeni, ' . "\n\n" . 'Za ponastavitev gesla obiščite sledečo povezavo:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Nato morate uporabiti sledeči aktivacijslki ključ: %3$s' . "\n\n" . 'Če na %1$s gesla niste želeli ponastaviti, je to sporočilo napaka in ga ignorirajte.';
 
 $lang['account_deleted'] = "Račun je uspešno izbrisan.";
 $lang['function_disabled'] = "Ta funkcija je onemogočena.";
