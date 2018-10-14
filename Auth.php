@@ -1821,5 +1821,32 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         return $this->getSessionUID($this->getCurrentSessionHash());
     }
 
+    /**
+     * Return current user sesssion info
+     *
+     * @return bool|mixed
+     */
+    public function getCurrentSessionUserInfo()
+    {
+        $ts = $this->config->table_sessions;
+        $tu = $this->config->table_users;
+
+        $query = "
+		SELECT {$ts}.uid, {$ts}.expiredate, {$ts}.ip, {$tu}.email, {$tu}.username
+		FROM {$ts}, {$tu}
+		WHERE hash = :hash AND {$ts}.uid = {$tu}.id";
+
+        $query = $this->dbh->prepare($query);
+        $query->execute(array(
+            'hash'	=>	$this->getCurrentSessionHash()
+        ));
+
+        if ($query->rowCount() == 0) {
+            return false;
+        }
+
+        return $query->fetch(\PDO::FETCH_ASSOC);
+    }
+
 
 }
