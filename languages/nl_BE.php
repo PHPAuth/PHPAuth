@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Hallo, ' . "\n\n" . 'Om je paswoord te herstelle
 
 $lang['account_deleted'] = "Je account is met success verwijderd.";
 $lang['function_disabled'] = "Deze functie is uitgeschakeld.";
+$lang['account_not_found'] = "Geen account gevonden met deze e-mail.";
 
 return $lang;
