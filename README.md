@@ -261,12 +261,14 @@ Available languages:
 * `pl_PL`
 * `ps_AF`
 * `pt_BR`
+* `ro_RO`
 * `ru_RU`
 * `se_SE`
+* `sk_SK`
 * `sl_SI`
 * `sr_RS`
-* `tr_TR`
 * `th_TH`
+* `tr_TR`
 * `uk_UA`
 * `vi_VN`
 
