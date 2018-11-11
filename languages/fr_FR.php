@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Bonjour,' . "\n\n" . 'Pour reinitialiser votre m
 
 $lang['account_deleted'] = "Compte supprimé.";
 $lang['function_disabled'] = "Cette fonction a &eacute;t&eacute; desactiv&eacute;.";
+$lang['account_not_found'] = "Pas de compte trouv&eacute; avec cette adresse email";
 
 return $lang;
