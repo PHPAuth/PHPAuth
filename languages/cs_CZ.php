@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Dobrý den, ' . "\n\n" . 'abyste mohli změnit s
 
 $lang['account_deleted'] = "Účet byl úspěšně smazán.";
 $lang['function_disabled'] = "Tato funkce byla deaktivována.";
+$lang['account_not_found'] = "Nebyly nalezeny žádné účty s touto e-mailová adresou";
 
 return $lang;
