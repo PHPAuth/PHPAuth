@@ -396,7 +396,6 @@ class Auth/* implements AuthInterface*/
     /**
     * Hashes provided password with Bcrypt
     * @param string $password
-    * @param string $password
     * @return string
     */
     public function getHash($password)
