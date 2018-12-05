@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Здравствуйте, \n\n Для сброс
 
 $lang['account_deleted'] = "Учётная запись удалена.";
 $lang['function_disabled'] = "Эта функция была отключена.";
+$lang['account_not_found'] = "Не найден аккаунт с таким электронным адресом";
 
 return $lang;
