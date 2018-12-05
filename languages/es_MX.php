@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Hola, ' . "\n\n" . 'Para reiniciar tu contraseñ
 
 $lang['account_deleted'] = "La cuenta se ha borrado con éxito.";
 $lang['function_disabled'] = "Esta función ha sido desactivada.";
+$lang['account_not_found'] = "No se ha encontrado ninguna cuenta con esa dirección de correo electrónico.";
 
 return $lang;
