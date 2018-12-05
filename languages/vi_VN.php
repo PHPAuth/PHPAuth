@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Xin chào, ' . "\n\n" . 'Đi đến đường d�
 
 $lang['account_deleted'] = "Tài khoản đã được xóa thành công.";
 $lang['function_disabled'] = "Chức năng này đã bị vô hiệu hóa.";
+$lang['account_not_found'] = "Không tìm thấy tài khoản nào có địa chỉ email đó";
 
 return $lang;
