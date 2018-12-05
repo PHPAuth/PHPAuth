@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Hei, ' . "\n\n" . 'For å tilbakestille passorde
 
 $lang['account_deleted'] = "Sletting av konto var vellyket.";
 $lang['function_disabled'] = "Denne funksjonen har blitt deaktivert.";
+$lang['account_not_found'] = "Ingen konto funnet med den e-mail adressen";
 
 return $lang;
