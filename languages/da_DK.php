@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Hello, ' . "\n\n" . 'Nulstill din adgangskode ve
 
 $lang['account_deleted'] = "Konto slettet.";
 $lang['function_disabled'] = "Denne funktion er blevet deaktiveret.";
+$lang['account_not_found'] = "Ingen konto fundet med den emailadresse";
 
 return $lang;
