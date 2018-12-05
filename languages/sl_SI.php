@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Pozdravljeni, ' . "\n\n" . 'Za ponastavitev gesl
 
 $lang['account_deleted'] = "Račun je uspešno izbrisan.";
 $lang['function_disabled'] = "Ta funkcija je onemogočena.";
+$lang['account_not_found'] = "Nobenega računa s tem e-poštnim naslovom ni";
 
 return $lang;
