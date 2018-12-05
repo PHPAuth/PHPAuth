@@ -69,6 +69,6 @@ $lang['email_reset_altbody'] = 'Üdv, ' . "\n\n" . 'Új jelszó létrehozásáho
 
 $lang['account_deleted'] = "A fiók sikeresen törőlve.";
 $lang['function_disabled'] = "Ez a funkció ki lett kapcsolva.";
-
+$lang['account_not_found'] = "Az e-mail címmel nem található fiók"
 
 return $lang;
