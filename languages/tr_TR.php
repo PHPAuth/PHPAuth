@@ -52,5 +52,6 @@ $lang['email_reset_body'] = 'Merhaba,<br/><br/>Parolanızı sıfırlamak için �
 $lang['email_reset_altbody'] = 'Merhaba,'. "\n\n". 'Parolanızı sıfırlamak için lütfen aşağıdaki bağlantıyı ziyaret edin:'. "\n". '%1$s/%2$s'. "\n\n". 'Ardından şu parola sıfırlama anahtarını kullanmanız gerekir: %3$s'. "\n\n". 'Son zamanlarda %1$s adresinde bir şifre sıfırlama tuşu istemediyseniz, bu mesaj hatayla gönderildi, lütfen yok sayın.';
 $lang['account_deleted'] = "Hesap başarıyla silindi.";
 $lang['function_disabled'] = "Bu işlev devre dışı.";
+$lang['account_not_found'] = "Bu e-posta adresine ait bir hesap bulunamadı.";
 
 return $lang;
