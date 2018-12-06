@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Здрастуйте, \n\n Для скиданн
 
 $lang['account_deleted'] = "Обліковий запис видалений.";
 $lang['function_disabled'] = "Ця функція була відключена.";
+$lang['account_not_found'] = "Не знайдено жодного акаунту з цією адресою електронної пошти.";
 
 return $lang;
