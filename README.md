@@ -41,7 +41,7 @@ User actions
 
 Requirements
 ---------------
-* PHP 5.6 or newer.
+* PHP 5.6 or newer (PHP 7.0+ recommended)
 * MySQL / MariaDB database or PostGreSQL database
 
 Composer Support
