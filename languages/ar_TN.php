@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'مرحبا، ' . "\n\n" . 'لإعادة تعيي
 
 $lang['account_deleted'] = "تم حذف الحساب بنجاح.";
 $lang['function_disabled'] = "تم تعطيل هذه الوظيفة.";
+$lang['account_not_found'] = "لا وجود لحساب بهذا البريد الالكتروني.";
 
 return $lang;

@@ -69,5 +69,6 @@ $lang['email_reset_altbody'] = 'Buna ziua, ' . "\n\n" . 'Pentru a vă reseta par
 
 $lang['account_deleted'] = "Contul a fost șters cu succes.";
 $lang['function_disabled'] = "Această funcție a fost dezactivată.";
+$lang['account_not_found'] = "Nu s-a găsit un cont cu adresa de e-mail respectivă.";
 
 return $lang;
