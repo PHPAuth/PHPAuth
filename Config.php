@@ -164,7 +164,7 @@ class Config
                         break;
                     };
 
-                    $query = "SELECT `key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ";
+                    $query = "SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ";
                     $dictionary = $this->dbh->query($query)->fetchAll(\PDO::FETCH_KEY_PAIR);
 
                     break;
