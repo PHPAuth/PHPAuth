@@ -21,7 +21,7 @@ foreach ($langs as $l) {
     echo('language = ' . $l);
 
     $query = "
-INSERT INTO `{$dbh_table}` (`key`, `{$l}`) VALUES (:key, :message)
+INSERT INTO `{$dbh_table}` (`translation_key`, `{$l}`) VALUES (:translation_key, :message)
 ON DUPLICATE KEY
 UPDATE `{$l}` = :message
 ";
@@ -33,8 +33,8 @@ UPDATE `{$l}` = :message
     foreach ($lang as $message_id => $message_text) {
 
         $sth->execute([
-            'key'       =>  "{$message_id}",
-            'message'   =>  "{$message_text}"
+            'translation_key'   =>  "{$message_id}",
+            'message'           =>  "{$message_text}"
         ]);
 
         echo "{$message_id} | ";
