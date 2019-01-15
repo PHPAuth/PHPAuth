@@ -2,6 +2,7 @@
 
 namespace PHPAuth;
 
+use Dotenv\Dotenv;
 use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
@@ -62,6 +63,10 @@ class Auth/* implements AuthInterface*/
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHP 5.6.0 required for PHPAuth engine!');
         }
+
+        $dotenv = Dotenv::create(__DIR__);
+        $dotenv->load();
+        $dotenv->required("PHPAUTH_SECRET")->notEmpty();
 
         $this->dbh = $dbh;
         $this->config = $config;
@@ -429,7 +434,7 @@ class Auth/* implements AuthInterface*/
     */
     protected function addSession($uid, $remember)
     {
-        $ip = $this->getIp();
+        $ip_hash = $this->getIpHash();
         $user = $this->getBaseUser($uid);
 
         if (!$user) {
@@ -437,7 +442,7 @@ class Auth/* implements AuthInterface*/
         }
 
         $data['hash'] = sha1($this->config->site_key . microtime());
-        $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $user_agent_hash = $this->getUserAgentHash();
 
         if (!$this->config->allow_concurrent_sessions) {
             $this->deleteExistingSessions($uid);
@@ -451,23 +456,22 @@ class Auth/* implements AuthInterface*/
 
         $data['cookie_crc'] = sha1($data['hash'] . $this->config->site_key);
 
-        // don't use INET_ATON(:ip), use ip2long(), 'cause SQLite or PosgreSQL does not have INET_ATON() function
-        $query = "
-INSERT INTO {$this->config->table_sessions}
-(uid, hash, expiredate, ip, agent, cookie_crc)
-VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
-";
-        $query_prepared = $this->dbh->prepare($query);
+        $query = $this->dbh->prepare("
+            INSERT INTO {$this->config->table_sessions}
+            (uid, hash, expiredate, ip_hash, user_agent_hash, cookie_crc)
+            VALUES (:uid, :hash, :expiredate, :ip_hash, :user_agent_hash, :cookie_crc)
+        ");
+
         $query_params = [
-            'uid'       => $uid,
-            'hash'      => $data['hash'],
+            'uid' => $uid,
+            'hash' => $data['hash'],
             'expiredate'=> date("Y-m-d H:i:s", $data['expire']),
-            'ip'        => $ip,
-            'agent'     => $agent,
+            'ip_hash' => $ip_hash,
+            'user_agent_hash' => $user_agent_hash,
             'cookie_crc'=> $data['cookie_crc']
         ];
 
-        if (!$query_prepared->execute($query_params)) {
+        if (!$query->execute($query_params)) {
             return false;
         }
 
@@ -514,7 +518,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function checkSession($hash)
     {
-        $ip = $this->getIp();
+        $ip_hash = $this->getIpHash();
         $block_status = $this->isBlocked();
 
         if ($block_status == "block") {
@@ -526,24 +530,23 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        // INET_NTOA(ip)
-        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash";
-        $query_prepared = $this->dbh->prepare($query);
-        $query_params = [
-            'hash' => $hash
-        ];
-        $query_prepared->execute($query_params);
+        $query = $this->dbh->prepare(
+            "SELECT * FROM {$this->config->table_sessions} WHERE hash = :hash"
+        );
 
-        if ($query_prepared->rowCount() == 0) {
+        $query->execute([
+            'hash' => $hash
+        ]);
+
+        if ($query->rowCount() == 0) {
             return false;
         }
 
-        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $row = $query->fetch(\PDO::FETCH_ASSOC);
 
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
-        $db_ip = $row['ip'];
         $db_cookie = $row['cookie_crc'];
 
         if ($currentdate > $expiredate) {
@@ -552,9 +555,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        if ($ip != $db_ip) {
+        if ($ip_hash !== $row['ip_hash']) {
             return false;
         }
+
+        // TODO: Check user agent ?
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
             if ($expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
@@ -1459,14 +1464,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function isBlocked()
     {
-        $ip = $this->getIp();
-        $this->deleteAttempts($ip, false);
+        $ip_hash = $this->getIpHash();
+        $this->deleteAttempts($ip_hash, false);
 
-        // INET_ATON
-        $query = "SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip";
-        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
-        $query_prepared->execute(['ip' => $ip]);
-        $attempts = $query_prepared->fetchColumn();
+        $query = $this->dbh->prepare("SELECT count(*) FROM {$this->config->table_attempts} WHERE ip_hash = :ip_hash");
+        $query->execute(['ip_hash' => $ip_hash]);
+        $attempts = $query->fetchColumn();
 
         if ($attempts < intval($this->config->attempts_before_verify)) {
             return "allow";
@@ -1518,6 +1521,29 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         return true;
     }
 
+    /**
+     * Returns a binary format hash of the client's IP address
+     * @return string
+     */
+    private function getIpHash() {
+        return md5($this->getIp() . getenv("PHPAUTH_SECRET"), TRUE);
+    }
+
+    /**
+     * Returns the client's user agent
+     * @return string
+     */
+    private function getUserAgent() {
+        return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    }
+
+    /**
+     * Returns a binary format hash of the client's user agent
+     * @return string
+     */
+    private function getUserAgentHash() {
+        return md5($this->getUserAgent() . getenv("PHPAUTH_SECRET"), TRUE);
+    }
 
     /**
     * Adds an attempt to database
@@ -1526,13 +1552,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
     protected function addAttempt()
     {
-        $ip = $this->getIp();
+        $ip_hash = $this->getIpHash();
         $attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
 
-        $query = "INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)";
-        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
-        return $query_prepared->execute([
-            'ip'         => $ip,
+        $query = $this->dbh->prepare("INSERT INTO {$this->config->table_attempts} (ip_hash, expiredate) VALUES (:ip_hash, :expiredate)");
+
+        return $query->execute([
+            'ip_hash' => $ip_hash,
             'expiredate' => $attempt_expiredate
         ]);
     }
@@ -1544,16 +1570,15 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param bool|false $all
      * @return bool
      */
-    protected function deleteAttempts($ip, $all = false)
+    protected function deleteAttempts($ip_hash, $all = false)
     {
-        // NEXT : 'ip = INET_ATON(:ip)'
         $query = ($all)
-            ? "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip"
-            : "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip AND NOW() > expiredate ";
+            ? "DELETE FROM {$this->config->table_attempts} WHERE ip_hash = :ip_hash"
+            : "DELETE FROM {$this->config->table_attempts} WHERE ip_hash = :ip_hash AND NOW() > expiredate ";
 
         $sth = $this->dbh->prepare($query);
         return $sth->execute([
-            'ip' => $ip
+            'ip_hash' => $ip_hash
         ]);
     }
 

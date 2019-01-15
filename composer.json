@@ -9,7 +9,8 @@
 		"php": ">=5.6.0",
 		"bjeavons/zxcvbn-php": "^0.4",
 		"phpmailer/phpmailer": "^6.0",
-	    "google/recaptcha": "^1.2"
+	    "google/recaptcha": "^1.2",
+		"vlucas/phpdotenv": "^3.1"
 	},
 	"require_dev": {
 		"phpunit/phpunit": "6.*"

@@ -68,11 +68,9 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
 
 DROP TABLE IF EXISTS `phpauth_attempts`;
 CREATE TABLE `phpauth_attempts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip` char(39) NOT NULL,
+  `ip_hash` BINARY(16) NOT NULL,
   `expiredate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ip` (`ip`)
+  KEY `ip_hash` (`ip_hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Requests table
@@ -98,8 +96,8 @@ CREATE TABLE `phpauth_sessions` (
   `uid` int(11) NOT NULL,
   `hash` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `expiredate` datetime NOT NULL,
-  `ip` varchar(39) NOT NULL,
-  `agent` varchar(200) NOT NULL,
+  `ip_hash` BINARY(16) NOT NULL,
+  `user_agent_hash` BINARY(16) NOT NULL,
   `cookie_crc` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
