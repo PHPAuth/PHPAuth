@@ -1847,5 +1847,39 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         return $query->fetch(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Deletes expired attempts from the database
+     */
+    private function deleteExpiredAttempts() {
+        $this->dbh->exec("
+            DELETE FROM {$this->config->table_attempts} WHERE NOW() > expiredate
+        ");
+    }
 
+    /**
+     * Deletes expired sessions from the database
+     */
+    private function deleteExpiredSessions() {
+        $this->dbh->exec("
+            DELETE FROM {$this->config->table_sessions} WHERE NOW() > expiredate
+        ");
+    }
+
+    /**
+     * Deletes expired requests from the database
+     */
+    private function deleteExpiredRequests() {
+        $this->dbh->exec("
+            DELETE FROM {$this->config->table_requests} WHERE NOW() > expire
+        ");
+    }
+
+    /**
+     * Daily cron job to remove expired data from the database
+     */
+    public function cron() {
+        $this->deleteExpiredAttempts();
+        $this->deleteExpiredSessions();
+        $this->deleteExpiredRequests();
+    }
 }
