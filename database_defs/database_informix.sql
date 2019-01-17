@@ -55,10 +55,8 @@ INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_secret_key', 'php
 
 DROP TABLE phpauth_attempts;
 CREATE TABLE phpauth_attempts (
-  id SERIAL,
-  ip varchar(39) NOT NULL,
-  expiredate DATETIME YEAR TO SECOND,
-  PRIMARY KEY (id)
+  ip_hash BYTE NOT NULL,
+  expiredate DATETIME YEAR TO SECOND
 );
 
 DROP TABLE phpauth_requests;
@@ -77,8 +75,8 @@ CREATE TABLE phpauth_sessions (
   uid integer NOT NULL,
   hash varchar(40) NOT NULL,
   expiredate DATETIME YEAR TO SECOND,
-  ip varchar(39) NOT NULL,
-  agent varchar(200) NOT NULL,
+  ip_hash BYTE NOT NULL,
+  user_agent_hash BYTE NOT NULL,
   cookie_crc char(40) NOT NULL,
   PRIMARY KEY (id)
 );

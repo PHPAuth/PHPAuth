@@ -59,10 +59,8 @@ INSERT INTO phpauth_config (setting, value) VALUES
 
 DROP TABLE IF EXISTS phpauth_attempts;
 CREATE TABLE phpauth_attempts (
-  id int NOT NULL IDENTITY(1,1),
-  ip character(39) NOT NULL,
-  expiredate datetime2 NOT NULL,
-  PRIMARY KEY (id)
+  ip_hash binary(16) NOT NULL,
+  expiredate datetime2 NOT NULL
 );
 
 DROP TABLE IF EXISTS phpauth_requests;
@@ -81,8 +79,8 @@ CREATE TABLE phpauth_sessions (
   uid integer NOT NULL,
   hash character varying(40) NOT NULL,
   expiredate datetime2 NOT NULL,
-  ip character varying(39) NOT NULL,
-  agent character varying(200) NOT NULL,
+  ip_hash binary(16) NOT NULL,
+  user_agent_hash binary(16) NOT NULL,
   cookie_crc character (40) NOT NULL,
   PRIMARY KEY (id)
 );

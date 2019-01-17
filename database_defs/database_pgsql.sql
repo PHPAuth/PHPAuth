@@ -59,10 +59,8 @@ INSERT INTO phpauth_config (setting, value) VALUES
 
 DROP TABLE IF EXISTS phpauth_attempts;
 CREATE TABLE phpauth_attempts (
-  id serial NOT NULL,
-  ip_hash bytea(16) NOT NULL,
-  expiredate timestamp without time zone NOT NULL,
-  PRIMARY KEY (id)
+  ip_hash bytea NOT NULL,
+  expiredate timestamp without time zone NOT NULL
 );
 
 CREATE TYPE request_type AS ENUM('activation','reset');
@@ -83,8 +81,8 @@ CREATE TABLE phpauth_sessions (
   uid integer NOT NULL,
   hash character (40) NOT NULL,
   expiredate timestamp without time zone NOT NULL,
-  ip_hash bytea(16) NOT NULL,
-  user_agent_hash bytea(16) NOT NULL,
+  ip_hash bytea NOT NULL,
+  user_agent_hash bytea NOT NULL,
   cookie_crc character (40) NOT NULL,
   PRIMARY KEY (id)
 );
