@@ -905,22 +905,18 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
+        $send_email = true;
+
         // if not set up manually, check config data
         if (false !== $use_email_activation) {
             $use_email_activation = true;
 
             if ($type == "reset" && !! $this->config->emailmessage_suppress_reset) {
-                $use_email_activation = false;
-                $return['error'] = false;
-
-                return $return;
+	            $send_email = false;
             }
 
             if ($type == "activation" && !! $this->config->emailmessage_suppress_activation) {
-                $use_email_activation = false;
-                $return['error'] = false;
-
-                return $return;
+	            $send_email = false;
             }
         }
 
@@ -974,7 +970,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $request_id = $this->dbh->lastInsertId();
 
-        if ($use_email_activation === true) {
+        if ($use_email_activation === true && $send_email) {
             $sendmail_status = $this->do_SendMail($email, $type, $token);
 
             if ($sendmail_status['error']) {
