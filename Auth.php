@@ -906,17 +906,17 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         // if not set up manually, check config data
-        if ($use_email_activation === null) {
+        if (false !== $use_email_activation) {
             $use_email_activation = true;
 
-            if ($type == "reset" && $this->config->emailmessage_suppress_reset === true ) {
+            if ($type == "reset" && !! $this->config->emailmessage_suppress_reset) {
                 $use_email_activation = false;
                 $return['error'] = false;
 
                 return $return;
             }
 
-            if ($type == "activation" && $this->config->emailmessage_suppress_activation === true ) {
+            if ($type == "activation" && !! $this->config->emailmessage_suppress_activation) {
                 $use_email_activation = false;
                 $return['error'] = false;
 
