@@ -26,6 +26,7 @@ Features
 * Easy configuration of multiple system parameters
 * Allows sending emails via SMTP or sendmail
 * Blocks disposable email addresses from registration
+* Hashes user information such as IP addresses and User Agent strings
 
 User actions
 ---------------
@@ -51,6 +52,13 @@ PHPAuth can now be installed with the following command:
 `composer require phpauth/phpauth:dev-master`
 
 Then: `require 'vendor/autoload.php';`
+
+Installation
+------------
+
+  * Copy `.env.dist` to `.env`
+  * Set a random value for `PHPAUTH_SECRET` in `.env` (Example: `PHPAUTH_SECRET="9cb3feb6bfc4d807c00d2774dc44122c"`)  
+    You can obtain a random value with the following command: `php -r "echo md5(random_bytes(32));"`
 
 Configuration
 ---------------
