@@ -638,7 +638,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param boolean $use_email_activation  -- activate email confirm or not
     * @return int $uid
     */
-    protected function addUser($email, $password, $params = array(), &$use_email_activation)
+    protected function addUser($email, $password, $params = [], &$use_email_activation)
     {
         $return['error'] = true;
 
@@ -676,10 +676,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $password = $this->getHash($password);
 
         if (is_array($params)&& count($params) > 0) {
-            $customParamsQueryArray = Array();
+            $customParamsQueryArray = [];
 
             foreach($params as $paramKey => $paramValue) {
-                $customParamsQueryArray[] = array('value' => $paramKey . ' = ?');
+                $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
             }
 
             $setParams = ', ' . implode(', ', array_map(function ($entry) {
@@ -690,13 +690,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
 
-        $bindParams = array_values(array_merge(array($email, $password, $isactive), $params, array($uid)));
+        $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
 
         if (!$query_prepared->execute($bindParams)) {
             $query = "DELETE FROM {$this->config->table_users} WHERE id = ?";
             $query_prepared = $this->dbh->prepare($query);
 
-            $query_prepared->execute(array($uid));
+            $query_prepared->execute([$uid]);
             $return['message'] = $this->__lang("system_error") . " #04";
 
             return $return;
@@ -1002,7 +1002,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $query = "SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(array($key, $type));
+        $query_prepared->execute([$key, $type]);
 
         if ($query_prepared->rowCount() === 0) {
             $this->addAttempt();
@@ -1356,7 +1356,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(array($newpass, $uid));
+        $query_prepared->execute([$newpass, $uid]);
 
         $return['error'] = false;
         $return['message'] = $this->__lang("password_changed");
@@ -1439,7 +1439,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $query = "UPDATE {$this->config->table_users} SET email = ? WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(array($email, $uid));
+        $query_prepared->execute([$email, $uid]);
 
         if ($query_prepared->rowCount() == 0) {
             $return['message'] = $this->__lang("system_error") . " #15";
@@ -1652,7 +1652,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $query = "SELECT password FROM {$this->config->table_users} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(array($userid));
+        $query_prepared->execute([$userid]);
 
         $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
@@ -1676,12 +1676,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
     
-        if (password_needs_rehash($hash, PASSWORD_DEFAULT, array('cost' => $this->config->bcrypt_cost))) {
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->config->bcrypt_cost])) {
             $hash = $this->getHash($password);
 
             $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
             $query_prepared = $this->dbh->prepare($query);
-            $query_prepared->execute(array($hash, $uid));
+            $query_prepared->execute([$hash, $uid]);
         }
     
         return true;
@@ -1836,9 +1836,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 		WHERE hash = :hash AND {$ts}.uid = {$tu}.id";
 
         $query = $this->dbh->prepare($query);
-        $query->execute(array(
+        $query->execute([
             'hash'	=>	$this->getCurrentSessionHash()
-        ));
+        ]);
 
         if ($query->rowCount() == 0) {
             return false;
