@@ -1534,7 +1534,7 @@ class Auth/* implements AuthInterface*/
      * @return string
      */
     private function getUserAgent() {
-        return isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        return isset($_SERVER['HTTP_USER_AGENT']) ?? '';
     }
 
     /**

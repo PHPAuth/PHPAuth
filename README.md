@@ -57,7 +57,7 @@ Installation
 ------------
 
   * Copy `.env.dist` to `.env`
-  * Set a random value for `PHPAUTH_SECRET` in `.env` (Example: `PHPAUTH_SECRET="9cb3feb6bfc4d807c00d2774dc44122c"`)  
+  * Set a random value for `PHPAUTH_HASHING_SALT` in `.env` (Example: `PHPAUTH_HASHING_SALT="9cb3feb6bfc4d807c00d2774dc44122c"`)  
     You can obtain a random value with the following command: `php -r "echo md5(random_bytes(32));"`
 
 Configuration
