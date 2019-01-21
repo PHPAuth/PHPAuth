@@ -6,7 +6,7 @@
 	"homepage": "http://phpauth.github.io/PHPAuth/",
 	"license": "MIT",
 	"require": {
-		"php": ">=7.1.0",
+		"php": ">=7.0.0",
 		"bjeavons/zxcvbn-php": "^0.4",
 		"phpmailer/phpmailer": "^6.0",
 	    "google/recaptcha": "^1.2"
