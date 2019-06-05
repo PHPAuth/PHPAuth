@@ -303,7 +303,7 @@ class Config
      *
      * @return array
      */
-    private function setForgottenDictionary()
+    protected function setForgottenDictionary()
     {
         $lang = array();
 
