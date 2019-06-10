@@ -1600,8 +1600,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @return string
      * @return boolean, false if no cookie
      */
-    public function getCurrentSessionHash() {
-        return $_COOKIE[$this->config->cookie_name] ?? false;
+    public function getCurrentSessionHash(){
+        return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
     }
 
     /**
