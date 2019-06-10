@@ -1600,8 +1600,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @return string
      * @return boolean, false if no cookie
      */
-    public function getCurrentSessionHash(){
-        return isset($_COOKIE[$this->config->cookie_name]) ? $_COOKIE[$this->config->cookie_name] : false;
+    public function getCurrentSessionHash()
+    {
+        return $_COOKIE[$this->config->cookie_name] ?? false;
     }
 
     /**
@@ -1846,7 +1847,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
      * Deletes expired attempts from the database
      */
-    private function deleteExpiredAttempts() {
+    private function deleteExpiredAttempts()
+    {
         $this->dbh->exec("
             DELETE FROM {$this->config->table_attempts} WHERE NOW() > expiredate
         ");
@@ -1855,7 +1857,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
      * Deletes expired sessions from the database
      */
-    private function deleteExpiredSessions() {
+    private function deleteExpiredSessions()
+    {
         $this->dbh->exec("
             DELETE FROM {$this->config->table_sessions} WHERE NOW() > expiredate
         ");
@@ -1864,7 +1867,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
      * Deletes expired requests from the database
      */
-    private function deleteExpiredRequests() {
+    private function deleteExpiredRequests()
+    {
         $this->dbh->exec("
             DELETE FROM {$this->config->table_requests} WHERE NOW() > expire
         ");
@@ -1873,7 +1877,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
      * Daily cron job to remove expired data from the database
      */
-    public function cron() {
+    public function cron()
+    {
         $this->deleteExpiredAttempts();
         $this->deleteExpiredSessions();
         $this->deleteExpiredRequests();
