@@ -22,7 +22,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
      */
     public static $dbh;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass() :void
     {
         require_once __DIR__ . '/../vendor/autoload.php';
         require_once __DIR__ . '/../Auth.php';
