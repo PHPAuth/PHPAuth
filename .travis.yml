@@ -1,13 +1,11 @@
 sudo: false
 language: php
 
-matrix:
-    include:
-        php:
-            - 7.0
-            - 7.1
-            - 7.2
-            - 7.3
+php:
+    - 7.0
+    - 7.1
+    - 7.2
+    - 7.3
     
 before_script:
   - composer install
