@@ -14,7 +14,7 @@ before_script:
   - mysql -u root phpauthtest < database_defs/database_mysql.sql
 
 script:
-    - phpunit --stderr
+    - vendor/bin/phpunit --stderr
 
 notifications:
     email: false
