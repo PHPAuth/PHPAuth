@@ -614,7 +614,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     public function isEmailBanned($email)
     {
         try{
-            $this->dbh->query("SELECT * FROM {$this->config->table_emails_banned};");
+            $this->dbh->query("SELECT * FROM {$this->config->table_emails_banned} LIMIT 1;");
         }catch (PDOException $e){
             return false;
         }
