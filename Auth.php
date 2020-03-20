@@ -613,9 +613,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     public function isEmailBanned($email)
     {
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config->table_emails_banned}'")->fetchAll() ) {
+        try{
+            $this->dbh->query("SELECT * FROM {$this->config->table_emails_banned};");
+        }catch (PDOException $e){
             return false;
-        };
+        }
 
         $query = "SELECT count(*) FROM {$this->config->table_emails_banned} WHERE domain = :domain";
         $query_prepared = $this->dbh->prepare($query);

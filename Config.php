@@ -82,9 +82,11 @@ class Config
                 $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
 
                 // check config table exists
-                if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config_table}'")->fetchAll() ) {
+                try{
+                    $this->dbh->query("SELECT * FROM {$this->config_table};");
+                }catch (PDOException $e){
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
-                };
+                }
 
                 // load configuration
                 $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
@@ -98,24 +100,32 @@ class Config
         // Check required tables exists
 
         // check table_attempts
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_attempts']}'")->fetchAll() ) {
-            die("PHPAuth: Table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
-        };
+        try{
+            $this->dbh->query("SELECT * FROM {$this->config['table_attempts']};");
+        }catch (PDOException $e){
+            die("PHPAuth: Config table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
+        }
 
         // check table requests
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_requests']}'")->fetchAll() ) {
-            die("PHPAuth: Table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
-        };
+        try{
+            $this->dbh->query("SELECT * FROM {$this->config['table_requests']};");
+        }catch (PDOException $e){
+            die("PHPAuth: Config table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
+        }
 
         // check table sessions
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_sessions']}'")->fetchAll() ) {
-            die("PHPAuth: Table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
-        };
+        try{
+            $this->dbh->query("SELECT * FROM {$this->config['table_sessions']};");
+        }catch (PDOException $e){
+            die("PHPAuth: Config table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
+        }
 
         // check table users
-        if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_users']}'")->fetchAll() ) {
-            die("PHPAuth: Table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
-        };
+        try{
+            $this->dbh->query("SELECT * FROM {$this->config['table_users']};");
+        }catch (PDOException $e){
+            die("PHPAuth: Config table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
+        }
 
         // Determine site language
         $site_language = (empty($config_site_language))
@@ -159,10 +169,12 @@ class Config
                     }
 
                     // check table exists in database
-                    if (! $this->dbh->query("SHOW TABLES LIKE '{$this->config['table_translations']}'")->fetchAll() ) {
+                    try{
+                        $this->dbh->query("SELECT * FROM {$this->config['table_translations']};");
+                    }catch (PDOException $e){
                         $dictionary = $this->setForgottenDictionary();
                         break;
-                    };
+                    }
 
                     $query = "SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ";
                     $dictionary = $this->dbh->query($query)->fetchAll(\PDO::FETCH_KEY_PAIR);
