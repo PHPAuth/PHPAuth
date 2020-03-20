@@ -83,7 +83,7 @@ class Config
 
                 // check config table exists
                 try{
-                    $this->dbh->query("SELECT * FROM {$this->config_table};");
+                    $this->dbh->query("SELECT * FROM {$this->config_table} LIMIT 1;");
                 }catch (PDOException $e){
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
                 }
@@ -101,28 +101,28 @@ class Config
 
         // check table_attempts
         try{
-            $this->dbh->query("SELECT * FROM {$this->config['table_attempts']};");
+            $this->dbh->query("SELECT * FROM {$this->config['table_attempts']} LIMIT 1;");
         }catch (PDOException $e){
             die("PHPAuth: Config table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
         // check table requests
         try{
-            $this->dbh->query("SELECT * FROM {$this->config['table_requests']};");
+            $this->dbh->query("SELECT * FROM {$this->config['table_requests']} LIMIT 1;");
         }catch (PDOException $e){
             die("PHPAuth: Config table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
         // check table sessions
         try{
-            $this->dbh->query("SELECT * FROM {$this->config['table_sessions']};");
+            $this->dbh->query("SELECT * FROM {$this->config['table_sessions']} LIMIT 1;");
         }catch (PDOException $e){
             die("PHPAuth: Config table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
         // check table users
         try{
-            $this->dbh->query("SELECT * FROM {$this->config['table_users']};");
+            $this->dbh->query("SELECT * FROM {$this->config['table_users']} LIMIT 1;");
         }catch (PDOException $e){
             die("PHPAuth: Config table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
         }
@@ -170,7 +170,7 @@ class Config
 
                     // check table exists in database
                     try{
-                        $this->dbh->query("SELECT * FROM {$this->config['table_translations']};");
+                        $this->dbh->query("SELECT * FROM {$this->config['table_translations']} LIMIT 1;");
                     }catch (PDOException $e){
                         $dictionary = $this->setForgottenDictionary();
                         break;
