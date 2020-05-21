@@ -67,12 +67,48 @@ class Config
                 break;
             }
             case 'json': {
+                // check valid keys
+                if (empty($config_source)) die('PHPAuth: config type is FILE, but no source file declared!'); //@todo: \Exception
+
+                // replace beginner '$' in filepath to application root directory
+                $source = preg_replace('/^\$/', getcwd(), $config_source);
+
+                // check json-config is readable
+                if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
+
+                // load configuration
+                $this->config = json_decode(file_get_content($source));
+
                 break;
             }
             case 'yml': {
+		// check valid keys
+                if (empty($config_source)) die('PHPAuth: config type is FILE, but no source file declared!'); //@todo: \Exception
+
+                // replace beginner '$' in filepath to application root directory
+                $source = preg_replace('/^\$/', getcwd(), $config_source);
+
+                // check yml-config is readable
+                if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
+
+                // load configuration
+                $this->config = yaml_parse(file_get_content($source));
+
                 break;
             }
             case 'xml': {
+		// check valid keys
+                if (empty($config_source)) die('PHPAuth: config type is FILE, but no source file declared!'); //@todo: \Exception
+
+                // replace beginner '$' in filepath to application root directory
+                $source = preg_replace('/^\$/', getcwd(), $config_source);
+
+                // check xml-config is readable
+                if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
+
+                // load configuration
+                $this->config = simplexml_load_string(file_get_content($source));
+
                 break;
             }
             default: {
