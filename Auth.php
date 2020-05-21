@@ -422,6 +422,24 @@ class Auth/* implements AuthInterface*/
     }
 
     /**
+    * Gets user role for a given UID, return INT
+    * @param string $id
+    * @return int $role
+    */
+    public function getRole($id)
+    {
+        $query = "SELECT `role` FROM {$this->config->table_users} WHERE id = :id";
+        $query_prepared = $this->dbh->prepare($query);
+        $query_prepared->execute(['id' => $id]);
+
+        if ($query_prepared->rowCount() == 0) {
+            return false;
+        }
+
+        return $query_prepared->fetchColumn();
+    }
+
+    /**
     * Creates a session for a specified user id
     * @param int $uid
     * @param boolean $remember
