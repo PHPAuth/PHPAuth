@@ -88,6 +88,7 @@ CREATE TABLE phpauth_users (
   id SERIAL,
   email varchar(100) DEFAULT NULL,
   password varchar(255) DEFAULT NULL,
+  role integer NOT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
   PRIMARY KEY (id)

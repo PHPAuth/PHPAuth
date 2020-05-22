@@ -94,6 +94,7 @@ CREATE TABLE phpauth_users (
   id serial NOT NULL,
   email character varying(100) DEFAULT NULL,
   password character varying(255) DEFAULT NULL,
+  role integer NOT NULL,
   isactive smallint NOT NULL DEFAULT '0',
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
