@@ -696,6 +696,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $password = $this->getHash($password);
 
+        if(isset($this->config->enable_roles)){
+            if($this->config->enable_roles){
+                $params["role"] = $role; 
+            }
+        }
+
         if (is_array($params)&& count($params) > 0) {
             $customParamsQueryArray = [];
 
@@ -711,7 +717,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, role = ?, isactive = ? {$setParams} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
 
-        $bindParams = array_values(array_merge([$email, $password, $role, $isactive], $params, [$uid]));
+        $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
 
         if (!$query_prepared->execute($bindParams)) {
             $query = "DELETE FROM {$this->config->table_users} WHERE id = ?";
