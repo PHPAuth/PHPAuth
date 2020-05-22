@@ -177,7 +177,7 @@ class Auth/* implements AuthInterface*/
     * @return array $return
     */
     //@todo: => registerUserAccount
-    public function register($email, $password, $repeatpassword, $role, $params = [], $captcha_response = null, $use_email_activation = null)
+    public function register($email, $password, $repeatpassword, $params = [], $captcha_response = null, $use_email_activation = null, $role = 0)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -235,7 +235,7 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
-        $addUser = $this->addUser($email, $password, $role, $params, $use_email_activation);
+        $addUser = $this->addUser($email, $password, $params, $use_email_activation, $role);
 
         if ($addUser['error'] != 0) {
             $return['message'] = $addUser['message'];
@@ -654,12 +654,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * Adds a new user to database
     * @param string $email      -- email
     * @param string $password   -- password
-    * @param int $role          -- role
     * @param array $params      -- additional params
     * @param boolean $use_email_activation  -- activate email confirm or not
+    * @param int $role          -- role
     * @return int $uid
     */
-    protected function addUser($email, $password, $role, $params = [], &$use_email_activation)
+    protected function addUser($email, $password, $params = [], &$use_email_activation, $role = 0)
     {
         $return['error'] = true;
 
