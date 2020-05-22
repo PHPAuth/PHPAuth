@@ -696,10 +696,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $password = $this->getHash($password);
 
-        if(isset($this->config->enable_roles)){
-            if($this->config->enable_roles){
-                $params["role"] = $role; 
+        try{
+            if((int) $this->config->enable_roles === 1){
+                $params["role"] = $role;
             }
+        } catch(Exception $e){         
         }
 
         if (is_array($params)&& count($params) > 0) {
@@ -714,7 +715,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }, $customParamsQueryArray));
         } else { $setParams = ''; }
 
-        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, role = ?, isactive = ? {$setParams} WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
 
         $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
