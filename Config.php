@@ -117,10 +117,14 @@ class Config
                 // check xml-config is readable
                 if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
 
-                if (!XMLReader::open($source)->isValid()) die("PHPAuth: config type XML is corrupted"); //@todo: \Exception
-		
-		// load configuration
-                $this->config = simplexml_load_file($source);
+                libxml_use_internal_errors(true); // don't display xml errors
+
+                $config = simplexml_load_file($source);
+
+                if(!$config){
+                  die("PHPAuth: config type XML is corrupted");
+                }
+                $this->config = $config;
 
                 break;
             }
