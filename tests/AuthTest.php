@@ -42,16 +42,16 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public function testRegister()
     {
         // Successful registration
-        $this->assertFalse(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertFalse(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$', 3)['error']);
 
         // Failed registration: same email
-        $this->assertTrue(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertTrue(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$', 3)['error']);
 
         // Failed registration: invalid email address
-        $this->assertTrue(self::$auth->register('InvalidEmail', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $this->assertTrue(self::$auth->register('InvalidEmail', 'T3H-1337-P@$$', 'T3H-1337-P@$$', 3)['error']);
 
         // Failed registration: invalid password
-        $this->assertTrue(self::$auth->register('test2@email.com', 'lamepass', 'lamepass')['error']);
+        $this->assertTrue(self::$auth->register('test2@email.com', 'lamepass', 'lamepass', 3)['error']);
     }
 
     /**

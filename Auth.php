@@ -177,7 +177,7 @@ class Auth/* implements AuthInterface*/
     * @return array $return
     */
     //@todo: => registerUserAccount
-    public function register($email, $password, $repeatpassword, $params = [], $captcha_response = null, $use_email_activation = null)
+    public function register($email, $password, $repeatpassword, $role, $params = [], $captcha_response = null, $use_email_activation = null)
     {
         $return['error'] = true;
         $block_status = $this->isBlocked();
@@ -235,7 +235,7 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
-        $addUser = $this->addUser($email, $password, $params, $use_email_activation);
+        $addUser = $this->addUser($email, $password, $role, $params, $use_email_activation);
 
         if ($addUser['error'] != 0) {
             $return['message'] = $addUser['message'];
@@ -436,7 +436,7 @@ class Auth/* implements AuthInterface*/
             return false;
         }
 
-        return $query_prepared->fetchColumn();
+        return (int) $query_prepared->fetchColumn();
     }
 
     /**
@@ -654,11 +654,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * Adds a new user to database
     * @param string $email      -- email
     * @param string $password   -- password
+    * @param int $role          -- role
     * @param array $params      -- additional params
     * @param boolean $use_email_activation  -- activate email confirm or not
     * @return int $uid
     */
-    protected function addUser($email, $password, $params = [], &$use_email_activation)
+    protected function addUser($email, $password, $role, $params = [], &$use_email_activation)
     {
         $return['error'] = true;
 
@@ -707,10 +708,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }, $customParamsQueryArray));
         } else { $setParams = ''; }
 
-        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, role = ?, isactive = ? {$setParams} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
 
-        $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
+        $bindParams = array_values(array_merge([$email, $password, $role, $isactive], $params, [$uid]));
 
         if (!$query_prepared->execute($bindParams)) {
             $query = "DELETE FROM {$this->config->table_users} WHERE id = ?";
@@ -1635,6 +1636,19 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
         }
         return $this->isAuthenticated;
+    }
+
+    /**
+     * Returns is user has a valid role
+     * @param int $role
+     * @return boolean
+     */
+    public function isRole($role) {
+        $uid = $this->getCurrentUID();
+        if ($uid === false) {
+            return false;
+        }
+        return ($this->getRole($uid) >= $role);
     }
 
    /**
