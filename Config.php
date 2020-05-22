@@ -76,6 +76,14 @@ class Config
                 // check json-config is readable
                 if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
 
+		switch (json_last_error()) {
+			case JSON_ERROR_NONE:
+				break;
+			default:
+				die("PHPAuth: config type JSON is corrupted. Error: " . json_last_error()); //@todo: \Exception
+				break;
+                }
+		
                 // load configuration
                 $this->config = json_decode(file_get_content($source));
 
@@ -92,8 +100,11 @@ class Config
                 if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
 
                 // load configuration
-                $this->config = yaml_parse(file_get_content($source));
-
+		try{
+			$this->config = yaml_parse(file_get_content($source));
+		} catch (Exception $e) {
+			die("PHPAuth: config type YML is corrupted. Error: " . $e); //@todo: \Exception
+		}
                 break;
             }
             case 'xml': {
@@ -106,8 +117,10 @@ class Config
                 // check xml-config is readable
                 if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
 
-                // load configuration
-                $this->config = simplexml_load_string(file_get_content($source));
+                if (!XMLReader::open($source)->isValid()) die("PHPAuth: config type XML is corrupted"); //@todo: \Exception
+		
+		// load configuration
+                $this->config = simplexml_load_file($source);
 
                 break;
             }
