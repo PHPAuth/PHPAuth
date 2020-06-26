@@ -1785,6 +1785,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     public function updateUser($uid, $params)
     {
         $setParams = '';
+	
+	//unset uid which is set in getUser(). array generated in getUser() is now usable as parameter for updateUser()
+	unset($params['uid']);
 
         if (is_array($params) && count($params) > 0) {
             $setParams = implode(', ', array_map( function($key, $value){
