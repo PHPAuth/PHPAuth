@@ -74,7 +74,7 @@ class Auth/* implements AuthInterface*/
         $this->isAuthenticated = $this->isLogged();
     }
 
-    /**
+   /**
      * Logs a user in
      * @param string $email
      * @param string $password
@@ -83,7 +83,7 @@ class Auth/* implements AuthInterface*/
      * @return array $return
      */
     //@todo: => loginUser
-    public function login($email, $password, $remember = 0, $captcha_response = null)
+    public function login($email, $password, $remember = 0, $captcha_response = null, $device_id = null)
     {
         $return['error'] = true;
 
@@ -147,7 +147,7 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
-        $sessiondata = $this->addSession($user['uid'], $remember);
+        $sessiondata = $this->addSession($user['uid'], $remember, $device_id);
 
         if ($sessiondata == false) {
             $return['message'] = $this->__lang("system_error") . " #01";
@@ -415,7 +415,7 @@ class Auth/* implements AuthInterface*/
     * @param boolean $remember
     * @return array $data
     */
-    protected function addSession($uid, $remember)
+    protected function addSession($uid, $remember, $device_id = null)
     {
         $ip = $this->getIp();
         $user = $this->getBaseUser($uid);
@@ -427,7 +427,9 @@ class Auth/* implements AuthInterface*/
         $data['hash'] = sha1($this->config->site_key . microtime());
         $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-        $this->deleteExistingSessions($uid);
+        if (!$this->config->allow_concurrent_sessions) {
+            $this->deleteExistingSessions($uid);
+        }
 
         if ($remember == true) {
             $data['expire'] = strtotime($this->config->cookie_remember);
@@ -440,8 +442,8 @@ class Auth/* implements AuthInterface*/
         // don't use INET_ATON(:ip), use ip2long(), 'cause SQLite or PosgreSQL does not have INET_ATON() function
         $query = "
 INSERT INTO {$this->config->table_sessions}
-(uid, hash, expiredate, ip, agent, cookie_crc)
-VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
+(uid, hash, expiredate, ip, device_id, agent, cookie_crc)
+VALUES (:uid, :hash, :expiredate, :ip, :device_id, :agent, :cookie_crc)
 ";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
@@ -449,6 +451,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             'hash'      => $data['hash'],
             'expiredate'=> date("Y-m-d H:i:s", $data['expire']),
             'ip'        => $ip,
+            'device_id' => $device_id,
             'agent'     => $agent,
             'cookie_crc'=> $data['cookie_crc']
         ];
@@ -498,7 +501,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $hash
     * @return boolean
     */
-    public function checkSession($hash)
+    public function checkSession($hash, $device_id = null)
     {
         $ip = $this->getIp();
         $block_status = $this->isBlocked();
@@ -513,7 +516,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         // INET_NTOA(ip)
-        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash";
+        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc, device_id FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'hash' => $hash
@@ -531,20 +534,32 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
         $db_cookie = $row['cookie_crc'];
+        $db_device_id = $row['device_id'];
 
         if ($currentdate > $expiredate) {
-            $this->deleteExistingSessions($uid);
-
+            $this->deleteSession($hash);
             return false;
         }
 
-        if ($ip != $db_ip) {
-            return false;
+        //compare device_id if set, else compare ip
+        if($device_id != null){
+
+            //compare device_id
+            if($db_device_id != $device_id){
+                return false;
+            }
+
+        } else {
+
+            //compare ip
+            if ($ip != $db_ip) {
+                return false;
+            }
         }
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
             if ($expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
-                $this->deleteExistingSessions($uid);
+                $this->deleteSession($hash);
                 $this->addSession($uid, false);
             }
             return true;
