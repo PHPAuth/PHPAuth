@@ -77,6 +77,7 @@ CREATE TABLE phpauth_sessions (
   hash varchar(40) NOT NULL,
   expiredate DATETIME YEAR TO SECOND,
   ip varchar(39) NOT NULL,
+  device_id varchar(36) NULL,
   agent varchar(200) NOT NULL,
   cookie_crc char(40) NOT NULL,
   PRIMARY KEY (id)

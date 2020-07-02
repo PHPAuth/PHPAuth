@@ -98,6 +98,7 @@ CREATE TABLE `phpauth_sessions` (
   `hash` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   `expiredate` datetime NOT NULL,
   `ip` varchar(39) NOT NULL,
+  `device_id` varchar(36) NULL,
   `agent` varchar(200) NOT NULL,
   `cookie_crc` char(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
   PRIMARY KEY (`id`)
