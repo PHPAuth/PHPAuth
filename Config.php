@@ -101,7 +101,10 @@ class Config
 
                 // load configuration
 		try{
-			$this->config = yaml_parse(file_get_content($source));
+			if(function_exists('yaml_parse')){
+				$this->config = yaml_parse(file_get_content($source));
+			} else {
+				die("Function yaml_parse not found"); //@todo: \Exception
 		} catch (Exception $e) {
 			die("PHPAuth: config type YML is corrupted. Error: " . $e); //@todo: \Exception
 		}
