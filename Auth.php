@@ -1621,10 +1621,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
    /**
     * Gets user data for current user (from cookie/session_hash) and returns an array, password is not returned
+    * @param bool $updateSession = false
     * @return array $data
     * @return boolean false if no current user
     */
-    public function getCurrentUser()
+    public function getCurrentUser($updateSession = false)
     {
         if ($this->currentuser === null) {
             $hash = $this->getCurrentSessionHash();
@@ -1639,8 +1640,34 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             $this->currentuser = $this->getUser($uid);
         }
+        
+        if ($updateSession) {
+            $this->renewUserSession($hash);
+        }
         return $this->currentuser;
     }
+    
+    /**
+     * Update user session expire time using either session hash or uid
+     * @param string $hash
+     * @param int $uid = null
+     * @return
+     * 
+    */
+    
+    private function renewUserSession($hash, $uid = null) 
+    {
+        $expire = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
+        
+        $where = (is_null(($uid))) ? "hash" : "uid";
+        $arr = (is_null($uid)) ? $hash : $uid;
+        
+        $STH = $this->dbh->prepare("UPDATE sessions SET expiredate = ? WHERE {$where} = ?");
+        $STH->execute([$expire, $arr]);
+
+        return;
+    }
+
 
     /**
      * Compare user's password with given password
