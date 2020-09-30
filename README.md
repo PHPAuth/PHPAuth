@@ -10,7 +10,7 @@ What is it
 
 PHPAuth is a secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.
 
-PHPAuth is work in progress, and not meant for people that doesn't know how to program, its meant for people that know what they are doing.. We cannot help everyone because they dont understand this class.. 
+PHPAuth is work in progress, and not meant for people that don't know how to program, its meant for people that know what they are doing. We cannot help everyone because they don't understand this class. 
 
 IT'S NOT FOR BEGINNERS!
 
@@ -61,13 +61,13 @@ The database table `config` contains multiple parameters allowing you to configu
 * `site_url`    : the URL of the Auth root, where you installed the system, without the trailing slash, used for emails.
 * `site_email`  : the email address from which to send activation and password reset emails
 * `site_key`    : a random string that you should modify used to validate cookies to ensure they are not tampered with
-* `site_timezone` : the timezone for correct datetime values
+* `site_timezone` : the timezone for correct DateTime values
 * `site_activation_page` : the activation page name appended to the `site_url` in the activation email
 * `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
 * `cookie_name` : the name of the cookie that contains session information, do not change unless necessary
 * `cookie_path` : the path of the session cookie, do not change unless necessary
 * `cookie_domain` : the domain of the session cookie, do not change unless necessary
-* `cookie_secure` : the HTTPS only setting of the session cookie, do not change unless necessary
+* `cookie_secure` : the HTTPS-only setting of the session cookie, do not change unless necessary
 * `cookie_http` : the HTTP only protocol setting of the session cookie, do not change unless necessary
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
@@ -91,12 +91,12 @@ The database table `config` contains multiple parameters allowing you to configu
 * `attempt_before_ban` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Default is `30`
 * `password_min_score` : the minimum score given by [zxcvbn](https://github.com/bjeavons/zxcvbn-php) that is allowed. Default is `3`
 * `translation_source`: source of translation, possible values: 'sql' (data from <table_translations> will be used), 'php' (default, translations will be loaded from languages/*.php), 'ini' (will be used languages/*.ini files)
-* `table_translations` : name of table with translation for all messages
-* `table_attempts` : name of table with all attempts (default is 'phpauth_attempts')
-* `table_requests` : name of table with all requests (default is 'phpauth_requests')
-* `table_sessions` : name of table with all sessions (default is 'phpauth_sessions')
-* `table_users` : name of table with all users (default is 'phpauth_users')
-* `table_emails_banned` : name of table with all banned email domains (default is 'phpauth_emails_banned')
+* `table_translations` : name of the table with translation for all messages
+* `table_attempts` : name of the table with all attempts (default is 'phpauth_attempts')
+* `table_requests` : name of the table with all requests (default is 'phpauth_requests')
+* `table_sessions` : name of the table with all sessions (default is 'phpauth_sessions')
+* `table_users` : name of the table with all users (default is 'phpauth_users')
+* `table_emails_banned` : name of the table with all banned email domains (default is 'phpauth_emails_banned')
 * `recaptcha_enabled`: 1 for Google reCaptcha enabled, 0 - disabled (default)
 * `recaptcha_site_key`: string, contains public reCaptcha key (for javascripts)
 * `recaptcha_secret_key`: string, contains secret reCaptcha key
@@ -107,7 +107,7 @@ CAPTCHA Implementation
 ---------------
 
 If `isBlocked()` returns `verify`, then a CAPTCHA code should be displayed.
-The method `checkCaptcha($captcha)` is called to verify a CAPTCHA code. By default this method returns `true`, but should be overridden to verify a CAPTCHA.
+The method `checkCaptcha($captcha)` is called to verify a CAPTCHA code. By default, this method returns `true` but should be overridden to verify a CAPTCHA.
 
 For example, if you are using Google's ReCaptcha NoCaptcha, use the following code:
 
