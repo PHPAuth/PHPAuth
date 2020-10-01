@@ -1,5 +1,22 @@
 [![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://travis-ci.org/PHPAuth/PHPAuth) 
-[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.0-8892BF.svg?style=flat-circle)](https://php.net/)
+![PHP version from Travis config](https://img.shields.io/travis/php-v/phpauth/phpauth/master)
+[![Discord server](https://img.shields.io/discord/761354508860653619?logo=discord)](https://discord.gg/ewGcMN4)
+![Lines of code](https://img.shields.io/tokei/lines/github/PHPAuth/PHPAuth)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/PHPAuth/PHPAuth)
+![GitHub All Releases](https://img.shields.io/github/downloads/PHPAuth/PHPAuth/total)
+![GitHub issues](https://img.shields.io/github/issues-raw/PHPAuth/PHPAuth)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/PHPAuth/PHPAuth)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/PHPAuth/PHPAuth)
+![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/PHPAuth/PHPAuth)
+![GitHub forks](https://img.shields.io/github/forks/PHPAuth/PHPAuth?label=Forks&style=plastic)
+![GitHub Repo stars](https://img.shields.io/github/stars/PHPAuth/PHPAuth?style=plastic)
+![GitHub watchers](https://img.shields.io/github/watchers/PHPAUth/PHPAuth?style=plastic)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/PHPAuth/PHPAuth)
+![GitHub contributors](https://img.shields.io/github/contributors/phpauth/phpauth)
+![GitHub last commit](https://img.shields.io/github/last-commit/phpauth/phpauth)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/PHPAuth/PHPAuth)
+
 
 
 PHPAuth
