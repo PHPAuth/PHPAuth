@@ -1662,7 +1662,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $where = (is_null(($uid))) ? "hash" : "uid";
         $arr = (is_null($uid)) ? $hash : $uid;
         
-        $STH = $this->dbh->prepare("UPDATE sessions SET expiredate = ? WHERE {$where} = ?");
+        $STH = $this->dbh->prepare("UPDATE {$this->config->table_sessions} SET expiredate = ? WHERE {$where} = ?");
         $STH->execute([$expire, $arr]);
 
         return;
