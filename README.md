@@ -1,7 +1,6 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-
 [![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://travis-ci.org/PHPAuth/PHPAuth) 
 ![PHP version from Travis config](https://img.shields.io/travis/php-v/phpauth/phpauth/master)
 [![Discord server](https://img.shields.io/discord/761354508860653619?logo=discord)](https://discord.gg/ewGcMN4)
