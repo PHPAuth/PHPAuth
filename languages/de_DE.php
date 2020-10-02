@@ -11,7 +11,7 @@ $lang['remember_me_invalid'] = "Das Angemeldet bleiben-Feld ist ungültig.";
 $lang['password_short'] = "Das Passwort ist zu kurz.";
 $lang['password_weak'] = "Das Passwort ist zu einfach.";
 $lang['password_nomatch'] = "Die Passwörter stimmen nicht überein.";
-$lang['password_changed'] = "Ihr Passwort wurde erfolgreich geändert.";
+$lang['password_changed'] = "Das Passwort wurde erfolgreich geändert.";
 $lang['password_incorrect'] = "Das aktuelle Passwort ist falsch.";
 $lang['password_notvalid'] = "Das Passwort ist ungültig.";
 
@@ -19,7 +19,7 @@ $lang['newpassword_short'] = "Das neue Passwort ist zu kurz.";
 $lang['newpassword_long'] = "Das neue Passwort ist zu lang.";
 $lang['newpassword_invalid'] = "Das neue Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben sowie eine Ziffer enthalten.";
 $lang['newpassword_nomatch'] = "Die neuen Passwörter stimmen nicht überein.";
-$lang['newpassword_match'] = "Das neue Passwort ist das gleiche wie das alte.";
+$lang['newpassword_match'] = "Das neue Passwort ist dasselbe wie das alte Passwort.";
 
 $lang['email_short'] = "Die E-Mail-Adresse ist zu kurz.";
 $lang['email_long'] = "Die E-Mail-Adresse ist zu lang.";
@@ -55,11 +55,11 @@ $lang['reset_requested'] = "Wir haben Ihnen eine E-Mail zum Zurücksetzen Ihres 
 $lang['reset_requested_emailmessage_suppressed'] = "Eine Anforderung zum Zurücksetzen Ihres Passworts wurde erstellt.";
 $lang['reset_exists'] = "Es liegt bereits eine Anfrage zum Zurücksetzen Ihres Passworts vor. Die nächste Anfrage wird am %s möglich sein.";
 
-$lang['already_activated'] = "Ih Benutzerkonto ist bereits aktiviert.";
+$lang['already_activated'] = "Ihr Benutzerkonto ist bereits aktiviert.";
 $lang['activation_sent'] = "Eine Aktivierungsmail wurde verschickt.";
 $lang['activation_exists'] = "Eine Aktivierungsmail wurde bereits verschickt. Der nächste Aktivierungsversuch wird am %s möglich sein.";
 
-$lang['email_activation_subject'] = '%s - Aktivieren Sie Ihr Benutzerkonto';
+$lang['email_activation_subject'] = '%s - Bitte aktivieren Sie Ihr Benutzerkonto';
 $lang['email_activation_body'] = 'Hallo,<br/><br/>um sich mit Ihrem Benutzerkonto anzumelden, müssen Sie zuerst Ihr Benutzerkonto aktivieren, indem Sie auf folgenden Link klicken oder ihn manuell in die Adresszeile Ihres Browsers kopieren: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Sie benötigen folgenden Aktivierungsschlüssel: <strong>%3$s</strong><br/><br/>Wenn Sie sich gar nicht auf %1$s angemeldet haben, können Sie diese E-Mail einfach ignorieren.';
 $lang['email_activation_altbody'] = 'Hallo,' . "\n\n" . 'um sich mit Ihrem Benutzerkonto anzumelden, mü+ssen Sie zuerst Ihr Benutzerkonto aktivieren, indem Sie auf folgenden Link klicken oder ihn manuell in die Adresszeile Ihres Browsers kopieren:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Sie benötigen folgenden Aktivierungsschlüssel: %3$s' . "\n\n" . 'Wenn Sie sich gar nicht auf %1$s angemeldet haben, können Sie diese E-Mail einfach ignorieren.';
 
