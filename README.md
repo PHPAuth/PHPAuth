@@ -262,6 +262,7 @@ Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
 Available languages:
 
 * `ar-TN`
+* `bs-BA`
 * `cs_CZ`
 * `da_DK`
 * `de_DE`
