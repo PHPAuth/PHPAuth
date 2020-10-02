@@ -6,7 +6,6 @@ php:
     - 7.2
     - 7.3
     - 7.4
-    - hhvm
 
 services:
   - mysql
@@ -21,13 +20,6 @@ before_script:
 script:
 - echo "skipping tests"
   
-jobs:
-    allow_failures:
-        - php: 7.2
-        - php: 7.3
-        - php: 7.4
-        - php: hhvm
-    fast_finish: true
 
 notifications:
     email: false
