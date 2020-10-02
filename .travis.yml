@@ -15,10 +15,15 @@ before_script:
   - mysql --version
   - mysql -e 'create database phpauthtest;'
   - mysql -u root phpauthtest < database_defs/database_mysql.sql
+  - phpenv config-rm xdebug.ini || return 0
 
-# Need fix
-#script:
-#    - vendor/bin/phpunit --stderr
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    local_dir: output
+    on:
+        branch: master
 
 notifications:
     email: false
