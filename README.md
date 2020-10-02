@@ -1,4 +1,7 @@
 [![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://travis-ci.org/PHPAuth/PHPAuth) 
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![PHP version from Travis config](https://img.shields.io/travis/php-v/phpauth/phpauth/master)
 [![Discord server](https://img.shields.io/discord/761354508860653619?logo=discord)](https://discord.gg/ewGcMN4)
 ![Lines of code](https://img.shields.io/tokei/lines/github/PHPAuth/PHPAuth)
@@ -308,3 +311,22 @@ Credits
 * [disposable](https://github.com/lavab/disposable) - @lavab
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer) - @PHPMailer
 * [zxcvbn-php](https://github.com/bjeavons/zxcvbn-php) - @bjeavons
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/Conver"><img src="https://avatars1.githubusercontent.com/u/6231022?v=4" width="100px;" alt=""/><br /><sub><b>Conver</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=Conver" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
