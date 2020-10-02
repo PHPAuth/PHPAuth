@@ -638,7 +638,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $password   -- password
     * @param array $params      -- additional params
     * @param boolean $use_email_activation  -- activate email confirm or not
-    * @return int $uid
+    * @return array
     */
     protected function addUser($email, $password, $params = [], &$use_email_activation)
     {
@@ -704,6 +704,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
+        $return['uid'] = $uid;
         $return['error'] = false;
         return $return;
     }
