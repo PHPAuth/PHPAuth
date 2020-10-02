@@ -29,14 +29,5 @@ jobs:
         - php: hhvm
     fast_finish: true
 
-deploy:
-    provider: pages
-    cleanup: true
-    token: $GITHUB_TOKEN
-    local_dir: output
-    strategy: git
-    on:
-        branch: master
-
 notifications:
     email: false
