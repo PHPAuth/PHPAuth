@@ -340,7 +340,7 @@ class Auth/* implements AuthInterface*/
         $query_prepared->execute(['email' => $email]);
 
         $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
-		if (!$row) {
+        if (!$row) {
             $this->addAttempt();
 
             $state['message'] = $this->__lang("email_incorrect");
@@ -359,6 +359,8 @@ class Auth/* implements AuthInterface*/
 
         $state['error'] = false;
         $state['message'] = ($use_email_activation == true ? $this->__lang("reset_requested") : $this->__lang('reset_requested_emailmessage_suppressed'));
+        $state['token'] = $addRequest['token'];
+        $state['expire'] = $addRequest["expire"];
 
         return $state;
     }
@@ -886,7 +888,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $email
     * @param string $type
     * @param boolean $use_email_activation
-    * @return boolean
+    * @return array
     */
     protected function addRequest($uid, $email, $type, &$use_email_activation)
     {
@@ -985,6 +987,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $return['error'] = false;
+        $return['token'] = $token;
+        $return['expire'] = $expire;
 
         return $return;
     }
