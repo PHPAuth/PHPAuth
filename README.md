@@ -323,6 +323,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://hemk.es/"><img src="https://avatars2.githubusercontent.com/u/15839724?v=4" width="100px;" alt=""/><br /><sub><b>Nico</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=turbopixel" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/hajro92"><img src="https://avatars0.githubusercontent.com/u/15570002?v=4" width="100px;" alt=""/><br /><sub><b>Hajrudin</b></sub></a><br /><a href="#translation-hajro92" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/Conver"><img src="https://avatars1.githubusercontent.com/u/6231022?v=4" width="100px;" alt=""/><br /><sub><b>conver</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=conver" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/louis123562"><img src="https://avatars1.githubusercontent.com/u/36068395?v=4" width="100px;" alt=""/><br /><sub><b>louis123562</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=louis123562" title="Documentation">📖</a></td>
   </tr>
 </table>
 
