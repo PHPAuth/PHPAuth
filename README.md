@@ -321,6 +321,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://hemk.es/"><img src="https://avatars2.githubusercontent.com/u/15839724?v=4" width="100px;" alt=""/><br /><sub><b>Nico</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=turbopixel" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/hajro92"><img src="https://avatars0.githubusercontent.com/u/15570002?v=4" width="100px;" alt=""/><br /><sub><b>Hajrudin</b></sub></a><br /><a href="#translation-hajro92" title="Translation">🌍</a></td>
   </tr>
 </table>
 
