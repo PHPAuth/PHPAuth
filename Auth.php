@@ -1861,7 +1861,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $tu = $this->config->table_users;
 
         $query = "
-		SELECT {$ts}.uid, {$ts}.expiredate, {$ts}.ip, {$tu}.email, {$tu}.username
+		SELECT {$ts}.uid, {$ts}.expiredate, {$ts}.ip, {$tu}.email
 		FROM {$ts}, {$tu}
 		WHERE hash = :hash AND {$ts}.uid = {$tu}.id";
 
