@@ -25,6 +25,23 @@
 PHPAuth
 =======
 
+Notice! (pr 1/10/2020)
+---------------
+PHPAuth is under going a complete rewrite to bring the code up to date, the project has been on hold for way to long time now and I decided to work on it again making sure EVERYONE can use it and not just advanded programmers. My goal is to make a Auth framework that is secure, extendable and useable for everyone. It will take some time but we have a good amount of users already using this code which are happily to help out. 
+
+#### Goals:
+- Bring code up to newest PHP version with min. of v7.1 to v7.4 (If new version comes out while rewriting the code will be pushed up to that version also)
+- Making the code even more seure to use by adding things like one time keys (OTP, 2FA etc)
+- Make sure that the code can be used by everyone, also beginners.
+- Write much better documentation.
+- Make database queries faster.
+- Uptimize the code.
+- Bring down issue count.
+- Respond faster to issue and PRs.
+- And much more!
+
+
+
 What is it
 ---------------
 
