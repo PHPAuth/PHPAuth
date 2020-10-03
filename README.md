@@ -314,7 +314,9 @@ Credits
 * [zxcvbn-php](https://github.com/bjeavons/zxcvbn-php) - @bjeavons
 
 ## Donation
+
 You can help with a donation, so we can rent servers to test on, we can tip our contributors as thank for their help.
+
 Bitcoin: 1PrXRMb9R8GkSRB8wSJ2MWhF9cc6YXCS8w
 
 ## Contributors ✨
