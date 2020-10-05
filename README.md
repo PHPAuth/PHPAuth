@@ -100,7 +100,9 @@ The database table `config` contains multiple parameters allowing you to configu
 * `site_key`    : a random string that you should modify used to validate cookies to ensure they are not tampered with
 * `site_timezone` : the timezone for correct DateTime values
 * `site_activation_page` : the activation page name appended to the `site_url` in the activation email
-* `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
+* `site_activation_page_append_code` : `1` to append /key to the `site_url` in the activation email to simplier UX, a RESTful API should be implemented for this option
+* `site_activation_page_append_code` : the password reset page name appended to the `site_url` in the password reset email
+* `site_password_reset_page` : `1` to append /key to the `site_url` in the reset email to simplier UX, a RESTful API should be implemented for this option
 * `cookie_name` : the name of the cookie that contains session information, do not change unless necessary
 * `cookie_path` : the path of the session cookie, do not change unless necessary
 * `cookie_domain` : the domain of the session cookie, do not change unless necessary
