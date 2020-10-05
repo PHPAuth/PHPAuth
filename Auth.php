@@ -1786,16 +1786,25 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             if ($type == 'activation') {
                 $mail->Subject  = $this->__lang('email_activation_subject', $this->config->site_name);
-                $mail->Body     = $this->__lang('email_activation_body', $this->config->site_url, $this->config->site_activation_page, $key);
-                $mail->AltBody  = $this->__lang('email_activation_altbody', $this->config->site_url, $this->config->site_activation_page, $key);
+                if($this->config->site_activation_page_append_code)
+                $url=$this->config->site_activation_page."/".$key;
+                else
+                $url=$this->config->site_activation_page;
+                $mail->Subject  = $this->__lang('email_activation_subject', $this->config->site_name);
+                $mail->Body     = $this->__lang('email_activation_body', $this->config->site_url, $url, $key);
+                $mail->AltBody  = $this->__lang('email_activation_altbody', $this->config->site_url, $url, $key);
             } elseif ($type == 'reset') {
+                if($this->config->site_password_reset_page_append_code)
+                $url=$this->config->site_password_reset_page."/".$key;
+                else
+                $url=$this->config->site_password_reset_page;
                 $mail->Subject  = $this->__lang('email_reset_subject', $this->config->site_name);
-                $mail->Body     = $this->__lang('email_reset_body', $this->config->site_url, $this->config->site_password_reset_page, $key);
-                $mail->AltBody  = $this->__lang('email_reset_altbody', $this->config->site_url, $this->config->site_password_reset_page, $key);
+                $mail->Body     = $this->__lang('email_reset_body', $this->config->site_url, $url, $key);
+                $mail->AltBody  = $this->__lang('email_reset_altbody', $this->config->site_url, $url, $key);
             } else {
                 return false;
             }
-
+            
             if (!$mail->send())
                 throw new \Exception($mail->ErrorInfo);
 
