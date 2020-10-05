@@ -40,6 +40,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "Criptos",
+      "name": "ANDRES TELLO",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4574233?v=4",
+      "profile": "http://www.ifscore.info",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
