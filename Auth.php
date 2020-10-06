@@ -714,7 +714,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
     * Gets basic user data for a given UID and returns an array
     * @param int $uid
-    * @return array $data
+    * @return array|bool $data
     */
     protected function getBaseUser($uid)
     {
