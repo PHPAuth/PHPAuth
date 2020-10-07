@@ -514,7 +514,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     * @param string $hash
     * @return boolean
     */
-    public function checkSession($hash)
+    public function checkSession($hash, $device_id = null)
     {
         $ip = $this->getIp();
         $block_status = $this->isBlocked();
@@ -529,7 +529,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         // INET_NTOA(ip)
-        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc FROM {$this->config->table_sessions} WHERE hash = :hash";
+        $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc, device_id FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'hash' => $hash
@@ -547,6 +547,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
         $db_cookie = $row['cookie_crc'];
+        $db_device_id = $row['device_id'];
 
         if ($currentdate > $expiredate) {
             $this->deleteSession($hash);
@@ -554,8 +555,14 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        if ($ip != $db_ip) {
-            return false;
+        if($device_id != null){
+            if($db_device_id !== $device_id){
+                return false;
+            }
+        } else {
+            if ($ip !== $db_ip) {
+                return false;
+            }
         }
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
