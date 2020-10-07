@@ -20,6 +20,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('cookie_remember', '+1 month'),
 ('cookie_secure', '0'),
 ('cookie_renew', '+5 minutes'),
+('days_for_automatic_password_expiration', '30'), 
 ('allow_concurrent_sessions', FALSE),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
@@ -47,6 +48,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('table_requests',  'phpauth_requests'),
 ('table_sessions',  'phpauth_sessions'),
 ('table_users', 'phpauth_users'),
+('table_params', 'phpauth_params'),
 ('table_emails_banned', 'phpauth_emails_banned'),
 ('table_translations', 'phpauth_translation_dictionary'),
 ('verify_email_max_length', '100'),
@@ -97,6 +99,11 @@ CREATE TABLE phpauth_users (
   email character varying(100) DEFAULT NULL,
   password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
+  expiration timestamp without time zone NOT NULL,
+  days2expire integer UNSIGNED NOT NULL DEFAULT 0,
+  params JSON NOT NULL DEFAULT '{}', 
+  status character varying(10), 
+  statuschange timestamp without time zone NOT NULL,  
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );

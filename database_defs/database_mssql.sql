@@ -20,6 +20,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('cookie_remember', '+1 month'),
 ('cookie_secure', '0'),
 ('cookie_renew', '+5 minutes'),
+('days_for_automatic_password_expiration', '30'), 
 ('allow_concurrent_sessions', FALSE),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
@@ -47,6 +48,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('table_requests',  'phpauth_requests'),
 ('table_sessions',  'phpauth_sessions'),
 ('table_users', 'phpauth_users'),
+('table_params', 'phpauth_params'),
 ('table_emails_banned', 'phpauth_emails_banned'),
 ('table_translations', 'phpauth_translation_dictionary'),
 ('verify_email_max_length', '100'),
@@ -95,8 +97,24 @@ CREATE TABLE phpauth_users (
   email character varying(100) DEFAULT NULL,
   password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
+  expiration datetime2 NOT NULL DEFAULT 0,
+  days2expire smallint UNSIGNED NOT NULL DEFAULT 0,
+  params nvarchar(max) NOT NULL DEFAULT '{}', 
+  status character varying(20) DEFAULT NULL,
+  statuschange datetime2 NOT NULL DEFAULT 0,  
   dt datetime2 NOT NULL DEFAULT GETDATE(),
   PRIMARY KEY (id)
+);
+
+
+DROP TABLE IF EXISTS `phpauth_params`;
+CREATE TABLE `phpauth_params` (
+  `json_key` character varying(100) DEFAULT '',
+  `name` character varying(100) DEFAULT '', 
+  `required` character varying(2) DEFAULT 'y', 
+  `description` character varying(255) DEFAULT '',
+  `filter` character varying(100) DEAULT 'NONE',
+  PRIMARY KEY (`json_key`)
 );
 
 DROP TABLE IF EXISTS phpauth_emails_banned;

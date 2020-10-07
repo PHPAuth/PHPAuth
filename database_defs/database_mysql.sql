@@ -27,6 +27,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('cookie_remember', '+1 month'),
   ('cookie_secure', '0'),
   ('cookie_renew', '+5 minutes'),
+  ('days_for_automatic_password_expiration', '30'), 
   ('allow_concurrent_sessions', FALSE),
   ('emailmessage_suppress_activation',  '0'),
   ('emailmessage_suppress_reset', '0'),
@@ -54,6 +55,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('table_requests',  'phpauth_requests'),
   ('table_sessions',  'phpauth_sessions'),
   ('table_users', 'phpauth_users'),
+  ('table_params', 'phpauth_params'),
   ('table_emails_banned', 'phpauth_emails_banned'),
   ('table_translations', 'phpauth_translation_dictionary'),
   ('verify_email_max_length', '100'),
@@ -114,9 +116,28 @@ CREATE TABLE `phpauth_users` (
   `email` varchar(100) DEFAULT NULL,
   `password` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
+  `expiration` timestamp NOT NULL DEFAULT 0,
+  `days2expire` int(3) UNSIGNED NOT NULL DEFAULT 0,
+  `params` JSON NOT NULL DEFAULT '{}', 
+  `status` enum ('enabled', 'disabled', 'deleted') DEFAULT 'enabled', 
+  `statuschange` timestamp NOT NULL DEFAULT 0,
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `email` (`email`)
+  KEY `email` (`email`), 
+  KEY `expiration` (`expiration`),
+  KEY `exporationstatus` (`expiration`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- User Parameters Table
+
+DROP TABLE IF EXISTS `phpauth_params`;
+CREATE TABLE `phpauth_params` (
+  `json_key` varchar(100) DEFAULT '',
+  `name` varchar(100) DEFAULT '', 
+  `required` enum('y', 'n') DEFAULT 'y', 
+  `description` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
+  `filter` enum('NONE', 'FILTER_SANITIZE_EMAIL', 'FILTER_SANITIZE_ENCODED', 'FILTER_SANITIZE_NUMBER_FLOAT', 'FILTER_SANITIZE_NUMBER_INT', 'FILTER_SANITIZE_SPECIAL_CHARS', 'FILTER_SANITIZE_STRING', 'FILTER_SANITIZE_URL') default 'NONE',  
+  PRIMARY KEY (`json_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Banned emails reference

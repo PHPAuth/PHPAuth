@@ -17,6 +17,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_remember', '+1 month');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_secure', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_renew', '+5 minutes');
+INSERT INTO phpauth_config (setting, value) VALUES ('days_for_automatic_password_expiration', '30'); 
 INSERT INTO phpauth_config (setting, value) VALUES ('allow_concurrent_sessions', FALSE);
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_activation',  '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_reset', '0');
@@ -43,6 +44,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('table_attempts',  'phpauth_
 INSERT INTO phpauth_config (setting, value) VALUES ('table_requests',  'phpauth_requests');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_sessions',  'phpauth_sessions');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_users', 'phpauth_users');
+INSERT INTO phpauth_config (setting, value) VALUES ('table_params', 'phpauth_params');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_emails_banned', 'phpauth_emails_banned');
 INSERT INTO phpauth_config (setting, value) VALUES ('table_translations', 'phpauth_translation_dictionary'),
 INSERT INTO phpauth_config (setting, value) VALUES ('verify_email_max_length', '100');
@@ -91,9 +93,25 @@ CREATE TABLE phpauth_users (
   email varchar(100) DEFAULT NULL,
   password varchar(255) DEFAULT NULL,
   isactive smallint DEFAULT 0 NOT NULL,
+  expiration DATETIME YEAR TO SECOND,
+  days2expire smallint DEFAULT 0  NOT NULL,
+  params JSON  DEFAULT '{}', 
+  status varchar(100) DEFAULT NULL,
+  statuschange DATETIME YEAR TO SECOND,  
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,
   PRIMARY KEY (id)
 );
+
+
+DROP TABLE phpauth_params;
+CREATE TABLE phpauth_params (
+  json_key varchar(100) DEFAULT '',
+  name varchar(100) DEFAULT '', 
+  required varchar(2) DEFAULT 'y', 
+  description VARCHAR(255) DEFAULT '',
+  filter VARCHAR(255) DEFAULT 'NONE',
+  PRIMARY KEY (json_key)
+)
 
 DROP TABLE phpauth_emails_banned;
 CREATE TABLE phpauth_emails_banned (

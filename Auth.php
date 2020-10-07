@@ -92,7 +92,6 @@ class Auth/* implements AuthInterface*/
         if ($block_status == "verify") {
             if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang("user_verify_failed");
-
                 return $return;
             }
         }
@@ -101,11 +100,17 @@ class Auth/* implements AuthInterface*/
             $return['message'] = $this->__lang("user_blocked");
             return $return;
         }
+        
 
+        $status = $this->verifyStatus($email);
         $validateEmail = $this->validateEmail($email);
         $validatePassword = $this->validatePassword($password);
-
-        if ($validateEmail['error'] == 1) {
+        
+        if($status['error'] == 1) { 
+            $return['message'] = $status; 
+            
+            return $return;
+        }  elseif ($validateEmail['error'] == 1) {
             $this->addAttempt();
             $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
 
@@ -132,6 +137,13 @@ class Auth/* implements AuthInterface*/
         }
 
         $user = $this->getBaseUser($uid);
+        
+        if($user['days2expire'] > 0 && time() > strtotime($user['expiration'])) {
+            $this->addAttempt();
+            $return['message'] = $this->__lang("password_expired");
+
+            return $return;
+        }
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
@@ -279,12 +291,14 @@ class Auth/* implements AuthInterface*/
         // NOW is no any way to determine, is this token used for activation or not?
 
         $request_result = $this->getRequest($activate_token, "activation");
+        
 
         if ($request_result['error']) {
             $return['message'] = $request_result['message'];
 
             return $return;
         }
+        
 
         if ($this->getBaseUser($request_result['uid'])['isactive'] == 1) {
             $this->addAttempt();
@@ -293,6 +307,16 @@ class Auth/* implements AuthInterface*/
 
             return $return;
         }
+        
+        $status=$this->verifyStatusbyid($request_result['uid']);
+        
+        if($status['error']){
+            $return['message']= $status['message']; 
+            
+            return $return; 
+        }
+        
+        
 
         $query = "UPDATE {$this->config->table_users} SET isactive = :isactive WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
@@ -394,6 +418,7 @@ class Auth/* implements AuthInterface*/
 
         return $this->deleteExistingSessions($uid);
     }
+    
 
     /**
     * Hashes provided password with Bcrypt
@@ -482,7 +507,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     //@todo: delete cookie at deleteSession
 
     /**
-    * Removes all existing sessions for a given UID
+    * Removes all existing sessions for a given UID wher phpauth_users.id=UID
     * @param int $uid
     * @return boolean
     */
@@ -535,7 +560,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             'hash' => $hash
         ];
         $query_prepared->execute($query_params);
-
         if ($query_prepared->rowCount() == 0) {
             return false;
         }
@@ -547,6 +571,15 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $currentdate = strtotime(date("Y-m-d H:i:s"));
         $db_ip = $row['ip'];
         $db_cookie = $row['cookie_crc'];
+        
+        
+        $status=$this->verifyStatusbyid($uid);
+        
+        if($status['error']) {
+            $this->deleteSession($hash); 
+            
+            return false;
+        }
 
         if ($currentdate > $expiredate) {
             $this->deleteSession($hash);
@@ -645,7 +678,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     protected function addUser($email, $password, $params = [], &$use_email_activation)
     {
         $return['error'] = true;
-
+        
+        $this->dbh->beginTransaction(); 
+        
         $query = "INSERT INTO {$this->config->table_users} (isactive) VALUES (0)";
         $query_prepared = $this->dbh->prepare($query);
 
@@ -661,13 +696,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
 
             if ($addRequest['error'] == 1) {
-                $query = "DELETE FROM {$this->config->table_users} WHERE id = :id";
-                $query_prepared = $this->dbh->prepare($query);
-                $query_params = [
-                    'id' => $uid
-                ];
-                $query_prepared->execute($query_params);
-
+                $this->dbh->rollBack(); 
                 $return['message'] = $addRequest['message'];
                 return $return;
             }
@@ -678,34 +707,51 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $password = $this->getHash($password);
+        if(empty($this->config->days_for_automatic_password_expiration) || $this->config->days_for_automatic_password_expiration < 1){
+            $days2expire=0; 
+            $expiration="0000-00-00 00:00:00"; 
+        } else {
+            $days2expire=$this->config->days_for_automatic_password_expiration; 
+            $expiration=date("Y-m-d H:i:s", strtotime("now +{$this->config->days_for_automatic_password_expiration} days"));
+        }
+        
+        if(empty($this->config->table_params)){ 
+            //retain backwards compatibility
+            if (is_array($params)&& count($params) > 0) {
+                $customParamsQueryArray = [];
 
-        if (is_array($params)&& count($params) > 0) {
-            $customParamsQueryArray = [];
+                foreach($params as $paramKey => $paramValue) {
+                    $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
+                }
 
-            foreach($params as $paramKey => $paramValue) {
-                $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
-            }
+                $setParams = ', ' . implode(', ', array_map(function ($entry) {
+                    return $entry['value'];
+                }, $customParamsQueryArray));
+            } else { $setParams = ''; }
 
-            $setParams = ', ' . implode(', ', array_map(function ($entry) {
-                return $entry['value'];
-            }, $customParamsQueryArray));
-        } else { $setParams = ''; }
-
-        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
-        $query_prepared = $this->dbh->prepare($query);
-
-        $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
-
-        if (!$query_prepared->execute($bindParams)) {
-            $query = "DELETE FROM {$this->config->table_users} WHERE id = ?";
+            $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ?, days2expire =?, expiration=?, status = 'enabled', statuschange=Now() {$setParams} WHERE id = ?";
             $query_prepared = $this->dbh->prepare($query);
-
-            $query_prepared->execute([$uid]);
-            $return['message'] = $this->__lang("system_error") . " #04";
-
-            return $return;
+            $bindParams = array_values(array_merge([$email, $password, $isactive, $days2expire, $expiration], $params, [$uid]));
+            
+        } else {
+            try { 
+                $json_params=json_encode($this->appyFilterParams($params)); 
+            } catch (\Exception $e){
+                $this->dbh->rollBack(); 
+                $return['message']=$e->getMessage(); 
+                return $return; 
+            }
+            $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ?, days2expire = ?, expiration = ?, params = ?, status = 'enabled', statuschange=Now() WHERE id = ?";
+            $query_prepared = $this->dbh->prepare($query);
+            $bindParams = array($email, $password, $isactive, $days2expire, $expiration, $json_params, $uid);
         }
 
+        if (!$query_prepared->execute($bindParams)) {
+            $this->dbh->rollBack(); 
+            $return['message'] = $this->__lang("system_error") . " #04";
+            return $return;
+        }
+        $this->dbh->commit(); 
         $return['uid'] = $uid;
         $return['error'] = false;
         return $return;
@@ -718,7 +764,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     */
     protected function getBaseUser($uid)
     {
-        $query = "SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id";
+        $query = "SELECT email, password, isactive, days2expire, expiration, status FROM {$this->config->table_users} WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['id' => $uid]);
 
@@ -756,6 +802,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if (!$withpassword)
             unset($data['password']);
 
+        if(empty($this->config->table_params))
+        $data['params']=json_decode($params); 
         return $data;
     }
 
@@ -804,7 +852,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $query = "DELETE FROM {$this->config->table_users} WHERE id = :uid";
+        $query = "UPDATE {$this->config->table_users} set status = 'deleted', statuschange = now(), id = :uid";
         $query_prepared = $this->dbh->prepare($query);
 
         if (!$query_prepared->execute(['uid' => $uid])) {
@@ -836,7 +884,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         return $return;
     }
-
+    
     /**
      * Force delete user without password or captcha verification.
      *
@@ -844,6 +892,48 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @return mixed
      */
     public function deleteUserForced($uid)
+    {
+        $return['error'] = true;
+
+        $query = "UPDATE {$this->config->table_users} set status = 'deleted', statuschange = now(), id = :uid";
+        $query_prepared = $this->dbh->prepare($query);
+
+        if (!$query_prepared->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #05";
+
+            return $return;
+        }
+
+        $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
+
+        if (!$query_prepared->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #06";
+
+            return $return;
+        }
+
+        $query = "DELETE FROM {$this->config->table_requests} WHERE uid = :uid";
+        $query_prepared = $this->dbh->prepare($query);
+
+        if (!$query_prepared->execute(['uid' => $uid])) {
+            $return['message'] = $this->__lang("system_error") . " #07";
+
+            return $return;
+        }
+
+        $return['error'] = false;
+        $return['message'] = $this->__lang("account_deleted");
+
+        return $return;
+    }
+    
+    /** 
+      * Purge user, delete permanently 
+      * @param $uid
+      * @return mixed
+    */
+    public function purgeUser($uid)
     {
         $return['error'] = true;
 
@@ -880,6 +970,54 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         return $return;
     }
 
+    /**
+      * Disable user administratively 
+      * @param $email
+      * @param mixed
+    */
+    public function disable($email)
+    {
+        $return['error'] = true;
+
+        $query = "UPDATE {$this->config->table_users} set status = 'disabled', statuschange = now(),  email = :email";
+        $query_prepared = $this->dbh->prepare($query);
+
+        if (!$query_prepared->execute(['email' => $email])) {
+            $return['message'] = $this->__lang("system_error") . " #23";
+
+            return $return;
+        }
+
+        $return['error'] = false;
+        $return['message'] = $this->__lang("account_disabled");
+
+        return $return;
+    }
+
+    /**
+      * Enable user administratively 
+      * @param $email
+      * @param mixed
+    */
+    public function enable($email)
+    {
+        $return['error'] = true;
+
+        $query = "UPDATE {$this->config->table_users} set status = 'enabled', statuschange = now(),  email = :email";
+        $query_prepared = $this->dbh->prepare($query);
+
+        if (!$query_prepared->execute(['email' => $email])) {
+            $return['message'] = $this->__lang("system_error") . " #24";
+
+            return $return;
+        }
+
+        $return['error'] = false;
+        $return['message'] = $this->__lang("account_enabled");
+
+        return $return;
+    }
+    
     // protected function add
 
     /**
@@ -1045,6 +1183,74 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         return $query_prepared->execute(['id' => $id]);
     }
+    
+    /**
+     * Verifies the administrative status 
+     * @param int $uid 
+     * @return array $return ['error', 'message']
+    */
+    protected function verifyStatusbyid($id)
+    {
+        $state['error'] = true; 
+        $query="SELECT status,id FROM {$this->config->table_users} where id = :id";
+        $query_prepared = $this->dbh->prepare($query); 
+        $query_prepared->execute(["id"=>$id]); 
+        $status=$query_prepared->fetch(\PDO::FETCH_ASSOC); 
+        if(!$status){
+            $status['message']= $this->__lang("system_error" . "#21"); 
+        }else{
+            switch($status['status']){
+                case "enabled": 
+                    $state['error']= false; 
+                    $state['message'] = false; 
+                break;
+                case "disabled":
+                    $state['message'] = $this->__lang("Account disabled"); 
+                    $this->deleteExistingSessions($status['id']); 
+                break; 
+                case "deleted":
+                    $state['message'] = $this->__lang("system_error" . "#22");
+                    $this->deleteExistingSessions($status['id']); 
+                break; 
+            }
+        }
+        return $state; 
+    }
+
+    /**
+     * Verifies the administrative status 
+     * @param string email 
+     * @return array $return ['error', 'message']
+    */
+    
+    protected function verifyStatus($email)
+    {
+        $state['error'] = true; 
+        $query="SELECT status,id FROM {$this->config->table_users} where email = :email";
+        $query_prepared = $this->dbh->prepare($query); 
+        $query_prepared->execute(["email"=>$email]); 
+        $status=$query_prepared->fetch(\PDO::FETCH_ASSOC); 
+        if(!$status){
+            $status['message']= $this->__lang("system_error" . "#21"); 
+        }else{
+            switch($status['status']){
+                case "enabled": 
+                    $state['error']= false; 
+                    $state['message'] = false; 
+                break;
+                case "disabled":
+                    $state['message'] = $this->__lang("Account disabled"); 
+                    $this->deleteExistingSessions($status['id']); 
+                break; 
+                case "deleted":
+                    $state['message'] = $this->__lang("system_error" . "#22");
+                    $this->deleteExistingSessions($status['id']); 
+                break; 
+            }
+        }
+        return $state; 
+    }
+    
 
     /**
     * Verifies that a password is greater than minimal length
@@ -1356,10 +1562,17 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $newpass = $this->getHash($newpass);
+        
+        if($user['days2expire'] > 0 ){
+            $expiration=date("Y-m-d H:i:s", strtotime("now +{$user['days2expire']} days"));
+        } else {
+            $expiration="0000-00-00 00:00:00"; 
+        }
+        
 
-        $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET password = ?, expiration = ?  WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute([$newpass, $uid]);
+        $query_prepared->execute([$newpass, $expiraation, $uid]);
 
         $return['error'] = false;
         $return['message'] = $this->__lang("password_changed");
@@ -1804,7 +2017,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             } else {
                 return false;
             }
-            
+
             if (!$mail->send())
                 throw new \Exception($mail->ErrorInfo);
 
@@ -1829,23 +2042,34 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 	
 	//unset uid which is set in getUser(). array generated in getUser() is now usable as parameter for updateUser()
 	unset($params['uid']);
+        if(empty($this->config->tables_params)){
+            if (is_array($params) && count($params) > 0) {
+                $setParams = implode(', ', array_map( function($key, $value){
+                    return $key . ' = ?';
+                }, array_keys($params), $params ));
+            }
 
-        if (is_array($params) && count($params) > 0) {
-            $setParams = implode(', ', array_map( function($key, $value){
-                return $key . ' = ?';
-            }, array_keys($params), $params ));
-        }
+            $query = "UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?";
 
-        $query = "UPDATE {$this->config->table_users} SET {$setParams} WHERE id = ?";
+            //NB: There is NO possible SQL-injection here, 'cause $setParams will be like 'name = ?, age = ?'
 
-        //NB: There is NO possible SQL-injection here, 'cause $setParams will be like 'name = ?, age = ?'
+            $query_prepared = $this->dbh->prepare($query);
+            $bindParams = array_values(array_merge($params, [$uid]));
 
-        $query_prepared = $this->dbh->prepare($query);
-        $bindParams = array_values(array_merge($params, [$uid]));
-
-        if (!$query_prepared->execute($bindParams)) {
-            $return['message'] = $this->__lang("system_error") . " #04";
-            return $return;
+            if (!$query_prepared->execute($bindParams)) {
+                $return['message'] = $this->__lang("system_error") . " #04";
+                return $return;
+            }
+        } else {
+            try { 
+                $json_params=json_encode($this->appyFilterParams($params)); 
+            } catch (\Exception $e){
+                $return['message']=$e->getMessage(); 
+                return $return; 
+            }
+            $query = "UPDATE {$this->config->table_users} params = ?  WHERE id = ?";
+            $query_prepared = $this->dbh->prepare($query);
+            $bindParams = array($json_params, $uid);
         }
 
         $return['error'] = false;
@@ -1930,4 +2154,149 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $this->deleteExpiredSessions();
         $this->deleteExpiredRequests();
     }
+    
+    /**
+     * Add a parameter to be validated by the json object, the object is restricted to be unidimensional, to store pair of $key=>$values
+     * @param string    $key the name of the key at the jsob object, cannot be empty and will be sanitized and lowerized
+     * @param string    $name human name of the variable, suitable for UI, if empty, key will be used instead 
+     * @param enum      $required y/n, default y,  
+     * @param string    $description description of the filed, human redeable, suitable for UI, can be empty
+     * @param enum      $filter, filter_var php to be applied, options: NONE,  FILTER_SANITIZE_EMAIL, FILTER_SANITIZE_ENCODED, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_SANITIZE_NUMBER_INT, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_SANITIZE_STRING, FILTER_SANITIZE_URL, default NONE 
+     * @return array $return[error/message]
+     */
+    public function addParam($key=null, $name=null, $required=null, $description=null, $filter="NONE")
+    {
+        $return['error'] = true;
+        
+        $filterOptions=array("NONE", "FILTER_SANITIZE_EMAIL", "FILTER_SANITIZE_ENCODED", "FILTER_SANITIZE_NUMBER_FLOAT", "FILTER_SANITIZE_NUMBER_INT", "FILTER_SANITIZE_SPECIAL_CHARS", "FILTER_SANITIZE_STRING", "FILTER_SANITIZE_URL"); 
+        
+        if(is_null($key)||empty($key)){
+            $return['message'] = $this->__lang("system_error" . "#17"); 
+            return $return ; 
+        }
+        if(!in_array($filter, $filterOptions)){
+            $return['message'] = $this->__lang("system_error" . "#18"); 
+            return $return ; 
+        }
+        if(is_null($name)||empty($name)){
+            $name=$key; 
+        }
+        if(is_null($required)||empty($required)||strcmp($required, "n")!=0){
+            $required="y"; 
+        }
+        
+        $key=strtolower(str_replace(" ", "", filter_var($key, FILTER_SANITIZE_STRING))); 
+        $query = "SELECT name,description FROM {$this->config->table_params} WHERE json_key=:key";
+        $query_prepared = $this->dbh->prepare($query);
+        if(!$query_prepared->execute(['key' => $key])){
+            $return['message'] = $this->__lang("system_error" . "#19"); 
+            return $return; 
+        }
+        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        if ($row) {
+            $return['message'] = $this->__lang("system_error" . "#20"); 
+            $return[$key]=$row; 
+            return $return; 
+        }
+        
+        $query="INSERT INTO {$this->config->table_params} values ( :key, :name, :required, :description, :filter )"; 
+        $query_prepared = $this->dbh->prepare($query); 
+        if(!$query_prepared->execute(['key'=> $key, 'name'=>$name, 'required'=>$required, 'description'=>$description, 'filter'=>$filter ])){
+            $return['message'] = $this->__lang("system_error" . "#21"); 
+            return $return; 
+        }; 
+        $return['message'] = $this->__lang("Key added").": {$key}"; 
+        $return['error'] = false;
+        return $return;
+    }
+    
+    /**
+     * Removes a param, always return true... 
+     * @return true
+    */
+    public function removeParam($key=null)
+    {
+        $query = "DELETE FROM {$this->config->table_params} where json_key=:key"; 
+        $query_prepared=$this->dbh->prepare($query); 
+        $query_prepared->execute(["key"=>$key]);
+        return true;
+    }
+    
+    /**
+     * Builds the array to be converted into json_object from the database with the filter aplicable to the value 
+     * @return array where key is the json_key from table_params
+     */
+     private function buildParams()
+     {
+        $jsonParams=array(); 
+        $query  = "SELECT json_key,filter,required from {$this->config->table_params } order by json_key"; 
+        $query_prepared=$this->dbh->prepare($query); 
+        $query_prepared->execute(); 
+        while($key = $query_prepared->fetch(\PDO::FETCH_ASSOC)){
+            $jsonParams[$key['json_key']]=array("required"=>$key['required'], "filter"=>$key['filter']);
+        }
+        return $jsonParams; 
+     }
+     
+     /**
+       * Filter the params by the defined filter and validate if vale is required,if required, trows and exeption
+       * @returns array built from tables_params definition and sanitizing filter applied
+       */
+    private function appyFilterParams($params)
+    {
+        $jsonParams=$this->buildParams();
+        $finalParams=array();
+        foreach($jsonParams as $k=>$v){
+            if(strcmp($v['required'], 'y') == 0 && !isset($params[$k])){
+                throw new \Exception("${k} required but not set"); 
+            }
+            if(strcmp($v['filter'], 'NONE')==0){
+                $finalParams[$k]= @$params[$k] ? $params[$k] : false; 
+            } else {
+                $finalParams[$k]= @$params[$k] ? filter_var($params[$k], constant($v['filter'])) : false ; 
+            }
+        }
+        return $finalParams; 
+    }
+     
+    /**
+     * Updates vigency of the password for the user, applys for the next password change
+     * @param int $uid 
+     * @param int $days2expire, 0 to disable expiration
+     * @returns true;
+     */
+    public function updateDays2Expire($uid, $days2expire, $doExpiration=false){
+        $days2expire=intval($days2expire); 
+        $query="UPDATE {$this->config->table_users} set days2expire = :days2expire where id=:uid"; 
+        $query_prepared=$this->dbh->prepare($query);
+        $query_prepared->execute(['days2expire'=>$days2expire, "uid"=>$uid]);
+        $query="UPDATE {$this->config->table_users} set days2expire = :days2expire where id=:uid"; 
+        if($doExpiration){
+            if($days2expire > 0 ){
+                $expiration=date("Y-m-d 23:59:59", strtotime("now +{$days2expire} days"));
+            } else {
+                $expiration="0000-00-00 00:00:00"; 
+            }
+            $query="UPDATE {$this->config->table_users} set expiration = :expiration where id=:uid"; 
+            $query_prepared=$this->dbh->prepare($query);
+            $query_prepared->execute(['expiration'=>$expiration, "uid"=>$uid]);
+        }
+        return true;
+    }
+    
+    /**
+     * Updates expiration of a password to an arbitrary date
+     * @param int   $uid 
+     * @param sting $expiration format YYYY-mm-dd time will be set to 23:59:59
+     * @returns bool, false  if exporation is not correct;
+     */
+    public function updateExpiration($uid, $expiration){
+        if(strcmp($expiration, date("Y-m-d", strtotime($expiration)))!=0)
+        return false; 
+        $query="UPDATE {$this->config->table_users} set expiration = :expiration where id=:uid"; 
+        $query_prepared=$this->dbh->prepare($query);
+        $query_prepared->execute(['expiration'=>$expiration." 23:59:59", "uid"=>$uid]); 
+        return true;
+    }
+     
 }
