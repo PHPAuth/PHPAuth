@@ -75,24 +75,29 @@ class Config
             case 'xml': {
                 break;
             }
-            default: {
-                // is 'SQL' or EMPTY value
-                //
-                // determine config table
-                $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
+          default: {
+            // is 'SQL' or EMPTY value
+            //
+            // determine config table
+            $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
 
-                // check config table exists
-                try{
-                    $this->dbh->query("SELECT * FROM {$this->config_table} LIMIT 1;");
-                }catch (PDOException $e){
-                    die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
-                }
+            // load configuration
+            try{
+              $configQuery = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table};");
 
-                // load configuration
-                $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
+              if ($configQuery instanceof \PDOException) {
+                $this->config = $configQuery->fetchAll(\PDO::FETCH_KEY_PAIR);
+              } else {
+                throw new \PDOException();
+              }
 
-                break;
             }
+            catch (\PDOException $e) {
+              die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
+            }
+
+            break;
+          }
         } // end switch
 
         $this->setForgottenDefaults(); // Danger foreseen is half avoided.
