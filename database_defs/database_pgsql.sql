@@ -25,6 +25,8 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
 ('mail_charset','UTF-8'),
+('default_jwt_iss', ''), 
+('default_jwt_aud', ''), 
 ('password_min_score',  '3'),
 ('site_activation_page',  'activate'),
 ('site_activation_page_append_code', '0'), 

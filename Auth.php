@@ -49,7 +49,16 @@ class Auth/* implements AuthInterface*/
      * @var \stdClass $recaptcha_config
      */
     protected $recaptcha_config = [];
-
+    
+    /**
+     * @var string private key used for jtw 
+    */
+    protected $private = "";
+    
+    /**
+      * @var string secret public key if RS256 is used
+    */
+    protected $public = "";
 
     /**
      * Initiates database connection
@@ -70,8 +79,9 @@ class Auth/* implements AuthInterface*/
         $this->messages_dictionary = $this->config->dictionary;
 
         date_default_timezone_set($this->config->site_timezone);
-
-        $this->isAuthenticated = $this->isLogged();
+        $this->isAuthenticated= false; 
+        $this->private = false; 
+        $this->public =  false; 
     }
 
     /**
@@ -107,7 +117,7 @@ class Auth/* implements AuthInterface*/
         $validatePassword = $this->validatePassword($password);
         
         if($status['error'] == 1) { 
-            $return['message'] = $status; 
+            $return['message'] = $status['message']; 
             
             return $return;
         }  elseif ($validateEmail['error'] == 1) {
@@ -177,6 +187,43 @@ class Auth/* implements AuthInterface*/
 
         return $return;
     }
+    
+    /**
+     * Logs a user in and genereate JTW token
+     * @param string $email
+     * @param string $password
+     * @param int $remember
+     * @param string $captcha_response = null
+     * @return array with $result 
+     */
+    //@todo: => loginUser
+    public function appLogin($email, $password, $remember = 0, $captcha_response = null, $callback=false, $iss=null, $aud=null)
+    {
+        $result['error']=true; 
+        $auth=$this->login($email, $password, $remember, $captcha_response); 
+        if($auth['error']){
+            return $auth; 
+        }
+        
+        if(is_null($iss)){
+            $iss=$this->config->default_jwt_iss; 
+        }
+        
+        if(is_null($aud)){
+            $aud=$this->config->default_jwt_aud; 
+        }
+        
+        $jwt=$this->generateJWT($iss, $aud, $remember, $auth['hash'], $callback); 
+        if(!$jwt){
+            $result['message']=$this->__lang("token_not_created"); 
+            return $result; 
+        }
+        
+        $result['error']=false; 
+        $result['jwt']=$jwt; 
+        return $result;
+    }
+    
 
     /**
     * Creates a new user, adds them to database
@@ -222,6 +269,13 @@ class Auth/* implements AuthInterface*/
 
             return $return;
         }
+        // passsword not the same as email
+        if(strcmp($email, $password)==0){
+            $return['message'] = $this->__lang('same_as_email');
+
+            return $return;
+        }
+        
 
         // Validate password
         $validatePassword = $this->validatePassword($password);
@@ -537,13 +591,15 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
     * Function to check if a session is valid
     * @param string $hash
+    * @param bool $jwt check if we are verifying on behalf a jwt token
     * @return boolean
     */
-    public function checkSession($hash)
+    public function checkSession($hash, $jwt=false)
     {
+    
+       
         $ip = $this->getIp();
         $block_status = $this->isBlocked();
-
         if ($block_status == "block") {
             $return['message'] = $this->__lang("user_blocked");
             return false;
@@ -565,7 +621,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
-
+        
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -592,7 +648,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
-            if ($expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
+            //jwt can't be automatically refreseh, they had to be explicity refreshed
+            if (!$jwt && $expiredate - $currentdate < strtotime($this->config->cookie_renew) - $currentdate) {
                 $this->deleteSession($hash);
                 $this->addSession($uid, false);
             }
@@ -760,7 +817,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
     * Gets basic user data for a given UID and returns an array
     * @param int $uid
-    * @return array|bool $data
+    * @return array $data
     */
     protected function getBaseUser($uid)
     {
@@ -1546,6 +1603,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $user = $this->getBaseUser($uid);
+        
+        if(strcmp($user['email'], $newpass)==0){
+            $return['message'] = $this->__lang('same_as_email');
+
+            return $return;
+        }
 
         if (!$user) {
             $this->addAttempt();
@@ -2265,7 +2328,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param int $days2expire, 0 to disable expiration
      * @returns true;
      */
-    public function updateDays2Expire($uid, $days2expire, $doExpiration=false){
+    public function updateDays2Expire($uid, $days2expire, $doExpiration=false)
+    {
         $days2expire=intval($days2expire); 
         $query="UPDATE {$this->config->table_users} set days2expire = :days2expire where id=:uid"; 
         $query_prepared=$this->dbh->prepare($query);
@@ -2290,7 +2354,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param sting $expiration format YYYY-mm-dd time will be set to 23:59:59
      * @returns bool, false  if exporation is not correct;
      */
-    public function updateExpiration($uid, $expiration){
+    public function updateExpiration($uid, $expiration)
+    {
         if(strcmp($expiration, date("Y-m-d", strtotime($expiration)))!=0)
         return false; 
         $query="UPDATE {$this->config->table_users} set expiration = :expiration where id=:uid"; 
@@ -2298,5 +2363,173 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared->execute(['expiration'=>$expiration." 23:59:59", "uid"=>$uid]); 
         return true;
     }
+    
+    /**
+    * Set secret to be use for jwt
+    * @param string $secret JWT secret key, must comply with Zxcvbn score
+    * @return true,  trow exception if Zxcvbn not satisfied 
+    */
+    public function setPrivateKey($secret)
+    {
+        $zxcvbn = new Zxcvbn();
+        if ($zxcvbn->passwordStrength($secret)['score'] < intval($this->config->password_min_score)) {
+            throw new Exception($this->__lang('password_weak'));
+            return false;
+        }
+        $this->private=$secret; 
+        return true;
+    }
+    
+    /**
+    * Set public key for RS256 JWT algorithm
+    * @param string public key for RS256 algo 
+    * @return true
+    */
+    public function setPublicKey($publicKey)
+    {
+        $this->public=$publicKey; 
+        return true;
+    }
+    
+    
+    
+    /** 
+     * Generate JWT token, 
+     * @param $iss string jwt issuer claim
+     * @param $aud string  jtw audience audience 
+     - @param $remember bool to use short time or long time
+     * @param $hash string hashed autentication 
+     * @param $callback  array object::function, $hash will be passed as argument, should return an array to be the data payload 
+     * @param $return bool jwt token or false 
+    */
+    public function generateJWT($iss, $aud, $remember, $hash, $callback=null)
+    {
+        if(!$this->private)
+        {
+            throw new Exception($this->__lang('system_error')); 
+            return false; 
+        }
+        if($this->public)
+        {
+            $algo='RS256'; 
+        }
+        else
+        {
+            $algo='HS512'; 
+        }
+        if(!$callback){
+            $params=array("hash"=>$hash); 
+        }else
+        {
+            $uid=$this->getSessionUID($hash); 
+            $user=$this->getBaseUser($uid); 
+            if(!is_array($user)){
+                throw new Exception($this->__lang("system_error")); 
+                exit; 
+            }
+            $user["hash"]=$hash; 
+            $params=call_user_func($callback, $user);
+            $params['hash']=$hash;
+            $params['remember']=$remember; 
+            if(!is_array($params)){
+                throw new \Exception($this->__lang('system_error')); 
+                return false;
+            }
+        }
+        if($remember){
+            $ttl=strtotime($this->config->cookie_remember)-time();
+        }
+        else{
+            $ttl=strtotime($this->config->cookie_forget)-time(); 
+        }
+        
+        
+        $iat=time(); 
+        $nbf=$iat; 
+        $exp=$iat+$ttl; 
+        $token = array(
+            "iss" => $iss,
+            "aud" => $aud,
+            "iat" => $iat,
+            "nbf" => $nbf,
+            "exp" => $exp,
+            "data" => $params
+            );
+        $jwt = \Firebase\JWT\JWT::encode($token, $this->private, $algo);
+        return $jwt;
+    }
+    
+    /**
+     * Decode a JWT 
+     * @param jwt 
+     * @return array decoded data claims, error if invalid jwt
+    */
+     public function decodeJwt($jwt)
+     {
+        if($this->public)
+        {
+            $algo='RS256'; 
+            $key=$this->public;
+        }
+        else
+        {
+            $algo='HS512'; 
+            $key=$this->private; 
+        }
+        $decode=\Firebase\JWT\JWT::decode($jwt, $key, array($algo));
+        $decode = json_decode(json_encode($decode), true); ; 
+        return $decode; 
+     }
      
+     /**
+       * Validate jwt token AND hash, hash must inside data claim as an array
+       * @param $jwt string signed token
+       * @return bool true if valid jwt and user false otherwise
+    */
+     
+     public function verifyJwtAuth($jwt)
+     {
+        try 
+        {
+            $decoded=$this->decodeJwt($jwt); 
+            $session=$this->checkSession($decoded['data']['hash'], true);
+            return $session;
+        } 
+        catch (\UnexpectedValueException $e) 
+        {
+            $message=$e->getMessage(); 
+            return false;
+        }
+     }
+     
+     /**
+       * Validate jwt token AND hash, hash must inside data claim as an array
+       * @param $jwt string signed token
+       * @return bool true if valid jwt and user false otherwise
+    */
+     
+     public function renewJwt($jwt)
+     {
+        try 
+        {
+            $decoded=$this->decodeJwt($jwt); 
+            $session=$this->checkSession($decoded['data']['hash'], true);
+            if($session)
+            {
+                $uid=$this->getSessionUID($decoded['data']['hash']);
+                $this->deleteSession($decoded['data']['hash']);
+                $session=$this->addSession($uid, 0); 
+                $ttl=strtotime($this->config->cookie_forget)-time(); 
+                $data=$decoded['data'];
+                $jwt=$this->generateJWT($decoded['iss'], $decoded['aud'], $data['remember'], $session['hash'], function($user) use ($data) {return $data; }); 
+                return array("error"=>false, "jwt"=>$jwt); 
+
+            }
+            return array("error"=>true, "message"=>$this->__lang("invalid")); 
+        } 
+        catch (\UnexpectedValueException $e) 
+        {
+            return array("error"=>true, "message"=>$e->getMessage()); 
+        }
+     }     
 }

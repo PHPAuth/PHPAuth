@@ -22,6 +22,8 @@ INSERT INTO phpauth_config (setting, value) VALUES ('allow_concurrent_sessions',
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_activation',  '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('emailmessage_suppress_reset', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('mail_charset','UTF-8');
+INSERT INTO phpauth_config (setting, value) VALUES ('default_jwt_iss', '');
+INSERT INTO phpauth_config (setting, value) VALUES ('default_jwt_aud', '');
 INSERT INTO phpauth_config (setting, value) VALUES ('password_min_score',  '3');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_activation_page',  'activate');
 INSERT INTO phpauth_config (setting, value) VALUES ('site_activation_page_append_code', '0');

@@ -132,6 +132,8 @@ The database table `config` contains multiple parameters allowing you to configu
 * `attempts_before_verify` : maximum amount of attempts to be made within `attack_mitigation_time` before requiring captcha. Default is `5`
 * `attempt_before_ban` : maximum amount of attempts to be made within `attack_mitigation_time` before temporally blocking the IP address. Default is `30`
 * `password_min_score` : the minimum score given by [zxcvbn](https://github.com/bjeavons/zxcvbn-php) that is allowed. Default is `3`
+* `default_jwt_iss` : the default issuer claim for jwt token
+* `default_jwt_aud` : the default audience claim for jwt token
 * `translation_source`: source of translation, possible values: 'sql' (data from <table_translations> will be used), 'php' (default, translations will be loaded from languages/*.php), 'ini' (will be used languages/*.ini files)
 * `table_translations` : name of the table with translation for all messages
 * `table_attempts` : name of the table with all attempts (default is 'phpauth_attempts')
