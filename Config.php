@@ -81,15 +81,20 @@ class Config
                 // determine config table
                 $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
 
-                // check config table exists
-                try{
-                    $this->dbh->query("SELECT * FROM {$this->config_table} LIMIT 1;");
-                }catch (PDOException $e){
+                // load configuration
+                try {
+                    $configQuery = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table};");
+
+                    if ($configQuery instanceof \PDOStatement) {
+                        $this->config = $configQuery->fetchAll(\PDO::FETCH_KEY_PAIR);
+                    } else {
+                        throw new \PDOException();
+                    }
+
+                }
+                catch (\PDOException $e) {
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
                 }
-
-                // load configuration
-                $this->config = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table}")->fetchAll(\PDO::FETCH_KEY_PAIR);
 
                 break;
             }
