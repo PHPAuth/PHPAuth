@@ -5,6 +5,8 @@ namespace PHPAuth;
 use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
+use \Firebase\JWT\JWT; 
+
 
 /*require_once 'AuthInterface.php';*/
 
