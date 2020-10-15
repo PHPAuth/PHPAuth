@@ -1,11 +1,13 @@
 <?php
 
 // phpunit backward compatibility
+use PHPUnit\Framework\TestCase;
+
 if (!class_exists('\PHPUnit\Framework\TestCase') && class_exists('\PHPUnit_Framework_TestCase')) {
     class_alias('\PHPUnit_Framework_TestCase', '\PHPUnit\Framework\TestCase');
 }
 
-class AuthTest extends \PHPUnit\Framework\TestCase
+class AuthTest extends TestCase
 {
     /**
      * @var PHPAuth\Auth
@@ -18,7 +20,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
     public static $config;
 
     /**
-     * @var \PDO
+     * @var PDO
      */
     public static $dbh;
 
@@ -28,7 +30,7 @@ class AuthTest extends \PHPUnit\Framework\TestCase
         require_once __DIR__ . '/../Auth.php';
         require_once __DIR__ . '/../Config.php';
 
-        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauthtest", "root", "");
+        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_table", "phpauth_test_user", "");
         self::$config = new PHPAuth\Config(self::$dbh);
         self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config);
 
