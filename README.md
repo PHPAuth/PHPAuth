@@ -1,7 +1,7 @@
 ![PHPAuth banner](https://github.com/PHPAUth/PHPAUth/blob/master/banner_small.png?raw=true)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Build Status](https://api.travis-ci.org/PHPAuth/PHPAuth.png)](https://travis-ci.org/PHPAuth/PHPAuth)
 ![PHP version from Travis config](https://img.shields.io/travis/php-v/phpauth/phpauth/master)
@@ -354,6 +354,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Conver"><img src="https://avatars1.githubusercontent.com/u/6231022?v=4" width="100px;" alt=""/><br /><sub><b>conver</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=conver" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/louis123562"><img src="https://avatars1.githubusercontent.com/u/36068395?v=4" width="100px;" alt=""/><br /><sub><b>louis123562</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=louis123562" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.ifscore.info"><img src="https://avatars1.githubusercontent.com/u/4574233?v=4" width="100px;" alt=""/><br /><sub><b>ANDRES TELLO</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=Criptos" title="Code">💻</a></td>
+    <td align="center"><a href="https://张成林.中国"><img src="https://avatars2.githubusercontent.com/u/30773389?v=4" width="100px;" alt=""/><br /><sub><b>张成林</b></sub></a><br /><a href="https://github.com/PHPAuth/PHPAuth/commits?author=zhangchenglin" title="Code">💻</a></td>
   </tr>
 </table>
 
