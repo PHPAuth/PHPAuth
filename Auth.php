@@ -2,8 +2,10 @@
 
 namespace PHPAuth;
 
+use Exception;
 use PDO;
 use PDOException;
+use RuntimeException;
 use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
@@ -1521,8 +1523,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         if ($this->recaptcha_config['recaptcha_enabled']) {
 
-            if (empty($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('No secret provided');
-            if (!is_string($this->recaptcha_config['recaptcha_secret_key'])) throw new \RuntimeException('The provided secret must be a string');
+            if (empty($this->recaptcha_config['recaptcha_secret_key'])) throw new RuntimeException('No secret provided');
+            if (!is_string($this->recaptcha_config['recaptcha_secret_key'])) throw new RuntimeException('The provided secret must be a string');
 
             $recaptcha = new ReCaptcha($this->recaptcha_config['recaptcha_secret_key']);
             $checkout = $recaptcha->verify($captcha_response, $this->getIp());
@@ -1821,11 +1823,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }
 
             if (!$mail->send())
-                throw new \Exception($mail->ErrorInfo);
+                throw new Exception($mail->ErrorInfo);
 
             $return['error'] = false;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $return['message'] = $mail->ErrorInfo;
         }
 
