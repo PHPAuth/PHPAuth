@@ -49,6 +49,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "zhangchenglin",
+      "name": "张成林",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/30773389?v=4",
+      "profile": "https://张成林.中国",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
