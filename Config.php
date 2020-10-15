@@ -2,6 +2,9 @@
 
 namespace PHPAuth;
 
+use PDO;
+use PDOException;
+
 /**
  * PHPAuth Config class
  */
@@ -24,12 +27,12 @@ class Config
      *
      * in any case, 4th argument defines site language as locale code
      *
-     * @param \PDO $dbh
+     * @param PDO $dbh
      * @param string $config_source -- declare source of config - table name, filepath or data-array
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(\PDO $dbh, $config_source = NULL, $config_type = '', $config_site_language = '')
+    public function __construct(PDO $dbh, $config_source = NULL, $config_type = '', $config_site_language = '')
     {
         $config_type = strtolower($config_type);
 
@@ -86,13 +89,13 @@ class Config
                     $configQuery = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table};");
 
                     if ($configQuery instanceof \PDOStatement) {
-                        $this->config = $configQuery->fetchAll(\PDO::FETCH_KEY_PAIR);
+                        $this->config = $configQuery->fetchAll(PDO::FETCH_KEY_PAIR);
                     } else {
-                        throw new \PDOException();
+                        throw new PDOException();
                     }
 
                 }
-                catch (\PDOException $e) {
+                catch (PDOException $e) {
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
                 }
 
@@ -182,7 +185,7 @@ class Config
                     }
 
                     $query = "SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ";
-                    $dictionary = $this->dbh->query($query)->fetchAll(\PDO::FETCH_KEY_PAIR);
+                    $dictionary = $this->dbh->query($query)->fetchAll(PDO::FETCH_KEY_PAIR);
 
                     break;
                 }
@@ -407,6 +410,6 @@ class Config
 
         return $lang;
     }
-	
+
 
 }

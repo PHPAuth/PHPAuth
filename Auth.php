@@ -2,6 +2,9 @@
 
 namespace PHPAuth;
 
+use Exception;
+use PDO;
+use PDOException;
 use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
@@ -19,7 +22,7 @@ class Auth/* implements AuthInterface*/
     const TOKEN_LENGTH = 20;
 
     /**
-     * @var \PDO $dbh
+     * @var PDO $dbh
      */
     protected $dbh;
 
@@ -54,10 +57,10 @@ class Auth/* implements AuthInterface*/
     /**
      * Initiates database connection
      *
-     * @param \PDO $dbh
+     * @param PDO $dbh
      * @param $config
      */
-    public function __construct(\PDO $dbh, Config $config)
+    public function __construct(PDO $dbh, Config $config)
     {
         if (version_compare(phpversion(), '5.6.0', '<')) {
             die('PHP 5.6.0 required for PHPAuth engine!');
@@ -160,7 +163,7 @@ class Auth/* implements AuthInterface*/
 
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
-		
+
 		$return['cookie_name'] = $this->config->cookie_name;
 
         return $return;
@@ -339,7 +342,7 @@ class Auth/* implements AuthInterface*/
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
-        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
         if (!$row) {
             $this->addAttempt();
 
@@ -540,7 +543,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
@@ -587,7 +590,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        return $query_prepared->fetch(\PDO::FETCH_ASSOC)['uid'];
+        return $query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
     }
 
     /**
@@ -611,6 +614,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     /**
     * Checks if an email is banned
     * @param string $email
+    * @var PDOException $e
     * @return boolean
     */
     public function isEmailBanned($email)
@@ -722,7 +726,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['id' => $uid]);
 
-        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -745,7 +749,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['id' => $uid]);
 
-        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -933,7 +937,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         if ($row_count > 0) {
 
-            $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+            $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
             $expiredate  = strtotime($row['expire']);
             $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -1014,7 +1018,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
-        $row = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         $expiredate = strtotime($row['expire']);
         $currentdate = strtotime(date("Y-m-d H:i:s"));
@@ -1088,7 +1092,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             return $state;
         }
-        
+
         if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
             $state['message'] = $this->__lang("email_banned");
@@ -1143,13 +1147,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         $zxcvbn = new Zxcvbn();
-	
+
         if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
             $state['message'] = $this->__lang('password_weak');
 
             return $state;
         }
-        
+
         if ($password !== $repeatpassword) {
             // Passwords don't match
             $state['message'] = $this->__lang("newpassword_nomatch");
@@ -1164,7 +1168,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             return $state;
         }
-	    
+
         $data = $this->getRequest($key, "reset");
 
         if ($data['error'] == 1) {
@@ -1248,7 +1252,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
-        $found_user = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $found_user = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
 		if(!$found_user) {
             $this->addAttempt();
@@ -1570,7 +1574,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $dictionary = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6";
         $dictionary_length = strlen($dictionary);
         $key = "";
-        
+
 	for ($i = 0; $i < $length; $i++) {
             $key .= $dictionary[ mt_rand(0, $dictionary_length - 1) ];
         }
@@ -1645,28 +1649,28 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
             $this->currentuser = $this->getUser($uid);
         }
-        
+
         if ($updateSession) {
             $this->renewUserSession($hash);
         }
         return $this->currentuser;
     }
-    
+
     /**
      * Update user session expire time using either session hash or uid
      * @param string $hash
      * @param int $uid = null
      * @return
-     * 
+     *
     */
-    
-    private function renewUserSession($hash, $uid = null) 
+
+    private function renewUserSession($hash, $uid = null)
     {
         $expire = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
-        
+
         $where = (is_null(($uid))) ? "hash" : "uid";
         $arr = (is_null($uid)) ? $hash : $uid;
-        
+
         $STH = $this->dbh->prepare("UPDATE {$this->config->table_sessions} SET expiredate = ? WHERE {$where} = ?");
         $STH->execute([$expire, $arr]);
 
@@ -1686,7 +1690,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute([$userid]);
 
-        $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
+        $data = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         if (!$data) {
             return false;
@@ -1694,7 +1698,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         return password_verify($password_for_check, $data['password']);
     }
-	
+
     /**
      * Check if users password needs to be rehashed
      * @param string $password
@@ -1707,7 +1711,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if (!password_verify($password, $hash)) {
             return false;
         }
-    
+
         if (password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->config->bcrypt_cost])) {
             $hash = $this->getHash($password);
 
@@ -1715,7 +1719,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $query_prepared = $this->dbh->prepare($query);
             $query_prepared->execute([$hash, $uid]);
         }
-    
+
         return true;
     }
 
@@ -1738,6 +1742,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      * @param $email
      * @param $type
      * @param $key
+     * @var Exception $e
      * @return array $return (contains error code and error message)
      */
     public function do_SendMail($email, $type, $key)
@@ -1804,13 +1809,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             } else {
                 return false;
             }
-            
+
             if (!$mail->send())
                 throw new \Exception($mail->ErrorInfo);
 
             $return['error'] = false;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $return['message'] = $mail->ErrorInfo;
         }
 
@@ -1826,7 +1831,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     public function updateUser($uid, $params)
     {
         $setParams = '';
-	
+
 	//unset uid which is set in getUser(). array generated in getUser() is now usable as parameter for updateUser()
 	unset($params['uid']);
 
@@ -1888,7 +1893,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return false;
         }
 
-        return $query->fetch(\PDO::FETCH_ASSOC);
+        return $query->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
