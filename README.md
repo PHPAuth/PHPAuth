@@ -249,7 +249,7 @@ In this example, the front-end is based on html, generated via php. The score is
 
 A full example can be found in the source: /examples/html-frontend-password-strength-gui-feedback/index.php
 
-**NB:** requires a database 
+**NB:** requires a database with phpauth tables from database_defs
 
 Custom config sources
 ---------------------
