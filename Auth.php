@@ -699,8 +699,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }
 
             $setParams = ', ' . implode(', ', array_map(function ($entry) {
-                return $entry['value'];
-            }, $customParamsQueryArray));
+                    return $entry['value'];
+                }, $customParamsQueryArray));
         } else {
             $setParams = '';
         }
@@ -913,9 +913,11 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if ($type == 'activation') {
 
             $dictionary_key__request_exists = 'activation_exists';
+
         } elseif ($type == 'reset') {
 
             $dictionary_key__request_exists = 'reset_exists';
+
         } else {
             $return['message'] = $this->__lang("system_error") . " #08";
 
@@ -951,7 +953,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             $currentdate = strtotime(date("Y-m-d H:i:s"));
 
             if ($currentdate < $expiredate) {
-                $return['message'] = $this->__lang($dictionary_key__request_exists, $this->format_datetime_obj_to_string($expiredate));
+                $return['message'] = $this->__lang($dictionary_key__request_exists, date($this->config->custom_datetime_format, $expiredate));
                 return $return;
             }
 
@@ -1069,7 +1071,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $state['error'] = true;
 
-        if (strlen($password) < (int) $this->config->verify_password_min_length) {
+        if (strlen($password) < (int)$this->config->verify_password_min_length) {
             $state['message'] = $this->__lang("password_short");
 
             return $state;
@@ -1089,12 +1091,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $state['error'] = true;
 
-        if (strlen($email) < (int) $this->config->verify_email_min_length) {
-            $state['message'] = $this->__lang("email_short", (int) $this->config->verify_email_min_length);
+        if (strlen($email) < (int)$this->config->verify_email_min_length) {
+            $state['message'] = $this->__lang("email_short", (int)$this->config->verify_email_min_length);
 
             return $state;
-        } elseif (strlen($email) > (int) $this->config->verify_email_max_length) {
-            $state['message'] = $this->__lang("email_long", (int) $this->config->verify_email_max_length);
+        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) {
+            $state['message'] = $this->__lang("email_long", (int)$this->config->verify_email_max_length);
 
             return $state;
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -1103,7 +1105,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $state;
         }
 
-        if ((int) $this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
+        if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
             $state['message'] = $this->__lang("email_banned");
 
@@ -1824,6 +1826,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
                 throw new Exception($mail->ErrorInfo);
 
             $return['error'] = false;
+
         } catch (Exception $e) {
             $return['message'] = $mail->ErrorInfo;
         }
@@ -1943,34 +1946,5 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $this->deleteExpiredAttempts();
         $this->deleteExpiredSessions();
         $this->deleteExpiredRequests();
-    }
-
-    /**
-     * Formats a unix-timestamp to more readable string based on site_language
-     * @param string $unix_timestamp
-     * @return string $return
-     */
-    public function format_datetime_obj_to_string($unix_timestamp, $with_seconds = false)
-    {
-
-        $format = "Y-m-d H:i";
-
-        switch ($this->config->site_language) {
-
-            case "de_DE":
-                $format = "d.m.Y H:i";
-                break;
-
-            default:
-                $format = "Y-m-d H:i";
-                break;
-        }
-
-        //With or without seconds
-        if ($with_seconds == true) {
-            $format .= ":s";
-        }
-
-        return date($format, $unix_timestamp);
     }
 }
