@@ -223,7 +223,7 @@ class Config
         $config_recaptcha = [];
 
         if (array_key_exists('recaptcha_enabled', $this->config)) {
-            $config_recaptcha['recaptcha_enabled'] = true;
+            $config_recaptcha['recaptcha_enabled'] = $this->config['recaptcha_enabled'];
             $config_recaptcha['recaptcha_site_key'] = $this->config['recaptcha_site_key'];
             $config_recaptcha['recaptcha_secret_key'] = $this->config['recaptcha_secret_key'];
         }
