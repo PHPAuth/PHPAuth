@@ -64,7 +64,8 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('translation_source', 'php'),
   ('recaptcha_enabled', 0),
   ('recaptcha_site_key', ''),
-  ('recaptcha_secret_key', '');
+  ('recaptcha_secret_key', ''),
+  ('custom_datetime_format', 'Y-m-d H:i');
 
 -- Attempts table
 

@@ -54,6 +54,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('translation_source', 'php')
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_enabled', 0);
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_site_key', '');
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_secret_key', 'php');
+INSERT INTO phpauth_config (setting, value) VALUES ('custom_datetime_format', 'Y-m-d H:i');
 
 DROP TABLE phpauth_attempts;
 CREATE TABLE phpauth_attempts (
