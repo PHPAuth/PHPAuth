@@ -236,6 +236,20 @@ if (!$auth->isLogged()) {
 ```
 **NB:** required package installed via composer: `composer require phpauth/phpauth:dev-master`!!!
 
+Validate user password in front-end
+-----------------------------------
+
+PHPAuth evaluates the strength of a password on user registration and manually added Users via `addUser()` function. The minimum score of accepted passwords is controlled via the `password_min_score` config-parameter.
+
+In this example, the front-end is based on html, generated via php. The score is passed as a javascript variable like
+
+```
+<?php echo 'let minimum_score =' . $config->password_min_score; ?>
+```
+
+A full example can be found in the source: /examples/html-frontend-password-strength-gui-feedback/index.php
+
+**NB:** requires a database with phpauth tables from database_defs
 
 Custom config sources
 ---------------------
