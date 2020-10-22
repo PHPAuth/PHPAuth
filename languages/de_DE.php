@@ -46,6 +46,7 @@ $lang['resetkey_invalid'] = "Der Sicherheitsschlüssel ist ungültig.";
 $lang['resetkey_incorrect'] = "Der Sicherheitsschlüssel ist nicht korrekt.";
 $lang['resetkey_expired'] = "Der Sicherheitsschlüssel ist abgelaufen.";
 $lang['password_reset'] = "Ihr Passwort wurde erfolgreich zurückgesetzt.";
+$lang['password_expired'] = "Ihr Passwort ist abgelaufen.";
 
 $lang['activationkey_invalid'] = "Der Aktivierungsschlüssel ist ungültig.";
 $lang['activationkey_incorrect'] = "Der Aktivierungsschlüssel ist nicht korrekt.";

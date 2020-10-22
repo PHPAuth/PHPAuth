@@ -46,6 +46,7 @@ $lang['resetkey_invalid'] = "Reset key is invalid.";
 $lang['resetkey_incorrect'] = "Reset key is incorrect.";
 $lang['resetkey_expired'] = "Reset key has expired.";
 $lang['password_reset'] = "Password reset successfully.";
+$lang['password_expired'] = "Your password is expired.";
 
 $lang['activationkey_invalid'] = "Activation key is invalid.";
 $lang['activationkey_incorrect'] = "Activation key is incorrect.";

@@ -90,6 +90,7 @@ class Auth/* implements AuthInterface*/
     public function login($email, $password, $remember = 0, $captcha_response = null)
     {
         $return['error'] = true;
+        $return['password_expired'] = false;
 
         $block_status = $this->isBlocked();
 
@@ -151,6 +152,15 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
+        //check if password is expired        
+        if ($this->checkPasswordExpiration($email)) {
+            $return['password_expired'] = true;
+            $return['error'] = true;
+            $return['message'] = $this->__lang("password_expired");
+
+            return $return;
+        }
+
         $sessiondata = $this->addSession($user['uid'], $remember);
 
         if ($sessiondata == false) {
@@ -168,6 +178,66 @@ class Auth/* implements AuthInterface*/
         $return['cookie_name'] = $this->config->cookie_name;
 
         return $return;
+    }
+
+    /**
+     * Returns true if the password of a user is expired
+     * @param string $email
+     * @return bool $return
+     */
+
+    public function checkPasswordExpiration($email = null)
+    {
+        $expiration_ts = null;
+
+        //is it even necessary to check?
+        if ($this->config->user_password_valid_for == null) {
+            return false;
+        }
+
+        //check if email was given
+        if ($email == null) {
+            //if not, try to use current user
+            $current_user = $this->getCurrentUser();
+
+            if ($current_user == null || $current_user == false) {
+                return true;
+            }
+
+            //use timestamp
+            $expiration_ts = $current_user['password_valid_until'];
+        } else {
+
+            //Get expiration timestamp from database
+            $query = "SELECT password_valid_until FROM {$this->config->table_users} WHERE email = :email";
+            $query_prepared = $this->dbh->prepare($query);
+            $query_prepared->execute(['email' => $email]);
+
+            $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
+
+            //Is user present?
+            if ($row == null || $row == false) {
+                return true;
+            }
+
+            $expiration_ts = $row['password_valid_until'];
+        }
+
+        //if user never had a timestamp
+        if ($expiration_ts == null) {
+            $expiration_ts = (new \DateTime())->format("Y-m-d H:i:s");
+        }
+
+        //create objects
+        $now = new \DateTime();
+        $expiration_ts_obj = new \DateTime($expiration_ts);
+
+        //compare now with expiration timestamp
+        if ($now >= $expiration_ts_obj) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -699,8 +769,8 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             }
 
             $setParams = ', ' . implode(', ', array_map(function ($entry) {
-                    return $entry['value'];
-                }, $customParamsQueryArray));
+                return $entry['value'];
+            }, $customParamsQueryArray));
         } else {
             $setParams = '';
         }
@@ -913,11 +983,9 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if ($type == 'activation') {
 
             $dictionary_key__request_exists = 'activation_exists';
-
         } elseif ($type == 'reset') {
 
             $dictionary_key__request_exists = 'reset_exists';
-
         } else {
             $return['message'] = $this->__lang("system_error") . " #08";
 
@@ -1071,7 +1139,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $state['error'] = true;
 
-        if (strlen($password) < (int)$this->config->verify_password_min_length) {
+        if (strlen($password) < (int) $this->config->verify_password_min_length) {
             $state['message'] = $this->__lang("password_short");
 
             return $state;
@@ -1091,12 +1159,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
     {
         $state['error'] = true;
 
-        if (strlen($email) < (int)$this->config->verify_email_min_length) {
-            $state['message'] = $this->__lang("email_short", (int)$this->config->verify_email_min_length);
+        if (strlen($email) < (int) $this->config->verify_email_min_length) {
+            $state['message'] = $this->__lang("email_short", (int) $this->config->verify_email_min_length);
 
             return $state;
-        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) {
-            $state['message'] = $this->__lang("email_long", (int)$this->config->verify_email_max_length);
+        } elseif (strlen($email) > (int) $this->config->verify_email_max_length) {
+            $state['message'] = $this->__lang("email_long", (int) $this->config->verify_email_max_length);
 
             return $state;
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -1105,7 +1173,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $state;
         }
 
-        if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
+        if ((int) $this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
             $state['message'] = $this->__lang("email_banned");
 
@@ -1208,10 +1276,18 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $password = $this->getHash($password);
 
-        $query = "UPDATE {$this->config->table_users} SET password = :password WHERE id = :id";
+        //is password expiration active?
+        if($this->config->user_password_valid_for != null){
+            $new_expiration_ts = new \DateTime();
+            date_add($new_expiration_ts, date_interval_create_from_date_string($this->config->user_password_valid_for));
+            $new_expiration_ts = $new_expiration_ts->format("Y-m-d H:i:s");
+        }
+
+        $query = "UPDATE {$this->config->table_users} SET password = :password, password_valid_until = :password_valid_until WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'password' => $password,
+            'password_valid_until' => $new_expiration_ts,
             'id' => $data['uid']
         ];
         $query_prepared->execute($query_params);
@@ -1371,11 +1447,20 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             return $return;
         }
 
+        //generate expiration timestamp for expiration, if necessary
+        $password_expiration_ts = null;
+
+        if ($this->config->user_password_valid_for != null) {
+            $password_expiration_ts = new \DateTime();
+            date_add($password_expiration_ts, date_interval_create_from_date_string($this->config->user_password_valid_for));
+            $password_expiration_ts = $password_expiration_ts->format("Y-m-d H:i:s");
+        }
+
         $newpass = $this->getHash($newpass);
 
-        $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET password = ? AND user_password_valid_for = ? WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute([$newpass, $uid]);
+        $query_prepared->execute([$newpass, $password_expiration_ts, $uid]);
 
         $return['error'] = false;
         $return['message'] = $this->__lang("password_changed");
@@ -1649,11 +1734,13 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
      */
     public function getCurrentUser($updateSession = false)
     {
+
+        $hash = $this->getCurrentSessionHash();
+        if ($hash === false) {
+            return false;
+        }
+
         if ($this->currentuser === null) {
-            $hash = $this->getCurrentSessionHash();
-            if ($hash === false) {
-                return false;
-            }
 
             $uid = $this->getSessionUID($hash);
             if ($uid === false) {
@@ -1826,7 +1913,6 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
                 throw new Exception($mail->ErrorInfo);
 
             $return['error'] = false;
-
         } catch (Exception $e) {
             $return['message'] = $mail->ErrorInfo;
         }

@@ -65,7 +65,8 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('recaptcha_enabled', 0),
   ('recaptcha_site_key', ''),
   ('recaptcha_secret_key', ''),
-  ('custom_datetime_format', 'Y-m-d H:i');
+  ('custom_datetime_format', 'Y-m-d H:i'),
+  ('user_password_valid_for', NULL);
 
 -- Attempts table
 
@@ -115,6 +116,7 @@ CREATE TABLE `phpauth_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
   `password` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
+  `password_valid_until` timestamp DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
