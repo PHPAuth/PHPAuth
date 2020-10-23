@@ -46,6 +46,7 @@ $lang['resetkey_invalid'] = "重置密钥无效。";
 $lang['resetkey_incorrect'] = "重置密钥不正确。";
 $lang['resetkey_expired'] = "重置密钥已过期。";
 $lang['password_reset'] = "密码重置成功。";
+$lang['password_expired'] = "您的密碼已過期。";
 
 $lang['activationkey_invalid'] = "激活密钥无效。";
 $lang['activationkey_incorrect'] = "激活密钥不正确。";
