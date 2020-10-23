@@ -123,7 +123,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `smtp_password` : the password for the SMTP server
 * `smtp_port` : the port for the SMTP server
 * `smtp_security` : `NULL` for no encryption, `tls` for TLS encryption, `ssl` for SSL encryption
-* `verify_password_min_length` : minimum password length, default is `3`  
+* `verify_password_min_length` : minimum password length, default is `3`
 * `verify_email_min_length` : minimum EMail length, default is `5`
 * `verify_email_max_length` : maximum EMail length, default is `100`
 * `verify_email_use_banlist` : use banlist while checking allowed EMails (see `/files/domains.json`), default is `1` (`true`)
@@ -327,11 +327,13 @@ Available languages:
 * `tr_TR`
 * `uk_UA`
 * `vi_VN`
+* `zh_CN`
+* `zh_TW`
 
 Documentation
 ---------------
 
-All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)  
+All class methods are documented in [the Wiki](https://github.com/PHPAuth/PHPAuth/wiki/Class-Methods)
 System error codes are listed and explained [here](https://github.com/PHPAuth/PHPAuth/wiki/System-error-codes)
 
 
