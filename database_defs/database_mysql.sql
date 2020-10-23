@@ -120,7 +120,7 @@ CREATE TABLE `phpauth_users` (
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
   `expiration` timestamp NOT NULL DEFAULT 0,
   `days2expire` int(3) UNSIGNED NOT NULL DEFAULT 0,
-  `params` JSON NOT NULL DEFAULT '{}', 
+  `params` JSON DEFAULT NULL, 
   `status` enum ('enabled', 'disabled', 'deleted') DEFAULT 'enabled', 
   `statuschange` timestamp NOT NULL DEFAULT 0,
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -97,7 +97,7 @@ CREATE TABLE phpauth_users (
   isactive smallint DEFAULT 0 NOT NULL,
   expiration DATETIME YEAR TO SECOND,
   days2expire smallint DEFAULT 0  NOT NULL,
-  params JSON  DEFAULT '{}', 
+  params JSON DEFAULT NULL, 
   status varchar(100) DEFAULT NULL,
   statuschange DATETIME YEAR TO SECOND,  
   dt DATETIME YEAR TO SECOND DEFAULT CURRENT YEAR TO SECOND,

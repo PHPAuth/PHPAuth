@@ -103,7 +103,7 @@ CREATE TABLE phpauth_users (
   isactive smallint NOT NULL DEFAULT '0',
   expiration timestamp without time zone NOT NULL,
   days2expire integer UNSIGNED NOT NULL DEFAULT 0,
-  params JSON NOT NULL DEFAULT '{}', 
+  params JSON NULL, 
   status character varying(10), 
   statuschange timestamp without time zone NOT NULL,  
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -101,7 +101,7 @@ CREATE TABLE phpauth_users (
   isactive smallint NOT NULL DEFAULT '0',
   expiration datetime2 NOT NULL DEFAULT 0,
   days2expire smallint UNSIGNED NOT NULL DEFAULT 0,
-  params nvarchar(max) NOT NULL DEFAULT '{}', 
+  params nvarchar(max) NULL, 
   status character varying(20) DEFAULT NULL,
   statuschange datetime2 NOT NULL DEFAULT 0,  
   dt datetime2 NOT NULL DEFAULT GETDATE(),
