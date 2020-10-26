@@ -249,7 +249,15 @@ class Config
 
         return false;
     }
-
+    
+    /**
+      * Config::__isset()
+      * @param $mixed setting
+      * @return false if empty or not set
+    */
+    public function __isset($content) {
+        return isset($this->config[$content]) && !empty($this->config[$content]);
+    }
     /**
      * Config::override()
      *
