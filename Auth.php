@@ -151,7 +151,7 @@ class Auth/* implements AuthInterface*/
 
         $user = $this->getBaseUser($uid);
 
-        if($user['expiration'] == null){
+        if ($user['expiration'] == null) {
             $user['expiration'] = "0000-00-00 00:00:00";
         }
 
@@ -869,8 +869,12 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if (!$withpassword)
             unset($data['password']);
 
-        if (empty($this->config->table_params))
+        if (empty($this->config->table_params)) {
+            $params = $this->applyFilterParams(json_decode($data['params']));
+            $data['params'] = $params;
             $data['params'] = json_decode($params);
+        }
+
         return $data;
     }
 
@@ -2535,5 +2539,26 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         } catch (\UnexpectedValueException $e) {
             return array("error" => true, "message" => $e->getMessage());
         }
+    }
+
+    /**
+     * Filter the params by the defined filter and validate if vale is required,if required, trows and exeption
+     * @returns array built from tables_params definition and sanitizing filter applied
+     */
+    private function applyFilterParams($params)
+    {
+        $jsonParams = $this->buildParams();
+        $finalParams = array();
+        foreach ($jsonParams as $k => $v) {
+            if (strcmp($v['required'], 'y') == 0 && !isset($params[$k])) {
+                throw new \Exception("${k} required but not set");
+            }
+            if (strcmp($v['filter'], 'NONE') == 0) {
+                $finalParams[$k] = @$params[$k] ? $params[$k] : false;
+            } else {
+                $finalParams[$k] = @$params[$k] ? filter_var($params[$k], constant($v['filter'])) : false;
+            }
+        }
+        return $finalParams;
     }
 }
