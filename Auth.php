@@ -439,6 +439,7 @@ class Auth/* implements AuthInterface*/
             return $state;
         }
 
+        $state['user_id'] = $row['id'];
         $state['error'] = false;
         $state['message'] = ($use_email_activation == true ? $this->__lang("reset_requested") : $this->__lang('reset_requested_emailmessage_suppressed'));
         $state['token'] = $addRequest['token'];
