@@ -151,6 +151,10 @@ class Auth/* implements AuthInterface*/
 
         $user = $this->getBaseUser($uid);
 
+        if($user['expiration'] == null){
+            $user['expiration'] = "0000-00-00 00:00:00";
+        }
+
         if ($user['days2expire'] > 0 && time() > strtotime($user['expiration'])) {
             $this->addAttempt();
             $return['message'] = $this->__lang("password_expired");
@@ -771,7 +775,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $password = $this->getHash($password);
         if (empty($this->config->days_for_automatic_password_expiration) || $this->config->days_for_automatic_password_expiration < 1) {
             $days2expire = 0;
-            $expiration = "0000-00-00 00:00:00";
+            $expiration = null;
         } else {
             $days2expire = $this->config->days_for_automatic_password_expiration;
             $expiration = date("Y-m-d H:i:s", strtotime("now +{$this->config->days_for_automatic_password_expiration} days"));
@@ -1465,7 +1469,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if ($user['days2expire'] > 0) {
             $expiration = date("Y-m-d H:i:s", strtotime("now +{$user['days2expire']} days"));
         } else {
-            $expiration = "0000-00-00 00:00:00";
+            $expiration = null;
         }
 
         $query = "UPDATE {$this->config->table_users} SET password = :password, expiration = :expiration WHERE id = :id";
@@ -1644,7 +1648,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         if ($user['days2expire'] > 0) {
             $expiration = date("Y-m-d H:i:s", strtotime("now +{$user['days2expire']} days"));
         } else {
-            $expiration = "0000-00-00 00:00:00";
+            $expiration = null;
         }
 
 
@@ -2354,7 +2358,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
             if ($days2expire > 0) {
                 $expiration = date("Y-m-d 23:59:59", strtotime("now +{$days2expire} days"));
             } else {
-                $expiration = "0000-00-00 00:00:00";
+                $expiration = null;
             }
             $query = "UPDATE {$this->config->table_users} set expiration = :expiration where id=:uid";
             $query_prepared = $this->dbh->prepare($query);

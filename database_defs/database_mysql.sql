@@ -118,11 +118,11 @@ CREATE TABLE `phpauth_users` (
   `email` varchar(100) DEFAULT NULL,
   `password` VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_ci DEFAULT NULL,
   `isactive` tinyint(1) NOT NULL DEFAULT '0',
-  `expiration` timestamp NOT NULL DEFAULT 0,
+  `expiration` timestamp NULL,
   `days2expire` int(3) UNSIGNED NOT NULL DEFAULT 0,
   `params` JSON DEFAULT NULL, 
   `status` enum ('enabled', 'disabled', 'deleted') DEFAULT 'enabled', 
-  `statuschange` timestamp NOT NULL DEFAULT 0,
+  `statuschange` timestamp NULL,
   `dt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `email` (`email`), 
@@ -150,6 +150,3 @@ CREATE TABLE `phpauth_emails_banned` (
   `domain` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-
--- 2018-04-12 10:42:00

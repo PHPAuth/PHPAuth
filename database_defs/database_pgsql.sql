@@ -101,11 +101,11 @@ CREATE TABLE phpauth_users (
   email character varying(100) DEFAULT NULL,
   password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
-  expiration timestamp without time zone NOT NULL,
+  expiration timestamp without time zone DEFAULT NULL,
   days2expire integer UNSIGNED NOT NULL DEFAULT 0,
   params JSON NULL, 
   status character varying(10), 
-  statuschange timestamp without time zone NOT NULL,  
+  statuschange timestamp without time zone DEFAULT NULL,  
   dt timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );

@@ -99,11 +99,11 @@ CREATE TABLE phpauth_users (
   email character varying(100) DEFAULT NULL,
   password character varying(255) DEFAULT NULL,
   isactive smallint NOT NULL DEFAULT '0',
-  expiration datetime2 NOT NULL DEFAULT 0,
+  expiration datetime2 DEFAULT NULL,
   days2expire smallint UNSIGNED NOT NULL DEFAULT 0,
   params nvarchar(max) NULL, 
   status character varying(20) DEFAULT NULL,
-  statuschange datetime2 NOT NULL DEFAULT 0,  
+  statuschange datetime2 DEFAULT NULL,  
   dt datetime2 NOT NULL DEFAULT GETDATE(),
   PRIMARY KEY (id)
 );
