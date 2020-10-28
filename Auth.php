@@ -1274,7 +1274,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
                     $state['message'] = false;
                     break;
                 case "disabled":
-                    $state['message'] = $this->__lang("Account disabled");
+                    $state['message'] = $this->__lang("account_disabled");
                     $this->deleteExistingSessions($status['id']);
                     break;
                 case "deleted":
@@ -1308,7 +1308,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
                     $state['message'] = false;
                     break;
                 case "disabled":
-                    $state['message'] = $this->__lang("Account disabled");
+                    $state['message'] = $this->__lang("account_disabled");
                     $this->deleteExistingSessions($status['id']);
                     break;
                 case "deleted":

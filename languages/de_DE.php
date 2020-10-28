@@ -71,4 +71,6 @@ $lang['account_deleted'] = "Ihr Benutzerkonto wurde erfolgreich gelöscht.";
 $lang['function_disabled'] = "Diese Funktion wurde deaktiviert.";
 $lang['account_not_found'] = "Zu der angegebenen E-Mail-Adresse wurde kein Benutzer gefunden.";
 
+$lang['account_disabled'] = "Ihr Benutzerkonto ist deaktiviert.";
+
 return $lang;

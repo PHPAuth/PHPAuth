@@ -71,4 +71,6 @@ $lang['account_deleted'] = "Account deleted successfully.";
 $lang['function_disabled'] = "This function has been disabled.";
 $lang['account_not_found'] = "No account found with that email address";
 
+$lang['account_disabled'] = "Your account is deactivated";
+
 return $lang;
