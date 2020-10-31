@@ -2552,25 +2552,20 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $return_arr = [];
         $return_arr['error'] = true;
         $return_arr['message'] = "unknown error";
-
         $pay_load = null;
 
         //create google auth object
         $g_client = new \Google\Client();
 
-        $g_client->setClientId("");
-        $g_client->setClientSecret("");
-        $g_client->setRedirectUri("");
+        $g_client->setClientId($this->config->google_client_id);
+        $g_client->setClientSecret($this->config->google_client_secret);
+        $g_client->setRedirectUri($this->config->google_redirect_url);
         $g_client->addScope("email");
 
-        $pay_load = null; //Wird zum Array mit Mitarbeiterinformationen aus Google-Datenbank
+        $pay_load = null;
 
         try {
-
-            //Mit dem Code den Auth-Code abrufen
             $googleToken = $g_client->fetchAccessTokenWithAuthCode($code);
-
-            //Token setzen
             $g_client->setAccessToken($googleToken);
         } catch (\Exception $e) {
             error_log($e);
@@ -2578,30 +2573,20 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         }
 
         try {
-
-            //Den Auth-Token verifizieren
             $pay_load = $g_client->verifyIdToken();
         } catch (\Exception $e) {
             error_log($e);
             return $return_arr;
         }
 
-        //Wenn die Informationen zum Benutzer nicht leer sind
         if ($pay_load !== null) {
-
-            error_log("PAYLOAD IST NICHT NULL!");
-            error_log("PAYLOAD:");
             error_log(print_r($pay_load, true));
-
-            //Aus dem PayLoad die E-Mail übernehmen
             $google_mail = $pay_load["email"];
         } else {
             error_log("PAYLOAD LEER");
+            $return_arr['message'] = "payload empty";
+            return $return_arr;
         }
-
-        //-----------------------------------------------------------------------------------------------------------------------
-        // GET USER ID VIA EMAIL RETURNED BY GOOGLE
-        //-----------------------------------------------------------------------------------------------------------------------
 
         $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
@@ -2611,21 +2596,14 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $data = $query_prepared->fetch(\PDO::FETCH_ASSOC);
 
-        // error_log(print_r($data, true));
-
         if (!isset($data['id'])) {
             $return_arr['message'] = "Account with given email not present in users-table";
             return $return_arr;
         }
 
-        //-----------------------------------------------------------------------------------------------------------------------
-        // ADD SESSION
-        //-----------------------------------------------------------------------------------------------------------------------
-
-        $result_add_session = $this->addSession($data['id'], true); //FIXME true oder false?
+        $result_add_session = $this->addSession($data['id'], true);
 
         if ($result_add_session['error'] == true) {
-            error_log("your fucked!");
             $return_arr['message'] = "could not add Session";
             return $return_arr;
         }
@@ -2647,16 +2625,14 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $return_arr = [];
         $return_arr['error'] = true;
         $return_arr['auth_url'] = null;
-
         $auth_url = null;
 
-        //Google-Objekt anlegen
         $g_client = new \Google\Client();
 
         try {
-            $g_client->setClientId("");
-            $g_client->setClientSecret("");
-            $g_client->setRedirectUri("");
+            $g_client->setClientId($this->config->google_client_id);
+            $g_client->setClientSecret($this->config->google_client_secret);
+            $g_client->setRedirectUri($this->config->google_redirect_url);
             $g_client->addScope("email");
 
             $auth_url = $g_client->createAuthUrl();

@@ -62,7 +62,10 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('recaptcha_enabled', 0),
 ('recaptcha_site_key', ''),
 ('recaptcha_secret_key', ''),
-('custom_datetime_format', 'Y-m-d H:i');
+('custom_datetime_format', 'Y-m-d H:i'),
+('google_client_id', null),
+('google_client_secret', null),
+('google_redirect_url', null;
 
 DROP TABLE IF EXISTS phpauth_attempts;
 CREATE TABLE phpauth_attempts (

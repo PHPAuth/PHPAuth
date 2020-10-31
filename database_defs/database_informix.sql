@@ -59,6 +59,9 @@ INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_enabled', 0);
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_site_key', '');
 INSERT INTO phpauth_config (setting, value) VALUES ('recaptcha_secret_key', 'php');
 INSERT INTO phpauth_config (setting, value) VALUES ('custom_datetime_format', 'Y-m-d H:i');
+INSERT INTO phpauth_config (setting, value) VALUES ('google_client_id', null);
+INSERT INTO phpauth_config (setting, value) VALUES ('google_client_secret', null);
+INSERT INTO phpauth_config (setting, value) VALUES ('google_redirect_url', null);
 
 DROP TABLE phpauth_attempts;
 CREATE TABLE phpauth_attempts (
