@@ -114,16 +114,10 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
-
-        $status = $this->verifyStatus($email);
         $validateEmail = $this->validateEmail($email);
         $validatePassword = $this->validatePassword($password);
 
-        if ($status['error'] == 1) {
-            $return['message'] = $status['message'];
-
-            return $return;
-        } elseif ($validateEmail['error'] == 1) {
+        if ($validateEmail['error'] == 1) {
             $this->addAttempt();
             $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
 
@@ -145,6 +139,14 @@ class Auth/* implements AuthInterface*/
         if (!$uid) {
             $this->addAttempt();
             $return['message'] = $this->__lang("account_not_found");
+
+            return $return;
+        }
+
+        $status = $this->verifyStatus($email);
+
+        if ($status['error'] == 1) {
+            $return['message'] = $status['message'];
 
             return $return;
         }
