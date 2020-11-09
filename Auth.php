@@ -252,6 +252,8 @@ class Auth/* implements AuthInterface*/
             ($use_email_activation == true
                 ? $this->__lang("register_success")
                 : $this->__lang('register_success_emailmessage_suppressed'));
+        $return['uid'] = $addUser['uid'];
+        $return['token'] = $addUser['token'];
 
         return $return;
     }
@@ -670,8 +672,10 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
         $uid = $this->dbh->lastInsertId("{$this->config->table_users}_id_seq");
         $email = htmlentities(strtolower($email));
 
+        $token = '';
         if ($use_email_activation) {
             $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
+            $token = $addRequest['token'];
 
             if ($addRequest['error'] == 1) {
                 $query = "DELETE FROM {$this->config->table_users} WHERE id = :id";
@@ -723,6 +727,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $return['uid'] = $uid;
         $return['error'] = false;
+        $return['token'] = $token;
         return $return;
     }
 
@@ -1297,6 +1302,7 @@ VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
 
         $state['error'] = false;
         $state['message'] = $this->__lang("activation_sent");
+        $state['token'] = $addRequest['token'];
         return $state;
     }
 
