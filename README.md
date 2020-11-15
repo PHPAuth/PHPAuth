@@ -33,7 +33,7 @@ PHPAuth is under going a complete rewrite to bring the code up to date, the proj
 
 #### Goals:
 - Bring code up to newest PHP version with min. of v7.1 to v7.4 (If new version comes out while rewriting the code will be pushed up to that version also)
-- Making the code even more seure to use by adding things like one time keys (OTP, 2FA etc)
+- Making the code even more secure to use by adding things like one time keys (OTP, 2FA etc)
 - Make sure that the code can be used by everyone, also beginners.
 - Write much better documentation.
 - Make database queries faster.
