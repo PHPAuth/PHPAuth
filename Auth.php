@@ -1240,7 +1240,7 @@ class Auth
             return $state;
         }
 
-        if ($use_email_activation == null) {
+        if ($use_email_activation == false) {
             $state['message'] = $this->__lang('function_disabled');
 
             return $state;
