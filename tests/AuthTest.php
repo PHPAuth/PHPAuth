@@ -30,7 +30,7 @@ class AuthTest extends TestCase
         require_once __DIR__ . '/../Auth.php';
         require_once __DIR__ . '/../Config.php';
 
-        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=nico_phpauth", "nico_phpauth", "XzJsVLs2_SA2g");
+        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_table", "phpauth_test_user", "");
         self::$config = new PHPAuth\Config(self::$dbh);
         self::$auth   = new PHPAuth\Auth(self::$dbh, self::$config);
 
