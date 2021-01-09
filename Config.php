@@ -29,19 +29,19 @@ class Config
      * in any case, 4th argument defines site language as locale code
      *
      * @param PDO $dbh
-     * @param string $config_source -- declare source of config - table name, filepath or data-array
+     * @param string|array $config_source -- declare source of config - table name, filepath or data-array
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(PDO $dbh, $config_source = NULL, $config_type = '', $config_site_language = '')
+    public function __construct(PDO $dbh, $config_source = NULL, string $config_type = '', string $config_site_language = '')
     {
         $config_type = strtolower($config_type);
 
-        if (version_compare(phpversion(), '5.6.0', '<')) {
-            die('PHPAuth: PHP 5.6.0+ required for PHPAuth engine!');
+        if (version_compare(phpversion(), '7.1.0', '<')) {
+            die('PHPAuth: PHP 7.1.0+ required for PHPAuth engine!');
         }
 
-        $this->config = array();
+        $this->config = [];
         $this->dbh = $dbh;
 
         switch ($config_type) {
@@ -73,13 +73,7 @@ class Config
                 break;
             }
             case 'json':
-            {
-                break;
-            }
             case 'yml':
-            {
-                break;
-            }
             case 'xml':
             {
                 break;
@@ -199,9 +193,6 @@ class Config
                     break;
                 }
                 case 'xml':
-                {
-                    break;
-                }
                 case 'json':
                 {
                     break;
@@ -234,10 +225,11 @@ class Config
     /**
      * Config::__get()
      *
-     * @param mixed $setting
-     * @return string
+     * @param string $setting
+     *
+     * @return string|int
      */
-    public function __get($setting)
+    public function __get(string $setting)
     {
         return array_key_exists($setting, $this->config) ? $this->config[$setting] : NULL;
     }
@@ -245,7 +237,7 @@ class Config
     /**
      * @return array
      */
-    public function getAll()
+    public function getAll() : array
     {
         return $this->config;
     }
@@ -253,11 +245,12 @@ class Config
     /**
      * Config::__set()
      *
-     * @param mixed $setting
+     * @param string $setting
      * @param mixed $value
+     *
      * @return bool
      */
-    public function __set($setting, $value)
+    public function __set(string $setting, $value) : bool
     {
         $query_prepared = $this->dbh->prepare("UPDATE {$this->config_table} SET value = :value WHERE setting = :setting");
 
@@ -273,11 +266,12 @@ class Config
     /**
      * Config::override()
      *
-     * @param mixed $setting
+     * @param string $setting
      * @param mixed $value
+     *
      * @return bool
      */
-    public function override($setting, $value)
+    public function override(string $setting, $value) : bool
     {
         $this->config[$setting] = $value;
 
@@ -321,13 +315,14 @@ class Config
 
     /**
      * Set configuration value if it is not present.
-     * @param $setting
-     * @param $default_value
+     * @param string $setting
+     * @param mixed $default_value
      */
-    protected function repairConfigValue($setting, $default_value)
+    protected function repairConfigValue(string $setting, $default_value)
     {
-        if (!isset($this->config[$setting]))
-            $this->config[$setting] = $default_value;
+        if (!isset($this->config[$setting])) {
+            $this->config[ $setting ] = $default_value;
+        }
     }
 
     /**
@@ -335,7 +330,7 @@ class Config
      *
      * @return array
      */
-    protected function setForgottenDictionary()
+    protected function setForgottenDictionary() : array
     {
         $lang = array();
 
