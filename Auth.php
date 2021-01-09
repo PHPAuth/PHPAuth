@@ -13,11 +13,12 @@ use ZxcvbnPhp\Zxcvbn;
 /*require_once 'AuthInterface.php';*/
 
 /**
- * Auth class
- * Required PHP 5.6 and above.
+ * PHPAuth is a secure PHP Authentication class
+ * that easily integrates into any site.
  *
+ * @link https://github.com/PHPAuth/PHPAuth
  */
-class Auth/* implements AuthInterface*/
+class Auth
 {
     const HASH_LENGTH = 40;
     const TOKEN_LENGTH = 20;
@@ -59,7 +60,7 @@ class Auth/* implements AuthInterface*/
      * Initiates database connection
      *
      * @param PDO $dbh
-     * @param $config
+     * @param Config $config
      */
     public function __construct(PDO $dbh, Config $config)
     {
@@ -429,7 +430,7 @@ class Auth/* implements AuthInterface*/
         $query_prepared->execute(['email' => strtolower($email)]);
 
         if ($query_prepared->rowCount() == 0) {
-            return false;
+            return 0;
         }
 
         return $query_prepared->fetchColumn();
@@ -595,7 +596,7 @@ class Auth/* implements AuthInterface*/
      *
      * @return int|null $uid
      */
-    public function getSessionUID(string $hash) : ?int
+    public function getSessionUID(string $hash) : int
     {
         $query = "SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
@@ -605,7 +606,7 @@ class Auth/* implements AuthInterface*/
         $query_prepared->execute($query_params);
 
         if ($query_prepared->rowCount() == 0) {
-            return NULL;
+            return 0;
         }
 
         return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)["uid"];
@@ -815,6 +816,7 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
+        // check password
         $validatePassword = $this->validatePassword($password);
 
         if ($validatePassword['error'] == 1) {
@@ -833,35 +835,8 @@ class Auth/* implements AuthInterface*/
             return $return;
         }
 
-        $query = "DELETE FROM {$this->config->table_users} WHERE id = :uid";
-        $query_prepared = $this->dbh->prepare($query);
-
-        if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #05";
-
-            return $return;
-        }
-
-        $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
-        $query_prepared = $this->dbh->prepare($query);
-
-        if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #06";
-
-            return $return;
-        }
-
-        $query = "DELETE FROM {$this->config->table_requests} WHERE uid = :uid";
-        $query_prepared = $this->dbh->prepare($query);
-
-        if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #07";
-
-            return $return;
-        }
-
-        $return['error'] = false;
-        $return['message'] = $this->__lang("account_deleted");
+        // remove user by function
+        $return = $this->deleteUserForced($uid);
 
         return $return;
     }
@@ -1648,12 +1623,14 @@ class Auth/* implements AuthInterface*/
 
     /**
      * Returns current session hash
+     *
      * @return string
-     * @return bool, false if no cookie
+     *
+     * @return string
      */
-    public function getCurrentSessionHash() : ?string
+    public function getCurrentSessionHash() : string
     {
-        return $_COOKIE[$this->config->cookie_name] ?? NULL;
+        return $_COOKIE[$this->config->cookie_name] ?? "";
     }
 
     /**
@@ -1663,9 +1640,7 @@ class Auth/* implements AuthInterface*/
     public function isLogged() : bool
     {
         if ($this->isAuthenticated === false) {
-            $hash = $this->getCurrentSessionHash() ?? ""; // (phpunit) checkSession requires string
-
-            $this->isAuthenticated = $this->checkSession($hash);
+            $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
         }
 
         return $this->isAuthenticated;
@@ -1679,14 +1654,12 @@ class Auth/* implements AuthInterface*/
      */
     public function getCurrentUser(bool $updateSession = false) : ?array
     {
-        if ($this->currentuser === null) {
-            $hash = $this->getCurrentSessionHash();
-            if ($hash === false) {
-                return NULL;
-            }
+        $hash = $this->getCurrentSessionHash();
 
+        if ($this->currentuser === null) {
             $uid = $this->getSessionUID($hash);
-            if ($uid === NULL) {
+
+            if ($uid === 0) {
                 return NULL;
             }
 
@@ -1696,6 +1669,7 @@ class Auth/* implements AuthInterface*/
         if ($updateSession) {
             $this->renewUserSession($hash);
         }
+
         return $this->currentuser;
     }
 
@@ -1902,12 +1876,13 @@ class Auth/* implements AuthInterface*/
     }
 
     /**
-     * Returns current user UID if logged or FALSE otherwise.
+     * Returns current user UID if logged or 0 otherwise.
      *
      * @return int
      */
     public function getCurrentUID() : int
     {
+
         return $this->getSessionUID($this->getCurrentSessionHash());
     }
 

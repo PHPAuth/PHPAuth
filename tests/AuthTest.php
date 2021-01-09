@@ -163,10 +163,10 @@ class AuthTest extends TestCase
         $this->assertEquals($uid, self::$auth->getSessionUID($hash));
 
         // Failed getSessionUID: invalid session hash
-        $this->assertNull(self::$auth->getSessionUID("invalidhash"));
+        $this->assertEmpty(self::$auth->getSessionUID("invalidhash"));
 
         // Failed getSessionUID: inexistant session hash
-        $this->assertNull(self::$auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+        $this->assertEmpty(self::$auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
     }
 
     /**
