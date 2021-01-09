@@ -89,7 +89,7 @@ class Auth
      * @return array $return
      */
     //@todo: => loginUser
-    public function login(string $email, string $password, int $remember = 0, bool $captcha_response = false) : array
+    public function login(string $email, string $password, int $remember = 0, string $captcha_response = "") : array
     {
         $return          = [];
         $return['error'] = true;
@@ -885,8 +885,6 @@ class Auth
         return $return;
     }
 
-    // protected function add
-
     /**
      * Creates an activation entry and sends email to user
      * @param int $uid
@@ -1302,10 +1300,10 @@ class Auth
      * @param string $currpass
      * @param string $newpass
      * @param string $repeatnewpass
-     * @param bool $captcha_response = false
+     * @param string $captcha_response = ""
      * @return array $return
      */
-    public function changePassword(int $uid, string $currpass, string $newpass, string $repeatnewpass, bool $captcha_response = false) : array
+    public function changePassword(int $uid, string $currpass, string $newpass, string $repeatnewpass, string $captcha_response = "") : array
     {
         $return = [];
         $return['error'] = true;
