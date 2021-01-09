@@ -5,13 +5,10 @@ namespace PHPAuth;
 use Exception;
 use PDO;
 use PDOException;
-use RuntimeException;
-use ZxcvbnPhp\Zxcvbn;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
-
-ini_set("error_reporting", E_ERROR);
-ini_set("display_errors", false);
+use RuntimeException;
+use ZxcvbnPhp\Zxcvbn;
 
 /*require_once 'AuthInterface.php';*/
 
@@ -93,7 +90,9 @@ class Auth/* implements AuthInterface*/
     //@todo: => loginUser
     public function login(string $email, string $password, int $remember = 0, bool $captcha_response = false) : array
     {
+        $return          = [];
         $return['error'] = true;
+        $return['hash']  = "";
 
         $block_status = $this->isBlocked();
 
@@ -381,7 +380,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Logs out the session, identified by hash
      * @param string $hash
-     * @return boolean
+     * @bool
      */
     public function logout(string $hash) : bool
     {
@@ -398,7 +397,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Logs out of all sessions for specified uid
      * @param int $uid
-     * @return boolean
+     * @bool
      */
     public function logoutAll(int $uid) : bool
     {
@@ -495,7 +494,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Removes all existing sessions for a given UID
      * @param int $uid
-     * @return boolean
+     * @bool
      */
     protected function deleteExistingSessions(int $uid) : bool
     {
@@ -593,9 +592,10 @@ class Auth/* implements AuthInterface*/
     /**
      * Retrieves the UID associated with a given session hash
      * @param string $hash
-     * @return int $uid
+     *
+     * @return int|null $uid
      */
-    public function getSessionUID(string $hash) : int
+    public function getSessionUID(string $hash) : ?int
     {
         $query = "SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
@@ -605,12 +605,10 @@ class Auth/* implements AuthInterface*/
         $query_prepared->execute($query_params);
 
         if ($query_prepared->rowCount() == 0) {
-            return false;
+            return NULL;
         }
 
-        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
-
-        return ($row['uid'] > 0) ? (int)$row['uid'] : 0;
+        return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)["uid"];
     }
 
     /**
@@ -634,8 +632,8 @@ class Auth/* implements AuthInterface*/
     /**
      * Checks if an email is banned
      * @param string $email
-     * @return boolean
-     * @var PDOException $e
+     *
+     * @return bool
      */
     public function isEmailBanned(string $email) : bool
     {
@@ -745,7 +743,7 @@ class Auth/* implements AuthInterface*/
      * @param int $uid
      * @return array|bool $data
      */
-    protected function getBaseUser(int $uid) : array
+    protected function getBaseUser(int $uid)
     {
         $query = "SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
@@ -799,6 +797,7 @@ class Auth/* implements AuthInterface*/
      */
     public function deleteUser(int $uid, string $password, string $captcha_response = "") : array
     {
+        $return = [];
         $return['error'] = true;
 
         $block_status = $this->isBlocked();
@@ -875,6 +874,7 @@ class Auth/* implements AuthInterface*/
      */
     public function deleteUserForced(int $uid) : array
     {
+        $return = [];
         $return['error'] = true;
 
         $query = "DELETE FROM {$this->config->table_users} WHERE id = :uid";
@@ -922,6 +922,7 @@ class Auth/* implements AuthInterface*/
      */
     protected function addRequest(int $uid, string $email, string $type, bool $use_email_activation = false) : array
     {
+        $return = [];
         $return['error'] = true;
 
         if ($type == 'activation') {
@@ -1029,6 +1030,7 @@ class Auth/* implements AuthInterface*/
      */
     public function getRequest(string $key, string $type) : array
     {
+        $return = [];
         $return['error'] = true;
 
         $query = "SELECT id, uid, expire FROM {$this->config->table_requests} WHERE token = ? AND type = ?";
@@ -1065,7 +1067,8 @@ class Auth/* implements AuthInterface*/
     /**
      * Deletes request from database
      * @param int $id
-     * @return boolean
+     *
+     * @return bool
      */
     protected function deleteRequest(int $id) : bool
     {
@@ -1079,6 +1082,7 @@ class Auth/* implements AuthInterface*/
      *
      * security requirements (ZxcvbnPhp\Zxcvbn) not checked now.
      * @param string $password
+     *
      * @return array $return ['error', 'message']
      */
     protected function validatePassword(string $password) : array
@@ -1099,6 +1103,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Verifies that an email is valid
      * @param string $email
+     *
      * @return array $return
      */
     protected function validateEmail(string $email) : array
@@ -1138,6 +1143,7 @@ class Auth/* implements AuthInterface*/
      * @param string $password
      * @param string $repeatpassword
      * @param string $captcha_response = null
+     *
      * @return array $return
      */
     public function resetPass(string $key, string $password, string $repeatpassword, string $captcha_response = "")
@@ -1247,7 +1253,8 @@ class Auth/* implements AuthInterface*/
      * Recreates activation email for a given email and sends
      * @param string $email
      * @param bool $use_email_activation
-     * @return array $return
+     *
+     * @return array
      */
     public function resendActivation(string $email, bool $use_email_activation = false) : array
     {
@@ -1325,6 +1332,7 @@ class Auth/* implements AuthInterface*/
      */
     public function changePassword(int $uid, string $currpass, string $newpass, string $repeatnewpass, bool $captcha_response = false) : array
     {
+        $return = [];
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
@@ -1408,6 +1416,7 @@ class Auth/* implements AuthInterface*/
      */
     public function changeEmail(int $uid, string $email, string $password, string $captcha = "") : array
     {
+        $return = [];
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
@@ -1489,6 +1498,7 @@ class Auth/* implements AuthInterface*/
 
     /**
      * Informs if a user is locked out
+     *
      * @return string
      */
     public function isBlocked() : string
@@ -1517,7 +1527,8 @@ class Auth/* implements AuthInterface*/
     /**
      * Verifies a captcha code
      * @param string $captcha
-     * @return boolean
+     *
+     * @return bool
      */
     protected function checkCaptcha(string $captcha) : bool
     {
@@ -1530,6 +1541,7 @@ class Auth/* implements AuthInterface*/
      * If reCaptcha disabled in config or config not defined - return TRUE (captcha passed)
      *
      * @param string $captcha_response
+     *
      * @return bool
      */
     protected function checkReCaptcha(string $captcha_response) : bool
@@ -1556,7 +1568,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Adds an attempt to database
      *
-     * @return boolean
+     * @bool
      */
     protected function addAttempt() : bool
     {
@@ -1637,7 +1649,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Returns current session hash
      * @return string
-     * @return boolean, false if no cookie
+     * @bool, false if no cookie
      */
     public function getCurrentSessionHash() : ?string
     {
@@ -1646,13 +1658,16 @@ class Auth/* implements AuthInterface*/
 
     /**
      * Returns is user logged in
-     * @return boolean
+     * @bool
      */
     public function isLogged() : bool
     {
         if ($this->isAuthenticated === false) {
-            $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
+            $hash = $this->getCurrentSessionHash() ?? ""; // (phpunit) checkSession requires string
+
+            $this->isAuthenticated = $this->checkSession($hash);
         }
+
         return $this->isAuthenticated;
     }
 
@@ -1660,7 +1675,7 @@ class Auth/* implements AuthInterface*/
      * Gets user data for current user (from cookie/session_hash) and returns an array, password is not returned
      * @param bool $updateSession = false
      * @return array $data
-     * @return boolean false if no current user
+     * @return bool false if no current user
      */
     public function getCurrentUser(bool $updateSession = false) : ?array
     {
@@ -1671,7 +1686,7 @@ class Auth/* implements AuthInterface*/
             }
 
             $uid = $this->getSessionUID($hash);
-            if ($uid === false) {
+            if ($uid === NULL) {
                 return NULL;
             }
 
