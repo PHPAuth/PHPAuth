@@ -380,7 +380,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Logs out the session, identified by hash
      * @param string $hash
-     * @bool
+     * @return bool
      */
     public function logout(string $hash) : bool
     {
@@ -397,7 +397,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Logs out of all sessions for specified uid
      * @param int $uid
-     * @bool
+     * @return bool
      */
     public function logoutAll(int $uid) : bool
     {
@@ -494,7 +494,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Removes all existing sessions for a given UID
      * @param int $uid
-     * @bool
+     * @return bool
      */
     protected function deleteExistingSessions(int $uid) : bool
     {
@@ -1568,7 +1568,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Adds an attempt to database
      *
-     * @bool
+     * @return bool
      */
     protected function addAttempt() : bool
     {
@@ -1649,7 +1649,7 @@ class Auth/* implements AuthInterface*/
     /**
      * Returns current session hash
      * @return string
-     * @bool, false if no cookie
+     * @return bool, false if no cookie
      */
     public function getCurrentSessionHash() : ?string
     {
@@ -1658,7 +1658,7 @@ class Auth/* implements AuthInterface*/
 
     /**
      * Returns is user logged in
-     * @bool
+     * @return bool
      */
     public function isLogged() : bool
     {
