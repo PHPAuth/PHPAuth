@@ -29,15 +29,20 @@ PHPAuth
 
 Notice! (pr 1/10/2020)
 ---------------
-PHPAuth is under going a complete rewrite to bring the code up to date, the project has been on hold for way to long time now and I decided to work on it again making sure EVERYONE can use it and not just advanded programmers. My goal is to make a Auth framework that is secure, extendable and useable for everyone. It will take some time but we have a good amount of users already using this code which are happily to help out.
+PHPAuth is under going a complete rewrite to bring the code up to date, the project has been on hold
+for way to long time now and I decided to work on it again making sure EVERYONE can use
+it and not just advanded programmers. My goal is to make a Auth framework that is secure,
+extendable and useable for everyone. It will take some time but we have a good amount of
+users already using this code which are happily to help out.
 
 #### Goals:
 - Bring code up to newest PHP version with min. of v7.1 to v7.4 (If new version comes out while rewriting the code will be pushed up to that version also)
+  - [X] [PHP 7 improvements](https://github.com/PHPAuth/PHPAuth/pull/482)
 - Making the code even more secure to use by adding things like one time keys (OTP, 2FA etc)
 - Make sure that the code can be used by everyone, also beginners.
 - Write much better documentation.
 - Make database queries faster.
-- Uptimize the code.
+- Optimize the code.
 - Bring down issue count.
 - Respond faster to issue and PRs.
 - And much more!
@@ -47,11 +52,11 @@ PHPAuth is under going a complete rewrite to bring the code up to date, the proj
 What is it
 ---------------
 
-PHPAuth is a secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.
+PHPAuth is a secure user authentication class for PHP websites, using a powerful password hashing system (Thanks to [ZxcvbnPhp\Zxcvbn](https://github.com/bjeavons/zxcvbn-php)) and attack blocking to keep your website and users secure.
 
 PHPAuth is work in progress, and not meant for people that don't know how to program, its meant for people that know what they are doing. We cannot help everyone because they don't understand this class.
 
-IT'S NOT FOR BEGINNERS!
+IT'S NOT ONLY FOR BEGINNERS!
 
 Features
 ---------------
@@ -80,7 +85,7 @@ User actions
 
 Requirements
 ---------------
-* PHP 7.0+
+* PHP 7.1+
 * MySQL / MariaDB database or PostGreSQL database
 
 Composer Support

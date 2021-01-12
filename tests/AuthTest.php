@@ -122,8 +122,8 @@ class AuthTest extends TestCase
     public function testConcurrentSessions()
     {
         // Get the current session
-        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
-        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $uid = (int)self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $hash = (string)self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = ".$uid.";", PDO::FETCH_ASSOC)->fetch()['hash'];
         // Add a new session
         self::$auth->config->allow_concurrent_sessions = false;
         $hash2 = self::$auth->login("test@email.com", 'T3H-1337-P@$$')['hash'];
@@ -156,17 +156,17 @@ class AuthTest extends TestCase
      */
     public function testGetSessionUID()
     {
-        $uid = self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
+        $uid = (int)self::$dbh->query("SELECT id FROM phpauth_users WHERE email = 'test@email.com';", PDO::FETCH_ASSOC)->fetch()['id'];
         $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = {$uid};", PDO::FETCH_ASSOC)->fetch()['hash'];
 
         // Successful getSessionUID
         $this->assertEquals($uid, self::$auth->getSessionUID($hash));
 
         // Failed getSessionUID: invalid session hash
-        $this->assertFalse(self::$auth->getSessionUID("invalidhash"));
+        $this->assertEmpty(self::$auth->getSessionUID("invalidhash"));
 
         // Failed getSessionUID: inexistant session hash
-        $this->assertFalse(self::$auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
+        $this->assertEmpty(self::$auth->getSessionUID("aaafda8ea2c65a596c7e089f256b1534f2298000"));
     }
 
     /**
@@ -192,7 +192,7 @@ class AuthTest extends TestCase
         $this->assertEquals("test@email.com", self::$auth->getUser($uid)['email']);
 
         // Failed getUser: inexistant UID
-        $this->assertFalse(self::$auth->getUser(9999999));
+        $this->assertNull(self::$auth->getUser(9999999));
     }
 
     /**
@@ -295,7 +295,7 @@ class AuthTest extends TestCase
         $this->assertFalse(self::$auth->checkSession($hash2));
         $this->assertFalse(self::$auth->checkSession($hash3));
         $this->assertFalse(self::$auth->isLogged());
-        $this->assertSame(self::$auth->getCurrentUser(), false);
+        $this->assertSame(self::$auth->getCurrentUser(), null);
         // Check no sessions
         $sessions = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetchAll();
         $this->assertSame(count($sessions), 0);
