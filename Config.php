@@ -250,7 +250,7 @@ class Config
      *
      * @return bool
      */
-    public function __set(string $setting, $value) : bool
+    public function __set(string $setting, $value)
     {
         $query_prepared = $this->dbh->prepare("UPDATE {$this->config_table} SET value = :value WHERE setting = :setting");
 
