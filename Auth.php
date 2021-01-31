@@ -65,7 +65,7 @@ class Auth
     public function __construct(PDO $dbh, Config $config)
     {
         if (version_compare(phpversion(), '7.1.0', '<')) {
-            die('PHP 7.1.0 required for PHPAuth engine!');
+            die($this->__lang("php_required"));
         }
 
         $this->dbh = $dbh;
