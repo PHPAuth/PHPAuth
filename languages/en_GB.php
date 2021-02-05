@@ -4,6 +4,12 @@ $lang = array();
 $lang['user_blocked'] = "You are currently locked out of the system.";
 $lang['user_verify_failed'] = "Captcha Code was invalid.";
 
+$lang['account_email_invalid'] = "Email address is incorrect or banned";
+$lang['account_password_invalid'] = "Password is invalid";
+$lang['account_not_found'] = "Account with given email not found.";
+
+$lang['login_remember_me_invalid'] = "The remember me field is invalid.";
+
 $lang['email_password_invalid'] = "Email address / password are invalid.";
 $lang['email_password_incorrect'] = "Email address / password are incorrect.";
 $lang['remember_me_invalid'] = "The remember me field is invalid.";
