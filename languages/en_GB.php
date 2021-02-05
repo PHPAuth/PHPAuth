@@ -71,6 +71,6 @@ $lang['account_deleted'] = "Account deleted successfully.";
 $lang['function_disabled'] = "This function has been disabled.";
 $lang['account_not_found'] = "No account found with that email address";
 
-$lang['php_version_required'] = "PHP %s+ required for PHPAuth engine!";
+$lang['php_version_required'] = "PHPAuth engine requires PHP version %s+!";
 
 return $lang;
