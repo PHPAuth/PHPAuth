@@ -72,4 +72,6 @@ $lang['account_deleted'] = "帳戶已成功刪除。";
 $lang['function_disabled'] = "此功能已被禁用。";
 $lang['account_not_found'] = "找不到使用該電子郵件地址的帳戶";
 
+$lang['php_version_required'] = "PHPAuth引擎需要PHP版本 ％s+！";
+
 return $lang;
