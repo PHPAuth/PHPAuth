@@ -337,20 +337,14 @@ class Config
         $lang['user_blocked'] = "You are currently locked out of the system.";
         $lang['user_verify_failed'] = "Captcha Code was invalid.";
 
-        //new
         $lang['account_email_invalid'] = "Email address is incorrect or banned";
-
-        //new
         $lang['account_password_invalid'] = "Password is invalid";
-
-        //new
         $lang['account_not_found'] = "Account with given email not found.";
-
 
         $lang['login_remember_me_invalid'] = "The remember me field is invalid.";
 
         $lang['email_password_invalid'] = "Email address / password are invalid.";
-        $lang['email_password_incorrect'] = "Password are incorrect for given EMail.";
+        $lang['email_password_incorrect'] = "Email address / password are incorrect.";
         $lang['remember_me_invalid'] = "The remember me field is invalid.";
 
         $lang['password_short'] = "Password is too short.";
@@ -368,7 +362,7 @@ class Config
 
         $lang['email_short'] = "Email address is too short.";
         $lang['email_long'] = "Email address is too long.";
-        $lang['email_invalid'] = "It is not a correct Email address.";
+        $lang['email_invalid'] = "Email address is invalid.";
         $lang['email_incorrect'] = "Email address is incorrect.";
         $lang['email_banned'] = "This email address is not allowed.";
         $lang['email_changed'] = "Email address changed successfully.";
@@ -398,11 +392,11 @@ class Config
 
         $lang['reset_requested'] = "Password reset request sent to email address.";
         $lang['reset_requested_emailmessage_suppressed'] = "Password reset request is created.";
-        $lang['reset_exists'] = "A reset request already exists.";
+        $lang['reset_exists'] = "A reset request already exists. Next reset password request will available at %s";             //@todo: updated 2018-06-28
 
         $lang['already_activated'] = "Account is already activated.";
         $lang['activation_sent'] = "Activation email has been sent.";
-        $lang['activation_exists'] = "An activation email has already been sent.";
+        $lang['activation_exists'] = "An activation email has already been sent. Next reactivation will available at %s";       //@todo: updated 2018-06-28
 
         $lang['email_activation_subject'] = '%s - Activate account';
         $lang['email_activation_body'] = 'Hello,<br/><br/> To be able to log in to your account you first need to activate your account by clicking on the following link : <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> You then need to use the following activation key: <strong>%3$s</strong><br/><br/> If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
@@ -414,6 +408,9 @@ class Config
 
         $lang['account_deleted'] = "Account deleted successfully.";
         $lang['function_disabled'] = "This function has been disabled.";
+        $lang['account_not_found'] = "No account found with that email address";
+
+        $lang['php_version_required'] = "PHPAuth engine requires PHP version %s+!";
 
         return $lang;
     }
