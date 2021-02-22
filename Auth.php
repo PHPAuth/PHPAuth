@@ -181,7 +181,7 @@ class Auth
      * @param string $repeatpassword
      * @param array $params
      * @param string $captcha_response = ""
-     * @param bool $use_email_activation = false
+     * @param boolean $use_email_activation = false
      * @return array $return
      */
     //@todo: => registerUserAccount
@@ -325,7 +325,7 @@ class Auth
     /**
      * Creates a reset key for an email address and sends email
      * @param string $email
-     * @param bool $use_email_activation
+     * @param boolean $use_email_activation
      * @return array $return
      */
     public function requestReset(string $email, bool $use_email_activation = false) : array
@@ -381,7 +381,7 @@ class Auth
     /**
      * Logs out the session, identified by hash
      * @param string $hash
-     * @return bool
+     * @return boolean
      */
     public function logout(string $hash) : bool
     {
@@ -398,7 +398,7 @@ class Auth
     /**
      * Logs out of all sessions for specified uid
      * @param int $uid
-     * @return bool
+     * @return boolean
      */
     public function logoutAll(int $uid) : bool
     {
@@ -495,7 +495,7 @@ class Auth
     /**
      * Removes all existing sessions for a given UID
      * @param int $uid
-     * @return bool
+     * @return boolean
      */
     protected function deleteExistingSessions(int $uid) : bool
     {
@@ -510,7 +510,7 @@ class Auth
      * Removes a session based on hash
      * @param string $hash
      *
-     * @return bool
+     * @return boolean
      */
     //@todo: delete cookie at deleteSession
     protected function deleteSession(string $hash) : bool
@@ -526,7 +526,7 @@ class Auth
      * @param string $hash
      * @param null|string $device_id
      *
-     * @return bool
+     * @return boolean
      */
     public function checkSession(string $hash, ?string $device_id = null) : bool
     {
@@ -615,7 +615,7 @@ class Auth
     /**
      * Checks if an email is already in use
      * @param string $email
-     * @return bool
+     * @return boolean
      */
     public function isEmailTaken(string $email) : bool
     {
@@ -634,7 +634,7 @@ class Auth
      * Checks if an email is banned
      * @param string $email
      *
-     * @return bool
+     * @return boolean
      */
     public function isEmailBanned(string $email) : bool
     {
@@ -764,7 +764,7 @@ class Auth
     /**
      * Gets public user data for a given UID and returns an array, password will be returned if param $withpassword is TRUE
      * @param int $uid
-     * @param bool|false $withpassword
+     * @param boolean|false $withpassword
      * @return array|null $data
      */
     public function getUser(int $uid, bool $withpassword = false) : ?array
@@ -1041,7 +1041,7 @@ class Auth
      * Deletes request from database
      * @param int $id
      *
-     * @return bool
+     * @return boolean
      */
     protected function deleteRequest(int $id) : bool
     {
@@ -1225,7 +1225,7 @@ class Auth
     /**
      * Recreates activation email for a given email and sends
      * @param string $email
-     * @param bool $use_email_activation
+     * @param boolean $use_email_activation
      *
      * @return array
      */
@@ -1501,7 +1501,7 @@ class Auth
      * Verifies a captcha code
      * @param string $captcha
      *
-     * @return bool
+     * @return boolean
      */
     protected function checkCaptcha(string $captcha) : bool
     {
@@ -1515,7 +1515,7 @@ class Auth
      *
      * @param string $captcha_response
      *
-     * @return bool
+     * @return boolean
      */
     protected function checkReCaptcha(string $captcha_response) : bool
     {
@@ -1541,7 +1541,7 @@ class Auth
     /**
      * Adds an attempt to database
      *
-     * @return bool
+     * @return boolean
      */
     protected function addAttempt() : bool
     {
@@ -1560,8 +1560,8 @@ class Auth
      * Deletes all attempts for a given IP from database
      *
      * @param string $ip
-     * @param bool|false $all
-     * @return bool
+     * @param boolean|false $all
+     * @return boolean
      */
     protected function deleteAttempts(string $ip, bool $all = false) : bool
     {
@@ -1633,7 +1633,7 @@ class Auth
 
     /**
      * Returns is user logged in
-     * @return bool
+     * @return boolean
      */
     public function isLogged() : bool
     {
@@ -1646,9 +1646,9 @@ class Auth
 
     /**
      * Gets user data for current user (from cookie/session_hash) and returns an array, password is not returned
-     * @param bool $updateSession = false
+     * @param boolean $updateSession = false
      * @return array $data
-     * @return bool false if no current user
+     * @return boolean false if no current user
      */
     public function getCurrentUser(bool $updateSession = false) : ?array
     {
@@ -1676,7 +1676,7 @@ class Auth
      * @param string $hash
      * @param int $uid = null
      *
-     * @return bool
+     * @return boolean
      */
     private function renewUserSession(string $hash, int $uid = 0) : bool
     {
@@ -1696,7 +1696,7 @@ class Auth
      * @param int $userid
      * @param string $password_for_check
      *
-     * @return bool
+     * @return boolean
      */
     public function comparePasswords(int $userid, string $password_for_check) : bool
     {
@@ -1718,7 +1718,7 @@ class Auth
      * @param string $password
      * @param string $hash
      * @param int $uid
-     * @return bool
+     * @return boolean
      */
     public function password_verify_with_rehash(string $password, string $hash, int $uid) : bool
     {
