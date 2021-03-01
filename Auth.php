@@ -1682,8 +1682,8 @@ class Auth
     {
         $expire = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
 
-        $where = (is_null(($uid))) ? "hash" : "uid";
-        $arr = (is_null($uid)) ? $hash : $uid;
+        $where = (is_null(($uid)) || $uid === 0) ? "hash" : "uid";
+        $arr = (is_null($uid) || $uid === 0) ? $hash : $uid;
 
         $STH = $this->dbh->prepare("UPDATE {$this->config->table_sessions} SET expiredate = ? WHERE {$where} = ?");
 
