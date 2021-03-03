@@ -941,8 +941,10 @@ class Auth
             $currentdate = strtotime(date("Y-m-d H:i:s"));
 
             if ($currentdate < $expiredate) {
-                $return['message'] = $this->__lang($dictionary_key__request_exists, date($this->config->custom_datetime_format, $expiredate));
-                return $return;
+                if($type == "activation"){
+                    $return['message'] = $this->__lang($dictionary_key__request_exists, date($this->config->custom_datetime_format, $expiredate));
+                    return $return;
+                }
             }
 
             $this->deleteRequest($row['id']);
