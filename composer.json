@@ -1,5 +1,5 @@
 {
-  "name": "rouaks/phpauth",
+  "name": "phpauth/phpauth",
   "description": "A secure user authentication class for PHP websites, using a powerful password hashing system and attack blocking to keep your website and users secure.",
   "type": "library",
   "keywords": [
