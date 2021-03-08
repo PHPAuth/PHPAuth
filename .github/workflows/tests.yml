@@ -2,7 +2,11 @@ name: run-tests
 
 on:
     push:
+      branches:
+        - master
     pull_request:
+      branches:
+        - master
 
 jobs:
     test:
@@ -13,7 +17,7 @@ jobs:
                 # dependency-version: [prefer-lowest, prefer-stable]
                 os: [ubuntu-latest]
 
-        name: P${{ matrix.php }} - ${{ matrix.os }}
+        name: PHP${{ matrix.php }} - ${{ matrix.os }}
 
         services:
             mysql:
@@ -28,3 +32,15 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  extensions: pdo, sqlite, pdo_sqlite, mysql, mysqli, pdo_mysql
+                  coverage: none
+
+            - name: Execute tests
+              run: vendor/bin/phpunit
+              env:
+                  DB_PORT: ${{ job.services.mysql.ports[3306] }}
