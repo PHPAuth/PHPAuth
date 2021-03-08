@@ -1,0 +1,26 @@
+name: run-tests
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    test:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                php: [7.4, 7.3, 7.2, 7.1]
+                # dependency-version: [prefer-lowest, prefer-stable]
+                os: [ubuntu-latest]
+
+        name: P${{ matrix.php }} - ${{ matrix.os }}
+
+        services:
+            mysql:
+                image: mysql
+                env:
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+                    MYSQL_DATABASE: phpauthtest
+                ports:
+                    - 3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
