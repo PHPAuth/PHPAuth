@@ -102,7 +102,7 @@ INSERT INTO `phpauth_emails_banned` (`id`, `domain`) VALUES
 (97, '0nelce.com'),
 (98, '0nes.net'),
 (99, '0nes.org'),
-(100, '0nly.org'),INSERT INTO `phpauth_emails_banned` (`id`, `domain`) VALUES
+(100, '0nly.org'),
 (1, '0-00.usa.cc'),
 (2, '0-180.com'),
 (3, '0-30-24.com'),
