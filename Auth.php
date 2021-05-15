@@ -486,7 +486,17 @@ class Auth
             return false;
         }
 
-        setcookie($this->config->cookie_name, $data['hash'], $data['expire'], $this->config->cookie_path, $this->config->cookie_domain, $this->config->cookie_secure, $this->config->cookie_http);
+        $cookie_options = [
+            'expires' => $data['expire'],
+            'path' => $this->config->cookie_path,
+            'domain' => $this->config->cookie_domain,
+            'secure' => $this->config->cookie_secure,
+            'httponly' =>  $this->config->cookie_http,
+            'samesite' => $this->config->cookie_samesite ?? 'Lax' // None || Lax  || Strict
+        ];
+
+        setcookie($this->config->cookie_name, $data['hash'], $cookie_options);
+
         $_COOKIE[$this->config->cookie_name] = $data['hash'];
 
         return $data;
