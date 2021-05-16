@@ -31,8 +31,8 @@ Notice! (pr 1/10/2020)
 ---------------
 PHPAuth is under going a complete rewrite to bring the code up to date, the project has been on hold
 for way to long time now and I decided to work on it again making sure EVERYONE can use
-it and not just advanded programmers. My goal is to make a Auth framework that is secure,
-extendable and useable for everyone. It will take some time but we have a good amount of
+it and not just advanced programmers. My goal is to make a Auth framework that is secure,
+extendible and usable for everyone. It will take some time but we have a good amount of
 users already using this code which are happily to help out.
 
 #### Goals:
@@ -107,9 +107,9 @@ The database table `config` contains multiple parameters allowing you to configu
 * `site_key`    : a random string that you should modify used to validate cookies to ensure they are not tampered with
 * `site_timezone` : the timezone for correct DateTime values
 * `site_activation_page` : the activation page name appended to the `site_url` in the activation email
-* `site_activation_page_append_code` : `1` to append /key to the `site_url` in the activation email to simplier UX, a RESTful API should be implemented for this option
+* `site_activation_page_append_code` : `1` to append /key to the `site_url` in the activation email to simpler UX, a RESTful API should be implemented for this option
 * `site_password_reset_page` : the password reset page name appended to the `site_url` in the password reset email
-* `site_password_reset_page_append_code` : `1` to append /key to the `site_url` in the reset email to simplier UX, a RESTful API should be implemented for this option
+* `site_password_reset_page_append_code` : `1` to append /key to the `site_url` in the reset email to simpler UX, a RESTful API should be implemented for this option
 * `cookie_name` : the name of the cookie that contains session information, do not change unless necessary
 * `cookie_path` : the path of the session cookie, do not change unless necessary
 * `cookie_domain` : the domain of the session cookie, do not change unless necessary
@@ -118,11 +118,11 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_http` : the [HTTP only protocol](https://owasp.org/www-community/HttpOnly) setting of the session cookie, true by default, do not change unless necessary
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
-* `cookie_renew` : the maximum time difference between session expiration and last page load before allowing the session to be renewed. Must respect PHP`s [strtotime](http://php.net/manual/en/function.strtotime.php) format.
+* `cookie_renew` : the maximum time difference between session expiration and last page load before allowing the session to be renewed. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `allow_concurrent_sessions` : Allow a user to have multiple active sessions (boolean). If false (default), logging in will end any existing sessions.
 * `bcrypt_cost` : the algorithmic cost of the bcrypt hashing function, can be changed based on hardware capabilities
 * `smtp` : `0` to use sendmail for emails, `1` to use SMTP
-* `smtp_debug` : `0` to disable SMTP debugging, `1` to enable SMTP debugging, useful when you are having email/smtp issues
+* `smtp_debug` : `0` to disable SMTP debugging, `1` to enable SMTP debugging, useful when you are having email/SMTP issues
 * `smtp_host` : hostname of the SMTP server
 * `smtp_auth` : `0` if the SMTP server doesn't require authentication, `1` if authentication is required
 * `smtp_username` : the username for the SMTP server
