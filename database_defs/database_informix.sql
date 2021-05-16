@@ -15,6 +15,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('cookie_http', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_name', 'phpauth_session_cookie');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_remember', '+1 month');
+INSERT INTO phpauth_config (setting, value) VALUES ('cookie_samesite', 'Strict');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_secure', '0');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_renew', '+5 minutes');
 INSERT INTO phpauth_config (setting, value) VALUES ('allow_concurrent_sessions', FALSE);
