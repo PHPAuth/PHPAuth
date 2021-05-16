@@ -26,7 +26,7 @@ INSERT INTO `phpauth_config` (`setting`, `value`) VALUES
   ('cookie_path', '/'),
   ('cookie_remember', '+1 month'),
   ('cookie_samesite', 'Strict'),
-  ('cookie_secure', '0'),
+  ('cookie_secure', '1'),
   ('cookie_renew', '+5 minutes'),
   ('allow_concurrent_sessions', FALSE),
   ('emailmessage_suppress_activation',  '0'),
