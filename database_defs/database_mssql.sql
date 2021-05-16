@@ -14,7 +14,7 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('bcrypt_cost', '10'),
 ('cookie_domain', NULL),
 ('cookie_forget', '+30 minutes'),
-('cookie_http', '0'),
+('cookie_http', '1'),
 ('cookie_name', 'phpauth_session_cookie'),
 ('cookie_path', '/'),
 ('cookie_remember', '+1 month'),

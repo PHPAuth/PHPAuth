@@ -11,7 +11,7 @@ INSERT INTO phpauth_config (setting, value) VALUES ('attempts_before_verify',  '
 INSERT INTO phpauth_config (setting, value) VALUES ('bcrypt_cost', '10');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_domain', NULL);
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_forget', '+30 minutes');
-INSERT INTO phpauth_config (setting, value) VALUES ('cookie_http', '0');
+INSERT INTO phpauth_config (setting, value) VALUES ('cookie_http', '1');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_name', 'phpauth_session_cookie');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_path', '/');
 INSERT INTO phpauth_config (setting, value) VALUES ('cookie_remember', '+1 month');

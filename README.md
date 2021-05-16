@@ -115,7 +115,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `cookie_domain` : the domain of the session cookie, do not change unless necessary
 * `cookie_samesite` : the [same-site setting](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) of the cookie. It defaults to Strict, do not change unless necessary
 * `cookie_secure` : the HTTPS-only setting of the session cookie, by default only allows calls over an HTTPS channel, do not change unless necessary
-* `cookie_http` : the HTTP only protocol setting of the session cookie, do not change unless necessary
+* `cookie_http` : the [HTTP only protocol](https://owasp.org/www-community/HttpOnly) setting of the session cookie, true by default, do not change unless necessary
 * `cookie_remember` : the time that a user will remain logged in for when ticking "remember me" on login. Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_forget` : the time a user will remain logged in when not ticking "remember me" on login.  Must respect PHP's [strtotime](http://php.net/manual/en/function.strtotime.php) format.
 * `cookie_renew` : the maximum time difference between session expiration and last page load before allowing the session to be renewed. Must respect PHP`s [strtotime](http://php.net/manual/en/function.strtotime.php) format.
