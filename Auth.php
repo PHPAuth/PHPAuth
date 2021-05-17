@@ -440,7 +440,7 @@ class Auth
      * Creates a session for a specified user id
      * @param int $uid
      * @param boolean $remember
-     * @return array $data
+     * @return array | false $data
      */
     protected function addSession(int $uid, bool $remember)
     {
@@ -495,7 +495,10 @@ class Auth
             'samesite' => $this->config->cookie_samesite ?? 'Lax' // None || Lax  || Strict
         ];
 
-        setcookie($this->config->cookie_name, $data['hash'], $cookie_options);
+        if(!setcookie($this->config->cookie_name, $data['hash'], $cookie_options)){
+            return false;
+        }
+
 
         $_COOKIE[$this->config->cookie_name] = $data['hash'];
 
@@ -854,7 +857,7 @@ class Auth
     /**
      * Force delete user without password or captcha verification.
      *
-     * @param $uid
+     * @param int $uid
      * @return array
      */
     public function deleteUserForced(int $uid) : array
