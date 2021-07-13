@@ -142,7 +142,7 @@ class Config
 
         // Determine site language
         $site_language = (empty($config_site_language))
-            ? isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB'
+            ? $this->config['site_language'] ?? 'en_GB'
             : $config_site_language;
 
         $dictionary = [];
@@ -154,11 +154,7 @@ class Config
 
                     $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
 
-                    if (is_readable($lang_file)) {
-                        $dictionary = include $lang_file;
-                    } else {
-                        $dictionary = $this->setForgottenDictionary();
-                    }
+                    $dictionary = is_readable($lang_file) ? include $lang_file : $this->setForgottenDictionary();
 
                     break;
                 }
@@ -167,11 +163,7 @@ class Config
 
                     $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
 
-                    if (is_readable($lang_file)) {
-                        $dictionary = parse_ini_file($lang_file);
-                    } else {
-                        $dictionary = $this->setForgottenDictionary();
-                    }
+                    $dictionary = is_readable($lang_file) ? parse_ini_file($lang_file) : $this->setForgottenDictionary();
                     break;
                 }
                 case 'sql':
