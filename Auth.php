@@ -89,24 +89,24 @@ class Auth
      * @return array $return
      */
     //@todo: => loginUser
-    public function login(string $email, string $password, int $remember = 0, string $captcha_response = ""): array
+    public function login(string $email, string $password, int $remember = 0, string $captcha_response = ''): array
     {
         $return          = [];
         $return['error'] = true;
-        $return['hash']  = "";
+        $return['hash']  = '';
 
         $block_status = $this->isBlocked();
 
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang("user_verify_failed");
+                $return['message'] = $this->__lang('user_verify_failed');
 
                 return $return;
             }
         }
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
             return $return;
         }
 
@@ -125,7 +125,7 @@ class Auth
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("remember_me_invalid");      //@todo => login_remember_me_invalid
+            $return['message'] = $this->__lang('remember_me_invalid');      //@todo => login_remember_me_invalid
 
             return $return;
         }
@@ -134,7 +134,7 @@ class Auth
 
         if (!$uid) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("account_not_found");
+            $return['message'] = $this->__lang('account_not_found');
 
             return $return;
         }
@@ -143,14 +143,14 @@ class Auth
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_password_incorrect");
+            $return['message'] = $this->__lang('email_password_incorrect');
 
             return $return;
         }
 
         if ($user['isactive'] != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("account_inactive");
+            $return['message'] = $this->__lang('account_inactive');
 
             return $return;
         }
@@ -158,13 +158,13 @@ class Auth
         $sessiondata = $this->addSession($user['uid'], $remember);
 
         if ($sessiondata == false) {
-            $return['message'] = $this->__lang("system_error") . " #01";
+            $return['message'] = $this->__lang('system_error') . ' #01';
 
             return $return;
         }
 
         $return['error'] = false;
-        $return['message'] = $this->__lang("logged_in");
+        $return['message'] = $this->__lang('logged_in');
 
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
@@ -185,28 +185,28 @@ class Auth
      * @return array $return
      */
     //@todo: => registerUserAccount
-    public function register(string $email, string $password, string $repeatpassword, array $params = [], string $captcha_response = "", bool $use_email_activation = false): array
+    public function register(string $email, string $password, string $repeatpassword, array $params = [], string $captcha_response = '', bool $use_email_activation = false): array
     {
         $return = [];
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang("user_verify_failed");
+                $return['message'] = $this->__lang('user_verify_failed');
 
                 return $return;
             }
         }
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
 
             return $return;
         }
 
         if ($password !== $repeatpassword) {
-            $return['message'] = $this->__lang("password_nomatch");
+            $return['message'] = $this->__lang('password_nomatch');
 
             return $return;
         }
@@ -239,7 +239,7 @@ class Auth
 
         if ($this->isEmailTaken($email)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_taken");
+            $return['message'] = $this->__lang('email_taken');
 
             return $return;
         }
@@ -255,7 +255,7 @@ class Auth
         $return['error'] = false;
         $return['message'] =
             ($use_email_activation == true
-                ? $this->__lang("register_success")
+                ? $this->__lang('register_success')
                 : $this->__lang('register_success_emailmessage_suppressed'));
         $return['uid'] = $addUser['uid'];
         $return['token'] = $addUser['token'];
@@ -274,15 +274,15 @@ class Auth
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
 
             return $return;
         }
 
         if (strlen($activate_token) !== self::TOKEN_LENGTH) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("activationkey_invalid");
+            $return['message'] = $this->__lang('activationkey_invalid');
 
             return $return;
         }
@@ -290,7 +290,7 @@ class Auth
         // 'user is already activated' will never triggered, because after successful activation token removed from DB
         // NOW is no any way to determine, is this token used for activation or not?
 
-        $request_result = $this->getRequest($activate_token, "activation");
+        $request_result = $this->getRequest($activate_token, 'activation');
 
         if ($request_result['error']) {
             $return['message'] = $request_result['message'];
@@ -301,7 +301,7 @@ class Auth
         if ($this->getBaseUser($request_result['uid'])['isactive'] == 1) {
             $this->addAttempt();
             $this->deleteRequest($request_result['id']);
-            $return['message'] = $this->__lang("system_error") . " #02"; // user activated, but activate token not expired
+            $return['message'] = $this->__lang('system_error') . ' #02'; // user activated, but activate token not expired
 
             return $return;
         }
@@ -317,7 +317,7 @@ class Auth
         $this->deleteRequest($request_result['id']);
 
         $return['error'] = false;
-        $return['message'] = $this->__lang("account_activated");
+        $return['message'] = $this->__lang('account_activated');
 
         return $return;
     }
@@ -333,8 +333,8 @@ class Auth
         $state['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "block") {
-            $state['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $state['message'] = $this->__lang('user_blocked');
 
             return $state;
         }
@@ -342,7 +342,7 @@ class Auth
         $validateEmail = $this->validateEmail($email);
 
         if ($validateEmail['error'] == 1) {
-            $state['message'] = $this->__lang("email_invalid");
+            $state['message'] = $this->__lang('email_invalid');
 
             return $state;
         }
@@ -355,12 +355,12 @@ class Auth
         if (!$row) {
             $this->addAttempt();
 
-            $state['message'] = $this->__lang("email_incorrect");
+            $state['message'] = $this->__lang('email_incorrect');
 
             return $state;
         }
 
-        $addRequest = $this->addRequest($row['id'], $email, "reset", $use_email_activation);
+        $addRequest = $this->addRequest($row['id'], $email, 'reset', $use_email_activation);
 
         if ($addRequest['error'] == 1) {
             $this->addAttempt();
@@ -371,9 +371,9 @@ class Auth
 
         $state['uid'] = $row['id'];
         $state['error'] = false;
-        $state['message'] = ($use_email_activation == true ? $this->__lang("reset_requested") : $this->__lang('reset_requested_emailmessage_suppressed'));
+        $state['message'] = ($use_email_activation == true ? $this->__lang('reset_requested') : $this->__lang('reset_requested_emailmessage_suppressed'));
         $state['token'] = $addRequest['token'];
-        $state['expire'] = $addRequest["expire"];
+        $state['expire'] = $addRequest['expire'];
 
         return $state;
     }
@@ -476,7 +476,7 @@ class Auth
         $query_params = [
             'uid' => $uid,
             'hash' => $data['hash'],
-            'expiredate' => date("Y-m-d H:i:s", $data['expire']),
+            'expiredate' => date('Y-m-d H:i:s', $data['expire']),
             'ip' => $ip,
             'agent' => $agent,
             'cookie_crc' => $data['cookie_crc']
@@ -543,8 +543,8 @@ class Auth
         $ip = $this->getIp();
         $block_status = $this->isBlocked();
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
             return false;
         }
 
@@ -568,7 +568,7 @@ class Auth
 
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
-        $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $currentdate = strtotime(date('Y-m-d H:i:s'));
         $db_ip = $row['ip'];
         $db_cookie = $row['cookie_crc'];
         $db_device_id = $row['device_id'];
@@ -619,7 +619,7 @@ class Auth
             return 0;
         }
 
-        return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)["uid"];
+        return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
     }
 
     /**
@@ -683,7 +683,7 @@ class Auth
         $query_prepared = $this->dbh->prepare($query);
 
         if (!$query_prepared->execute()) {
-            $return['message'] = $this->__lang("system_error") . " #03";
+            $return['message'] = $this->__lang('system_error') . ' #03';
             return $return;
         }
 
@@ -692,7 +692,7 @@ class Auth
 
         $token = '';
         if ($use_email_activation) {
-            $addRequest = $this->addRequest($uid, $email, "activation", $use_email_activation);
+            $addRequest = $this->addRequest($uid, $email, 'activation', $use_email_activation);
             $token = $addRequest['token'];
 
             if ($addRequest['error'] == 1) {
@@ -738,7 +738,7 @@ class Auth
             $query_prepared = $this->dbh->prepare($query);
 
             $query_prepared->execute([$uid]);
-            $return['message'] = $this->__lang("system_error") . " #04";
+            $return['message'] = $this->__lang('system_error') . ' #04';
 
             return $return;
         }
@@ -806,22 +806,22 @@ class Auth
      * @param string $captcha_response
      * @return array $return
      */
-    public function deleteUser(int $uid, string $password, string $captcha_response = ""): array
+    public function deleteUser(int $uid, string $password, string $captcha_response = ''): array
     {
         $return = [];
         $return['error'] = true;
 
         $block_status = $this->isBlocked();
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang("user_verify_failed");
+                $return['message'] = $this->__lang('user_verify_failed');
 
                 return $return;
             }
         }
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
 
             return $return;
         }
@@ -840,7 +840,7 @@ class Auth
 
         if (!password_verify($password, $user['password'])) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("password_incorrect");
+            $return['message'] = $this->__lang('password_incorrect');
 
             return $return;
         }
@@ -866,7 +866,7 @@ class Auth
         $query_prepared = $this->dbh->prepare($query);
 
         if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #05";
+            $return['message'] = $this->__lang('system_error') . ' #05';
 
             return $return;
         }
@@ -875,7 +875,7 @@ class Auth
         $query_prepared = $this->dbh->prepare($query);
 
         if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #06";
+            $return['message'] = $this->__lang('system_error') . ' #06';
 
             return $return;
         }
@@ -884,13 +884,13 @@ class Auth
         $query_prepared = $this->dbh->prepare($query);
 
         if (!$query_prepared->execute(['uid' => $uid])) {
-            $return['message'] = $this->__lang("system_error") . " #07";
+            $return['message'] = $this->__lang('system_error') . ' #07';
 
             return $return;
         }
 
         $return['error'] = false;
-        $return['message'] = $this->__lang("account_deleted");
+        $return['message'] = $this->__lang('account_deleted');
 
         return $return;
     }
@@ -913,7 +913,7 @@ class Auth
         } elseif ($type == 'reset') {
             $dictionary_key__request_exists = 'reset_exists';
         } else {
-            $return['message'] = $this->__lang("system_error") . " #08";
+            $return['message'] = $this->__lang('system_error') . ' #08';
 
             return $return;
         }
@@ -924,11 +924,11 @@ class Auth
         if (false !== $use_email_activation) {
             $use_email_activation = true;
 
-            if ($type == "reset" && !!$this->config->emailmessage_suppress_reset) {
+            if ($type == 'reset' && !!$this->config->emailmessage_suppress_reset) {
                 $send_email = false;
             }
 
-            if ($type == "activation" && !!$this->config->emailmessage_suppress_activation) {
+            if ($type == 'activation' && !!$this->config->emailmessage_suppress_activation) {
                 $send_email = false;
             }
         }
@@ -943,7 +943,7 @@ class Auth
             $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
             $expiredate = strtotime($row['expire']);
-            $currentdate = strtotime(date("Y-m-d H:i:s"));
+            $currentdate = strtotime(date('Y-m-d H:i:s'));
 
             if ($currentdate < $expiredate) {
                 $return['message'] = $this->__lang($dictionary_key__request_exists, date($this->config->custom_datetime_format, $expiredate));
@@ -962,7 +962,7 @@ class Auth
         */
 
         $token = $this->getRandomKey(self::TOKEN_LENGTH); // use GUID for tokens?
-        $expire = date("Y-m-d H:i:s", strtotime($this->config->request_key_expiration));
+        $expire = date('Y-m-d H:i:s', strtotime($this->config->request_key_expiration));
 
         $query = "INSERT INTO {$this->config->table_requests} (uid, token, expire, type) VALUES (:uid, :token, :expire, :type)";
         $query_prepared = $this->dbh->prepare($query);
@@ -975,7 +975,7 @@ class Auth
         ];
 
         if (!$query_prepared->execute($query_params)) {
-            $return['message'] = $this->__lang("system_error") . " #09";
+            $return['message'] = $this->__lang('system_error') . ' #09';
 
             return $return;
         }
@@ -988,7 +988,7 @@ class Auth
             if ($sendmail_status['error']) {
                 $this->deleteRequest($request_id);
 
-                $return['message'] = $this->__lang("system_error") . ' ' . $sendmail_status['message'] . " #10";
+                $return['message'] = $this->__lang('system_error') . ' ' . $sendmail_status['message'] . ' #10';
                 return $return;
             }
         }
@@ -1017,7 +1017,7 @@ class Auth
 
         if ($query_prepared->rowCount() === 0) {
             $this->addAttempt();
-            $return['message'] = $this->__lang($type . "key_incorrect");
+            $return['message'] = $this->__lang($type . 'key_incorrect');
 
             return $return;
         }
@@ -1025,12 +1025,12 @@ class Auth
         $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         $expiredate = strtotime($row['expire']);
-        $currentdate = strtotime(date("Y-m-d H:i:s"));
+        $currentdate = strtotime(date('Y-m-d H:i:s'));
 
         if ($currentdate > $expiredate) {
             $this->addAttempt();
             $this->deleteRequest($row['id']);
-            $return['message'] = $this->__lang($type . "key_expired");
+            $return['message'] = $this->__lang($type . 'key_expired');
 
             return $return;
         }
@@ -1068,7 +1068,7 @@ class Auth
         $state['error'] = true;
 
         if (strlen($password) < (int)$this->config->verify_password_min_length) {
-            $state['message'] = $this->__lang("password_short");
+            $state['message'] = $this->__lang('password_short');
 
             return $state;
         }
@@ -1089,22 +1089,22 @@ class Auth
         $state['error'] = true;
 
         if (strlen($email) < (int)$this->config->verify_email_min_length) {
-            $state['message'] = $this->__lang("email_short", (int)$this->config->verify_email_min_length);
+            $state['message'] = $this->__lang('email_short', (int)$this->config->verify_email_min_length);
 
             return $state;
         } elseif (strlen($email) > (int)$this->config->verify_email_max_length) {
-            $state['message'] = $this->__lang("email_long", (int)$this->config->verify_email_max_length);
+            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length);
 
             return $state;
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $state['message'] = $this->__lang("email_invalid", $email);
+            $state['message'] = $this->__lang('email_invalid', $email);
 
             return $state;
         }
 
         if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
-            $state['message'] = $this->__lang("email_banned");
+            $state['message'] = $this->__lang('email_banned');
 
             return $state;
         }
@@ -1124,27 +1124,27 @@ class Auth
      *
      * @return array $return
      */
-    public function resetPass(string $key, string $password, string $repeatpassword, string $captcha_response = "")
+    public function resetPass(string $key, string $password, string $repeatpassword, string $captcha_response = '')
     {
         $state['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $state['message'] = $this->__lang("user_verify_failed");
+                $state['message'] = $this->__lang('user_verify_failed');
 
                 return $state;
             }
         }
 
-        if ($block_status == "block") {
-            $state['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $state['message'] = $this->__lang('user_blocked');
 
             return $state;
         }
 
         if (strlen($key) != self::TOKEN_LENGTH) {
-            $state['message'] = $this->__lang("resetkey_invalid");
+            $state['message'] = $this->__lang('resetkey_invalid');
 
             return $state;
         }
@@ -1166,7 +1166,7 @@ class Auth
 
         if ($password !== $repeatpassword) {
             // Passwords don't match
-            $state['message'] = $this->__lang("newpassword_nomatch");
+            $state['message'] = $this->__lang('newpassword_nomatch');
 
             return $state;
         }
@@ -1179,7 +1179,7 @@ class Auth
             return $state;
         }
 
-        $data = $this->getRequest($key, "reset");
+        $data = $this->getRequest($key, 'reset');
 
         if ($data['error'] == 1) {
             $state['message'] = $data['message'];
@@ -1192,14 +1192,14 @@ class Auth
         if (!$user) {
             $this->addAttempt();
             $this->deleteRequest($data['id']);
-            $state['message'] = $this->__lang("system_error") . " #11";
+            $state['message'] = $this->__lang('system_error') . ' #11';
 
             return $state;
         }
 
         if (password_verify($password, $user['password'])) {
             $this->addAttempt();
-            $state['message'] = $this->__lang("newpassword_match");
+            $state['message'] = $this->__lang('newpassword_match');
 
             return $state;
         }
@@ -1215,14 +1215,14 @@ class Auth
         $query_prepared->execute($query_params);
 
         if ($query_prepared->rowCount() == 0) {
-            $state['message'] = $this->__lang("system_error") . " #12";
+            $state['message'] = $this->__lang('system_error') . ' #12';
 
             return $state;
         }
 
         $this->deleteRequest($data['id']);
         $state['error'] = false;
-        $state['message'] = $this->__lang("password_reset");
+        $state['message'] = $this->__lang('password_reset');
 
         return $state;
     }
@@ -1239,8 +1239,8 @@ class Auth
         $state['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "block") {
-            $state['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $state['message'] = $this->__lang('user_blocked');
 
             return $state;
         }
@@ -1267,7 +1267,7 @@ class Auth
 
         if (!$found_user) {
             $this->addAttempt();
-            $state['message'] = $this->__lang("email_incorrect"); // Really: account not found!
+            $state['message'] = $this->__lang('email_incorrect'); // Really: account not found!
 
             return $state;
         }
@@ -1275,13 +1275,13 @@ class Auth
         // this check must be implemented in activateAccount() method
         if ($found_user['isactive']) {
             $this->addAttempt();
-            $state['message'] = $this->__lang("already_activated");
+            $state['message'] = $this->__lang('already_activated');
 
             return $state;
         }
 
         // Create an activation entry and sends email to user
-        $addRequest = $this->addRequest($found_user['id'], $email, "activation", $use_email_activation);
+        $addRequest = $this->addRequest($found_user['id'], $email, 'activation', $use_email_activation);
 
         // $addRequest = $this->addRequestOptimized($found_user, "activation", $use_email_activation);
 
@@ -1294,7 +1294,7 @@ class Auth
         }
 
         $state['error'] = false;
-        $state['message'] = $this->__lang("activation_sent");
+        $state['message'] = $this->__lang('activation_sent');
         $state['token'] = $addRequest['token'];
         return $state;
     }
@@ -1308,21 +1308,21 @@ class Auth
      * @param string $captcha_response = ""
      * @return array $return
      */
-    public function changePassword(int $uid, string $currpass, string $newpass, string $repeatnewpass, string $captcha_response = ""): array
+    public function changePassword(int $uid, string $currpass, string $newpass, string $repeatnewpass, string $captcha_response = ''): array
     {
         $return = [];
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang("user_verify_failed");
+                $return['message'] = $this->__lang('user_verify_failed');
                 return $return;
             }
         }
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
 
             return $return;
         }
@@ -1343,7 +1343,7 @@ class Auth
 
             return $return;
         } elseif ($newpass !== $repeatnewpass) {
-            $return['message'] = $this->__lang("newpassword_nomatch");
+            $return['message'] = $this->__lang('newpassword_nomatch');
 
             return $return;
         }
@@ -1360,14 +1360,14 @@ class Auth
 
         if (!$user) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("system_error") . " #13";
+            $return['message'] = $this->__lang('system_error') . ' #13';
 
             return $return;
         }
 
         if (!password_verify($currpass, $user['password'])) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("password_incorrect");
+            $return['message'] = $this->__lang('password_incorrect');
 
             return $return;
         }
@@ -1379,7 +1379,7 @@ class Auth
         $query_prepared->execute([$newpass, $uid]);
 
         $return['error'] = false;
-        $return['message'] = $this->__lang("password_changed");
+        $return['message'] = $this->__lang('password_changed');
 
         return $return;
     }
@@ -1392,22 +1392,22 @@ class Auth
      * @param string $captcha = null
      * @return array
      */
-    public function changeEmail(int $uid, string $email, string $password, string $captcha = ""): array
+    public function changeEmail(int $uid, string $email, string $password, string $captcha = ''): array
     {
         $return = [];
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == "verify") {
+        if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha) == false) {
-                $return['message'] = $this->__lang("user_verify_failed");
+                $return['message'] = $this->__lang('user_verify_failed');
 
                 return $return;
             }
         }
 
-        if ($block_status == "block") {
-            $return['message'] = $this->__lang("user_blocked");
+        if ($block_status == 'block') {
+            $return['message'] = $this->__lang('user_blocked');
 
             return $return;
         }
@@ -1422,7 +1422,7 @@ class Auth
 
         if ($this->isEmailTaken($email)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("email_taken");
+            $return['message'] = $this->__lang('email_taken');
 
             return $return;
         }
@@ -1430,7 +1430,7 @@ class Auth
         $validatePassword = $this->validatePassword($password);
 
         if ($validatePassword['error'] == 1) {
-            $return['message'] = $this->__lang("password_notvalid");
+            $return['message'] = $this->__lang('password_notvalid');
 
             return $return;
         }
@@ -1439,21 +1439,21 @@ class Auth
 
         if (!$user) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("system_error") . " #14";
+            $return['message'] = $this->__lang('system_error') . ' #14';
 
             return $return;
         }
 
         if (!password_verify($password, $user['password'])) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("password_incorrect");
+            $return['message'] = $this->__lang('password_incorrect');
 
             return $return;
         }
 
         if ($email == $user['email']) {
             $this->addAttempt();
-            $return['message'] = $this->__lang("newemail_match");
+            $return['message'] = $this->__lang('newemail_match');
 
             return $return;
         }
@@ -1463,13 +1463,13 @@ class Auth
         $query_prepared->execute([$email, $uid]);
 
         if ($query_prepared->rowCount() == 0) {
-            $return['message'] = $this->__lang("system_error") . " #15";
+            $return['message'] = $this->__lang('system_error') . ' #15';
 
             return $return;
         }
 
         $return['error'] = false;
-        $return['message'] = $this->__lang("email_changed");
+        $return['message'] = $this->__lang('email_changed');
 
         return $return;
     }
@@ -1491,14 +1491,14 @@ class Auth
         $attempts = $query_prepared->fetchColumn();
 
         if ($attempts < (int)$this->config->attempts_before_verify) {
-            return "allow";
+            return 'allow';
         }
 
         if ($attempts < (int)$this->config->attempts_before_ban) {
-            return "verify";
+            return 'verify';
         }
 
-        return "block";
+        return 'block';
     }
 
 
@@ -1556,7 +1556,7 @@ class Auth
     protected function addAttempt(): bool
     {
         $ip = $this->getIp();
-        $attempt_expiredate = date("Y-m-d H:i:s", strtotime($this->config->attack_mitigation_time));
+        $attempt_expiredate = date('Y-m-d H:i:s', strtotime($this->config->attack_mitigation_time));
 
         $query = "INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)";
         $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
@@ -1593,9 +1593,9 @@ class Auth
      */
     public function getRandomKey(int $length = self::TOKEN_LENGTH): string
     {
-        $dictionary = "A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6";
+        $dictionary = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
         $dictionary_length = strlen($dictionary);
-        $key = "";
+        $key = '';
 
         for ($i = 0; $i < $length; $i++) {
             $key .= $dictionary[mt_rand(0, $dictionary_length - 1)];
@@ -1638,7 +1638,7 @@ class Auth
      */
     public function getCurrentSessionHash(): string
     {
-        return $_COOKIE[$this->config->cookie_name] ?? "";
+        return $_COOKIE[$this->config->cookie_name] ?? '';
     }
 
     /**
@@ -1690,9 +1690,9 @@ class Auth
      */
     private function renewUserSession(string $hash, int $uid = 0): bool
     {
-        $expire = date("Y-m-d H:i:s", strtotime($this->config->cookie_remember));
+        $expire = date('Y-m-d H:i:s', strtotime($this->config->cookie_remember));
 
-        $where = (is_null(($uid))) ? "hash" : "uid";
+        $where = (is_null(($uid))) ? 'hash' : 'uid';
         $arr = (is_null($uid)) ? $hash : $uid;
 
         $STH = $this->dbh->prepare("UPDATE {$this->config->table_sessions} SET expiredate = ? WHERE {$where} = ?");
@@ -1815,7 +1815,7 @@ class Auth
             if ($type == 'activation') {
                 $mail->Subject = $this->__lang('email_activation_subject', $this->config->site_name);
                 if ($this->config->site_activation_page_append_code) {
-                    $url = $this->config->site_activation_page . "/" . $key;
+                    $url = $this->config->site_activation_page . '/' . $key;
                 } else {
                     $url = $this->config->site_activation_page;
                 }
@@ -1824,7 +1824,7 @@ class Auth
                 $mail->AltBody = $this->__lang('email_activation_altbody', $this->config->site_url, $url, $key);
             } elseif ($type == 'reset') {
                 if ($this->config->site_password_reset_page_append_code) {
-                    $url = $this->config->site_password_reset_page . "/" . $key;
+                    $url = $this->config->site_password_reset_page . '/' . $key;
                 } else {
                     $url = $this->config->site_password_reset_page;
                 }
@@ -1874,7 +1874,7 @@ class Auth
         $bindParams = array_values(array_merge($params, [$uid]));
 
         if (!$query_prepared->execute($bindParams)) {
-            $return['message'] = $this->__lang("system_error") . " #04";
+            $return['message'] = $this->__lang('system_error') . ' #04';
             return $return;
         }
 

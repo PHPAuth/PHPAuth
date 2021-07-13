@@ -1,11 +1,11 @@
 <?php
 
 //include PHPAuth files
-include("../../Config.php");
-include("../../Auth.php");
+include('../../Config.php');
+include('../../Auth.php');
 
 //database-connection-object
-$dbh = new PDO("mysql:host=localhost;dbname=database", "username", "password");
+$dbh = new PDO('mysql:host=localhost;dbname=database', 'username', 'password');
 
 //creating a config-object is enough at this point
 $config = new PHPAuth\Config($dbh);
