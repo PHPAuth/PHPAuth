@@ -115,12 +115,15 @@ class Auth
             $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
 
             return $return;
-        } elseif ($validatePassword['error'] == 1) {
-            $this->addAttempt();
-            $return['message'] = $validatePassword['message']; // ?? $this->__lang("account_password_invalid");
+        }
 
+        if ($validatePassword['error'] == 1) {
+            $this->addAttempt();
+            $return['message'] = $validatePassword['message'];
+            // ?? $this->__lang("account_password_invalid");
             return $return;
-        } elseif ($remember != 0 && $remember != 1) {
+        }
+        elseif ($remember != 0 && $remember != 1) {
             $this->addAttempt();
             $return['message'] = $this->__lang('remember_me_invalid');      //@todo => login_remember_me_invalid
 
@@ -1077,9 +1080,9 @@ class Auth
             $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length);
             return $state;
         }
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $state['message'] = $this->__lang('email_invalid', $email);
 
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $state['message'] = $this->__lang('email_invalid', $email);
             return $state;
         }
 
