@@ -64,8 +64,8 @@ class Auth
      */
     public function __construct(PDO $dbh, Config $config)
     {
-        if (version_compare(phpversion(), '7.1.0', '<')) {
-            die($this->__lang("php_version_required",'7.1.0'));
+        if (version_compare(PHP_VERSION, '7.1.0', '<')) {
+            exit($this->__lang('php_version_required', '7.1.0'));
         }
 
         $this->dbh = $dbh;
