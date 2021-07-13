@@ -33,7 +33,7 @@ class Config
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(PDO $dbh, $config_source = NULL, string $config_type = '', string $config_site_language = '')
+    public function __construct(PDO $dbh, $config_source = null, string $config_type = '', string $config_site_language = '')
     {
         $config_type = strtolower($config_type);
 
@@ -49,13 +49,17 @@ class Config
             {
 
                 // check valid keys
-                if (empty($config_source)) die('PHPAuth: config type is FILE, but no source file declared!'); //@todo: \Exception
+                if (empty($config_source)) {
+                    die('PHPAuth: config type is FILE, but no source file declared!');
+                } //@todo: \Exception
 
                 // replace beginner '$' in filepath to application root directory
                 $source = preg_replace('/^\$/', getcwd(), $config_source);
 
                 // check ini-config is readable
-                if (!is_readable($source)) die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist"); //@todo: \Exception
+                if (!is_readable($source)) {
+                    die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist");
+                } //@todo: \Exception
 
                 // load configuration
                 $this->config = parse_ini_file($source);
@@ -65,7 +69,9 @@ class Config
             case 'array':
             {
                 // check data is valid
-                if (empty($config_source)) die('PHPAuth: config type is ARRAY, but source config is EMPTY'); //@todo: \Exception
+                if (empty($config_source)) {
+                    die('PHPAuth: config type is ARRAY, but source config is EMPTY');
+                } //@todo: \Exception
 
                 // get configuration from given array
                 $this->config = $config_source;
@@ -94,7 +100,6 @@ class Config
                     } else {
                         throw new PDOException();
                     }
-
                 } catch (PDOException $e) {
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
                 }
@@ -143,7 +148,6 @@ class Config
         $dictionary = [];
 
         if (isset($this->config['translation_source'])) {
-
             switch ($this->config['translation_source']) {
                 case 'php':
                 {
@@ -202,7 +206,6 @@ class Config
                     $dictionary = $this->setForgottenDictionary();
                 }
             } // end switch
-
         } else {
             $dictionary = $this->setForgottenDictionary();
         }
@@ -231,13 +234,13 @@ class Config
      */
     public function __get(string $setting)
     {
-        return array_key_exists($setting, $this->config) ? $this->config[$setting] : NULL;
+        return array_key_exists($setting, $this->config) ? $this->config[$setting] : null;
     }
 
     /**
      * @return array
      */
-    public function getAll() : array
+    public function getAll(): array
     {
         return $this->config;
     }
@@ -271,7 +274,7 @@ class Config
      *
      * @return bool
      */
-    public function override(string $setting, $value) : bool
+    public function override(string $setting, $value): bool
     {
         $this->config[$setting] = $value;
 
@@ -330,7 +333,7 @@ class Config
      *
      * @return array
      */
-    protected function setForgottenDictionary() : array
+    protected function setForgottenDictionary(): array
     {
         $lang = array();
 
@@ -414,6 +417,4 @@ class Config
 
         return $lang;
     }
-
-
 }
