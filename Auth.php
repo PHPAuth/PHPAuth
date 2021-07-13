@@ -97,12 +97,9 @@ class Auth
 
         $block_status = $this->isBlocked();
 
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
-
-                return $return;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha_response) == false) {
+            $return['message'] = $this->__lang('user_verify_failed');
+            return $return;
         }
 
         if ($block_status == 'block') {
@@ -191,12 +188,9 @@ class Auth
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
-
-                return $return;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha_response) == false) {
+            $return['message'] = $this->__lang('user_verify_failed');
+            return $return;
         }
 
         if ($block_status == 'block') {
@@ -452,7 +446,7 @@ class Auth
         }
 
         $data['hash'] = sha1($this->config->site_key . microtime());
-        $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         if (!$this->config->allow_concurrent_sessions) {
             $this->deleteExistingSessions($uid);
@@ -583,10 +577,8 @@ class Auth
             if ($db_device_id !== $device_id) {
                 return false;
             }
-        } else {
-            if ($ip !== $db_ip) {
-                return false;
-            }
+        } elseif ($ip !== $db_ip) {
+            return false;
         }
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
@@ -632,12 +624,7 @@ class Auth
         $query = "SELECT count(*) FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
-
-        if ($query_prepared->fetchColumn() == 0) {
-            return false;
-        }
-
-        return true;
+        return !($query_prepared->fetchColumn() == 0);
     }
 
     /**
@@ -659,12 +646,7 @@ class Auth
         $query_prepared->execute([
             'domain' => (strtolower(explode('@', $email)[1]))
         ]);
-
-        if ($query_prepared->fetchColumn() == 0) {
-            return false;
-        }
-
-        return true;
+        return !($query_prepared->fetchColumn() == 0);
     }
 
     /**
@@ -714,10 +696,10 @@ class Auth
 
         $password = $this->getHash($password);
 
-        if (is_array($params) && count($params) > 0) {
+        if (is_array($params) && $params !== []) {
             $customParamsQueryArray = [];
 
-            foreach ($params as $paramKey => $paramValue) {
+            foreach (array_keys($params) as $paramKey) {
                 $customParamsQueryArray[] = ['value' => $paramKey . ' = ?'];
             }
 
@@ -812,12 +794,9 @@ class Auth
         $return['error'] = true;
 
         $block_status = $this->isBlocked();
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
-
-                return $return;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha_response) == false) {
+            $return['message'] = $this->__lang('user_verify_failed');
+            return $return;
         }
 
         if ($block_status == 'block') {
@@ -1092,11 +1071,13 @@ class Auth
             $state['message'] = $this->__lang('email_short', (int)$this->config->verify_email_min_length);
 
             return $state;
-        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) {
-            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length);
+        }
 
+        if (strlen($email) > (int)$this->config->verify_email_max_length) {
+            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length);
             return $state;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        }
+        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $state['message'] = $this->__lang('email_invalid', $email);
 
             return $state;
@@ -1129,12 +1110,9 @@ class Auth
         $state['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $state['message'] = $this->__lang('user_verify_failed');
-
-                return $state;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha_response) == false) {
+            $state['message'] = $this->__lang('user_verify_failed');
+            return $state;
         }
 
         if ($block_status == 'block') {
@@ -1314,11 +1292,9 @@ class Auth
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
-                return $return;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha_response) == false) {
+            $return['message'] = $this->__lang('user_verify_failed');
+            return $return;
         }
 
         if ($block_status == 'block') {
@@ -1342,9 +1318,10 @@ class Auth
             $return['message'] = $validatePassword['message'];
 
             return $return;
-        } elseif ($newpass !== $repeatnewpass) {
-            $return['message'] = $this->__lang('newpassword_nomatch');
+        }
 
+        if ($newpass !== $repeatnewpass) {
+            $return['message'] = $this->__lang('newpassword_nomatch');
             return $return;
         }
 
@@ -1398,12 +1375,9 @@ class Auth
         $return['error'] = true;
         $block_status = $this->isBlocked();
 
-        if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
-
-                return $return;
-            }
+        if ($block_status == 'verify' && $this->checkCaptcha($captcha) == false) {
+            $return['message'] = $this->__lang('user_verify_failed');
+            return $return;
         }
 
         if ($block_status == 'block') {
@@ -1860,7 +1834,7 @@ class Auth
         //unset uid which is set in getUser(). array generated in getUser() is now usable as parameter for updateUser()
         unset($params['uid']);
 
-        if (is_array($params) && count($params) > 0) {
+        if (is_array($params) && $params !== []) {
             $setParams = implode(', ', array_map(function ($key, $value) {
                 return $key . ' = ?';
             }, array_keys($params), $params));
