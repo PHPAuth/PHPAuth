@@ -265,16 +265,16 @@ By default, config defined at `phpauth_config` data table.
 It is possible to define custom config from other sources: ini-file, other SQL-table or php-array:
 
 ```
-Config($dbh, $config_type, $config_source, $config_language)
+Config($dbh, $config_source, $config_type, $config_language)
 ```
-* `config_type`:
-  * 'sql' (or empty value) - load config from database,
-  * 'ini' - config must be declared in INI file (sections can be used for better readability, but will not be parsed)
-  * 'array' - config will be loaded from $config_source (type of array)
 * `config_source` -
   * for 'sql': name of custom table with configuration
   * for 'ini': path and name of INI file (for example: '$/config/config.ini', '$' means application root)
   * for 'array': it is a array with configuration
+* `config_type`:
+  * 'sql' (or empty value) - load config from database,
+  * 'ini' - config must be declared in INI file (sections can be used for better readability, but will not be parsed)
+  * 'array' - config will be loaded from $config_source (type of array)
 * `config_language` - custom language for site as locale value (default is 'en_GB')
 
 Examples:
@@ -282,11 +282,11 @@ Examples:
 ```
 new Config($dbh); // load config from SQL table 'phpauth_config', language is 'en_GB'
 
-new Config($dbh, '', 'my_config'); // load config from SQL table 'my_config', language is 'en_GB'
+new Config($dbh, 'my_config', ''); // load config from SQL table 'my_config', language is 'en_GB'
 
-new Config($dbh, 'ini', '$/config/phpauth.ini'); // configuration will be loaded from INI file, '$' means Application basedir
+new Config($dbh, '$/config/phpauth.ini', 'ini'); // configuration will be loaded from INI file, '$' means Application basedir
 
-new Config($dbh, 'array', $CONFIG_ARRAY); // configuration must be defined in $CONFIG_ARRAY value
+new Config($dbh, $CONFIG_ARRAY, 'array'); // configuration must be defined in $CONFIG_ARRAY value
 
 new Config($dbh, '', '', 'ru_RU'); // load configuration from default SQL table and use ru_RU locale
 ```
