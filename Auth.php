@@ -539,7 +539,7 @@ class Auth
     protected function removeCookie() : void
     {
         if(isset($_COOKIE[$this->config->cookie_name])) {
-            unset($_COOKIE[ $this->config->cookie_name ]);
+            unset($_COOKIE[$this->config->cookie_name]);
         }
         setcookie($this->config->cookie_name, null, -1, '/');
     }
