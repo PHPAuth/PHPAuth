@@ -512,6 +512,7 @@ class Auth
         $query = "DELETE FROM {$this->config->table_sessions} WHERE uid = :uid";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['uid' => $uid]);
+        $this->removeCookie();
 
         return $query_prepared->rowCount() > 0;
     }
@@ -522,13 +523,25 @@ class Auth
      *
      * @return boolean
      */
-    //@todo: delete cookie at deleteSession
     protected function deleteSession(string $hash): bool
     {
         $query = "DELETE FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['hash' => $hash]);
+        $this->removeCookie();
+
         return $query_prepared->rowCount() == 1;
+    }
+
+    /**
+     * Clear user cookie
+     */
+    protected function removeCookie() : void
+    {
+        if(isset($_COOKIE[$this->config->cookie_name])) {
+            unset($_COOKIE[ $this->config->cookie_name ]);
+        }
+        setcookie($this->config->cookie_name, null, -1, '/');
     }
 
     /**
