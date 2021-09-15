@@ -536,12 +536,17 @@ class Auth
     /**
      * Clear user cookie
      */
-    protected function removeCookie() : void
+    protected function removeCookie() : bool
     {
         if(isset($_COOKIE[$this->config->cookie_name])) {
             unset($_COOKIE[$this->config->cookie_name]);
         }
-        setcookie($this->config->cookie_name, null, -1, '/');
+
+        if (!setcookie($this->config->cookie_name, null, -1, '/')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
