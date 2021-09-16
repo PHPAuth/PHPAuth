@@ -6,6 +6,15 @@
   "commit": false,
   "contributors": [
     {
+      "login": "KarelWintersky",
+      "name": "Karel Wintersky",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2164874?v=4",
+      "profile": "https://github.com/KarelWintersky",
+      "contributions": [
+        "code", "doc"
+      ]
+    },
+    {
       "login": "turbopixel",
       "name": "Nico",
       "avatar_url": "https://avatars2.githubusercontent.com/u/15839724?v=4",
