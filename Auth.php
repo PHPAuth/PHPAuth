@@ -419,7 +419,8 @@ class Auth
     }
 
     /**
-     * Gets UID for a given email address, return int
+     * Gets UID for a given email address or zero if email not found
+     
      * @param string $email
      * @return int $uid
      */
@@ -428,12 +429,10 @@ class Auth
         $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => strtolower($email)]);
-
-        if ($query_prepared->rowCount() == 0) {
-            return 0;
-        }
-
-        return $query_prepared->fetchColumn();
+        
+        $uid = $query_prepared->fetchColumn();
+        
+        return $uid === false ? 0 : $uid;
     }
 
     /**
