@@ -1,9 +1,17 @@
-* text=auto
-* eol=lf
+# This file tells which files and directories should be ignored and
+# NOT downloaded when using composer to pull down a project with
+# the --prefer-dist option selected. Used to remove development
+# specific files so user has a clean download.
 
-/.git           export-ignore
-/.gitignore     export-ignore
-/tests          export-ignore
-/.travis.yml    export-ignore
-/phpunit.xml    export-ignore
-/README.md      export-ignore
+.github             export-ignore
+.all-contributorsrc export-ignore
+.editorconfig       export-ignore
+.gitattributes      export-ignore
+.gitignore          export-ignore
+.travis.yml         export-ignore
+CODE_OF_CONDUCT.md  export-ignore
+CONTRIBUTING.md     export-ignore
+README.md           export-ignore
+phpunit.xml         export-ignore
+tests               export-ignore
+banner_small.png    export-ignore
