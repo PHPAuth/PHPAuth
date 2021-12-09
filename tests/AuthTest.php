@@ -248,6 +248,7 @@ class AuthTest extends TestCase
     }
 
     /**
+     * @depends testLogin
      * @depends testChangeEmail
      */
     public function testLogout()

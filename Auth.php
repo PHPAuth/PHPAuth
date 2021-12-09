@@ -420,7 +420,7 @@ class Auth
 
     /**
      * Gets UID for a given email address or zero if email not found
-     
+
      * @param string $email
      * @return int $uid
      */
@@ -429,9 +429,9 @@ class Auth
         $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => strtolower($email)]);
-        
+
         $uid = $query_prepared->fetchColumn();
-        
+
         return $uid === false ? 0 : $uid;
     }
 
@@ -575,13 +575,16 @@ class Auth
         $query_params = [
             'hash' => $hash
         ];
-        $query_prepared->execute($query_params);
 
-        if ($query_prepared->rowCount() == 0) {
+        if (!$query_prepared->execute($query_params)) {
             return false;
         }
 
         $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($row)) {
+            return false;
+        }
 
         $uid = $row['uid'];
         $expiredate = strtotime($row['expiredate']);
@@ -630,10 +633,9 @@ class Auth
         $query_params = [
             'hash' => $hash
         ];
-        $query_prepared->execute($query_params);
 
-        if ($query_prepared->rowCount() == 0) {
-            return 0;
+        if (!$query_prepared->execute($query_params)) {
+            return false;
         }
 
         return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
