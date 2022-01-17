@@ -1622,7 +1622,7 @@ class Auth
     }
 
     /**
-     * Returns IP address
+     * Returns IP address of client
      * @return string $ip
      */
     protected function getIp(): string
@@ -1642,6 +1642,8 @@ class Auth
         } else {
             $ipAddress = '127.0.0.1';
         }
+
+        $ipAddress = explode(',', $ipAddress);
 
         return $ipAddress;
     }
