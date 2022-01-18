@@ -1643,7 +1643,7 @@ class Auth
             $ipAddress = '127.0.0.1';
         }
 
-        $ipAddress = explode(',', $ipAddress);
+        $ipAddress = explode(',', $ipAddress)[0];
 
         return $ipAddress;
     }
