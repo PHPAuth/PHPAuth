@@ -541,7 +541,7 @@ class Auth
             unset($_COOKIE[$this->config->cookie_name]);
         }
 
-        if (!setcookie($this->config->cookie_name, null, -1, '/')) {
+        if (!setcookie($this->config->cookie_name, '', -1, '/')) {
             return false;
         }
 
