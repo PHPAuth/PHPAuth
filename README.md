@@ -29,24 +29,24 @@ PHPAuth
 
 Notice! (pr 1/10/2020)
 ---------------
-PHPAuth is under going a complete rewrite to bring the code up to date, the project has been on hold
-for way to long time now and I decided to work on it again making sure EVERYONE can use
-it and not just advanced programmers. My goal is to make a Auth framework that is secure,
-extendible and usable for everyone. It will take some time but we have a good amount of
+PHPAuth is undergoing a complete rewrite to bring the code up to date, the project has been on hold
+for way to long time now, and I decided to work on it again making sure EVERYONE can use
+it and not just advanced programmers. My goal is to make an Auth framework that is secure,
+extendable and usable for everyone. It will take some time, but we have a good amount of
 users already using this code which are happily to help out.
 
 #### Goals:
-- Bring code up to newest PHP version with min. of v7.1 to v7.4 (If new version comes out while rewriting the code will be pushed up to that version also)
-  - [X] [PHP 7 improvements](https://github.com/PHPAuth/PHPAuth/pull/482)
-- Making the code even more secure to use by adding things like one time keys (OTP, 2FA etc)
-- Make sure that the code can be used by everyone, also beginners.
-- Write much better documentation.
-- Make database queries faster.
-- Optimize the code.
-- Bring down issue count.
-- Respond faster to issue and PRs.
-- And much more!
 
+- [X] Bring code up to latest PHP version with min. of v7.1 to v7.4 (If new version comes out while rewriting the code will be pushed up to that version also)
+  - [X] [PHP 7 improvements](https://github.com/PHPAuth/PHPAuth/pull/482)
+- [ ] Making the code even more secure to use by adding things like one time keys (OTP, 2FA etc)
+- [ ] Make sure that the code can be used by everyone, also beginners.
+- [ ] Write much better documentation.
+- [ ] Make database queries faster.
+- [ ] Optimize the code.
+- [ ] Bring down issue count.
+- [ ] Respond faster to issue and PRs.
+- And much more!
 
 
 What is it
@@ -92,9 +92,11 @@ Composer Support
 ---------------
 PHPAuth can now be installed with the following command:
 
-`composer require phpauth/phpauth:dev-master`
+`composer require phpauth/phpauth`
 
-Then: `require 'vendor/autoload.php';`
+Then: `require '/path/to/vendor/autoload.php';`
+
+Installing without composer not recommended.
 
 Configuration
 ---------------
@@ -198,13 +200,12 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 ```php
 <?php
 
-include("Config.php");
-include("Auth.php");
+require_once __DIR__ . '/vendow/autoload.php';
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
-$config = new PHPAuth\Config($dbh);
-$auth   = new PHPAuth\Auth($dbh, $config);
+$config = new \PHPAuth\src\Config($dbh);
+$auth   = new \PHPAuth\src\Auth($dbh, $config);
 
 if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
@@ -213,34 +214,9 @@ if (!$auth->isLogged()) {
     exit();
 }
 
-?>
 ```
 
-or
-
-```php
-<?php
-
-require_once 'vendor/autoload.php';
-
-use PHPAuth\Config as PHPAuthConfig;
-use PHPAuth\Auth as PHPAuth;
-
-$dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
-
-$config = new PHPAuthConfig($dbh);
-$auth = new PHPAuth($dbh, $config);
-
-if (!$auth->isLogged()) {
-    header('HTTP/1.0 403 Forbidden');
-    echo "Forbidden";
-
-    exit();
-}
-
-?>
-```
-**NB:** required package installed via composer: `composer require phpauth/phpauth:dev-master`!!!
+**NB:** required package installed via composer: `composer require phpauth/phpauth`!!!
 
 Validate user password in front-end
 -----------------------------------
@@ -279,16 +255,16 @@ Config($dbh, $config_source, $config_type, $config_language)
 
 Examples:
 
-```
+```php
 new Config($dbh); // load config from SQL table 'phpauth_config', language is 'en_GB'
 
-new Config($dbh, 'my_config', ''); // load config from SQL table 'my_config', language is 'en_GB'
+new Config($dbh, 'my_config'); // load config from SQL table 'my_config', language is 'en_GB'
 
 new Config($dbh, '$/config/phpauth.ini', 'ini'); // configuration will be loaded from INI file, '$' means Application basedir
 
 new Config($dbh, $CONFIG_ARRAY, 'array'); // configuration must be defined in $CONFIG_ARRAY value
 
-new Config($dbh, '', '', 'ru_RU'); // load configuration from default SQL table and use ru_RU locale
+new Config($dbh, null, '', 'ru_RU'); // load configuration from default SQL table and use ru_RU locale
 ```
 
 
@@ -300,7 +276,11 @@ The language for error and success messages returned by PHPAuth can be configure
 the available languages as the third parameter to the Auth constructor. If no language parameter is provided
 then the default `en_GB`language is used.
 
-Example: `$auth   = new PHPAuth\Auth($dbh, $config, "fr_FR");`
+Example:
+```php
+$config = new PHPAuth\Config($dbh, null, 'sql', 'fr_FR');
+$auth   = new PHPAuth\Auth($dbh, $config);`
+```
 
 Available languages:
 
@@ -351,7 +331,6 @@ Anyone can contribute to improve or fix PHPAuth, to do so you can either report 
 Credits
 ---------------
 
-* [password_compat](https://github.com/ircmaxell/password_compat) - @ircmaxell
 * [disposable](https://github.com/lavab/disposable) - @lavab
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer) - @PHPMailer
 * [zxcvbn-php](https://github.com/bjeavons/zxcvbn-php) - @bjeavons

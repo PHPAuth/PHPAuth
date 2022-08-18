@@ -11,8 +11,19 @@ use PDOStatement;
  */
 class Config
 {
+    /**
+     * @var PDO
+     */
     protected $dbh;
+
+    /**
+     * @var array
+     */
     public $config;
+
+    /**
+     * @var string
+     */
     public $config_table = 'phpauth_config';
 
     /**
@@ -37,8 +48,8 @@ class Config
     {
         $config_type = strtolower($config_type);
 
-        if (version_compare(phpversion(), '7.1.0', '<')) {
-            die('PHPAuth: PHP 7.1.0+ required for PHPAuth engine!');
+        if (PHP_VERSION_ID < 70200) {
+            die('PHPAuth: PHP 7.2.0+ required for PHPAuth engine!');
         }
 
         $this->config = [];
@@ -47,7 +58,6 @@ class Config
         switch ($config_type) {
             case 'ini':
             {
-
                 // check valid keys
                 if (empty($config_source)) {
                     die('PHPAuth: config type is FILE, but no source file declared!');
@@ -142,17 +152,15 @@ class Config
 
         // Determine site language
         $site_language = (empty($config_site_language))
-            ? isset($this->config['site_language']) ? $this->config['site_language'] : 'en_GB'
+            ? $this->config['site_language'] ?? 'en_GB'
             : $config_site_language;
 
         $dictionary = [];
 
         if (isset($this->config['translation_source'])) {
             switch ($this->config['translation_source']) {
-                case 'php':
-                {
-
-                    $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
+                case 'php': {
+                    $lang_file = __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
 
                     if (is_readable($lang_file)) {
                         $dictionary = include $lang_file;
@@ -165,7 +173,7 @@ class Config
                 case 'ini':
                 {
 
-                    $lang_file = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
+                    $lang_file = __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
 
                     if (is_readable($lang_file)) {
                         $dictionary = parse_ini_file($lang_file);
@@ -342,7 +350,7 @@ class Config
 
         $lang['account_email_invalid'] = 'Email address is incorrect or banned';
         $lang['account_password_invalid'] = 'Password is invalid';
-        $lang['account_not_found'] = 'Account with given email not found.';
+        $lang['account_not_found'] = 'No account found with that email address';
 
         $lang['login_remember_me_invalid'] = 'The remember me field is invalid.';
 
@@ -395,11 +403,11 @@ class Config
 
         $lang['reset_requested'] = 'Password reset request sent to email address.';
         $lang['reset_requested_emailmessage_suppressed'] = 'Password reset request is created.';
-        $lang['reset_exists'] = 'A reset request already exists. Next reset password request will available at %s';             //@todo: updated 2018-06-28
+        $lang['reset_exists'] = 'A reset request already exists. Next reset password request will available at %s';
 
         $lang['already_activated'] = 'Account is already activated.';
         $lang['activation_sent'] = 'Activation email has been sent.';
-        $lang['activation_exists'] = 'An activation email has already been sent. Next reactivation will available at %s';       //@todo: updated 2018-06-28
+        $lang['activation_exists'] = 'An activation email has already been sent. Next reactivation will available at %s';
 
         $lang['email_activation_subject'] = '%s - Activate account';
         $lang['email_activation_body'] = 'Hello,<br/><br/> To be able to log in to your account you first need to activate your account by clicking on the following link : <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> You then need to use the following activation key: <strong>%3$s</strong><br/><br/> If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
@@ -411,7 +419,6 @@ class Config
 
         $lang['account_deleted'] = 'Account deleted successfully.';
         $lang['function_disabled'] = 'This function has been disabled.';
-        $lang['account_not_found'] = 'No account found with that email address';
 
         $lang['php_version_required'] = 'PHPAuth engine requires PHP version %s+!';
 

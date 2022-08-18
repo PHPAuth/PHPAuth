@@ -8,7 +8,7 @@ include('../../Auth.php');
 $dbh = new PDO('mysql:host=localhost;dbname=database', 'username', 'password');
 
 //creating a config-object is enough at this point
-$config = new PHPAuth\Config($dbh);
+$config = new \PHPAuth\src\Config($dbh);
 // $auth   = new PHPAuth\Auth($dbh, $config);
 
 ?>
@@ -79,7 +79,7 @@ $config = new PHPAuth\Config($dbh);
             //evaluate password strength
             let result = zxcvbn(password);
 
-            //set minimum_score via php 
+            //set minimum_score via php
             <?php echo 'let minimum_score =' . $config->password_min_score; ?>
 
             //enable submit button
