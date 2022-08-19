@@ -200,12 +200,12 @@ Making a page accessible only to authenticated users is quick and easy, requirin
 ```php
 <?php
 
-require_once __DIR__ . '/vendow/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 $dbh = new PDO("mysql:host=localhost;dbname=phpauth", "username", "password");
 
-$config = new \PHPAuth\src\Config($dbh);
-$auth   = new \PHPAuth\src\Auth($dbh, $config);
+$config = new \PHPAuth\Config($dbh);
+$auth   = new \PHPAuth\Auth($dbh, $config);
 
 if (!$auth->isLogged()) {
     header('HTTP/1.0 403 Forbidden');
@@ -277,9 +277,10 @@ the available languages as the third parameter to the Auth constructor. If no la
 then the default `en_GB`language is used.
 
 Example:
+
 ```php
-$config = new PHPAuth\Config($dbh, null, 'sql', 'fr_FR');
-$auth   = new PHPAuth\Auth($dbh, $config);`
+$config = new \PHPAuth\Config($dbh, null, 'sql', 'fr_FR');
+$auth   = new \PHPAuth\Auth($dbh, $config);`
 ```
 
 Available languages:

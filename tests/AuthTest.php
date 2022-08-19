@@ -27,10 +27,8 @@ class AuthTest extends TestCase
     public static function setUpBeforeClass()
     {
         require_once __DIR__ . '/../vendor/autoload.php';
-        // require_once __DIR__ . '/../src/Auth.php';
-        // require_once __DIR__ . '/../src/Config.php';
 
-        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_table", "phpauth_test_user", "");
+        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_database", "phpauth_test_user", "");
         self::$config = new \PHPAuth\Config(self::$dbh);
         self::$auth   = new \PHPAuth\Auth(self::$dbh, self::$config);
 

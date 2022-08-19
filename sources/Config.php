@@ -9,7 +9,7 @@ use PDOStatement;
 /**
  * PHPAuth Config class
  */
-class Config
+class Config implements ConfigInterface
 {
     /**
      * @var PDO
@@ -44,7 +44,7 @@ class Config
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(PDO $dbh, $config_source = null, string $config_type = '', string $config_site_language = '')
+    public function __construct(PDO $dbh, $config_source = null, string $config_type = self::CONFIG_TYPE_SQL, string $config_site_language = '')
     {
         $config_type = strtolower($config_type);
 
@@ -54,10 +54,10 @@ class Config
 
         $this->config = [];
         $this->dbh = $dbh;
+        $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 
         switch ($config_type) {
-            case 'ini':
-            {
+            case self::CONFIG_TYPE_INI : {
                 // check valid keys
                 if (empty($config_source)) {
                     die('PHPAuth: config type is FILE, but no source file declared!');
@@ -76,8 +76,7 @@ class Config
 
                 break;
             }
-            case 'array':
-            {
+            case self::CONFIG_TYPE_ARRAY: {
                 // check data is valid
                 if (empty($config_source)) {
                     die('PHPAuth: config type is ARRAY, but source config is EMPTY');
@@ -88,18 +87,34 @@ class Config
 
                 break;
             }
-            case 'json':
-            case 'yml':
-            case 'xml':
-            {
+            case self::CONFIG_TYPE_JSON: {
+                die('PHPAuth: Config type JSON not supported now');
                 break;
             }
+            case self::CONFIG_TYPE_YML: {
+                die('PHPAuth: Config type YAML not supported now');
+                break;
+            }
+            case self::CONFIG_TYPE_XML: {
+                die('PHPAuth: Config type XML not supported now');
+                break;
+            }
+            case self::CONFIG_TYPE_SQL:
             default:
             {
                 // is 'SQL' or EMPTY value
                 //
                 // determine config table
                 $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
+
+                if ($this->checkTableExists($this->config_table) === false) {
+                    die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
+                }
+
+                /*$this->config = $this
+                    ->dbh
+                    ->query("SELECT `setting`, `value` FROM {$this->config_table} ORDER BY `setting`")
+                    ->fetchAll(PDO::FETCH_KEY_PAIR);*/
 
                 // load configuration
                 try {
@@ -123,30 +138,19 @@ class Config
         // Check required tables exists
 
         // check table_attempts
-        try {
-            $this->dbh->query("SELECT * FROM {$this->config['table_attempts']} LIMIT 1;");
-        } catch (PDOException $e) {
+        if ($this->checkTableExists($this->config['table_attempts']) === false) {
             die("PHPAuth: Config table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
-        // check table requests
-        try {
-            $this->dbh->query("SELECT * FROM {$this->config['table_requests']} LIMIT 1;");
-        } catch (PDOException $e) {
+        if ($this->checkTableExists($this->config['table_requests']) === false) {
             die("PHPAuth: Config table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
-        // check table sessions
-        try {
-            $this->dbh->query("SELECT * FROM {$this->config['table_sessions']} LIMIT 1;");
-        } catch (PDOException $e) {
+        if ($this->checkTableExists($this->config['table_sessions']) === false) {
             die("PHPAuth: Config table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
-        // check table users
-        try {
-            $this->dbh->query("SELECT * FROM {$this->config['table_users']} LIMIT 1;");
-        } catch (PDOException $e) {
+        if ($this->checkTableExists($this->config['table_users']) === false) {
             die("PHPAuth: Config table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
         }
 
@@ -170,9 +174,7 @@ class Config
 
                     break;
                 }
-                case 'ini':
-                {
-
+                case 'ini': {
                     $lang_file = __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
 
                     if (is_readable($lang_file)) {
@@ -182,25 +184,22 @@ class Config
                     }
                     break;
                 }
-                case 'sql':
-                {
-
+                case 'sql': {
                     // check field `table_translations` present
-                    if (empty($this->config['table_translations'])) {
+                    if (
+                        empty($this->config['table_translations'])
+                        ||
+                        ($this->checkTableExists($this->config['table_translations']) === false))
+                    {
                         $dictionary = $this->setForgottenDictionary();
                         break;
                     }
 
-                    // check table exists in database
-                    try {
-                        $this->dbh->query("SELECT * FROM {$this->config['table_translations']} LIMIT 1;");
-                    } catch (PDOException $e) {
-                        $dictionary = $this->setForgottenDictionary();
-                        break;
-                    }
-
-                    $query = "SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ";
-                    $dictionary = $this->dbh->query($query)->fetchAll(PDO::FETCH_KEY_PAIR);
+                    $dictionary =
+                        $this
+                            ->dbh
+                            ->query("SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ")
+                            ->fetchAll(PDO::FETCH_KEY_PAIR);
 
                     break;
                 }
@@ -237,7 +236,6 @@ class Config
      * Config::__get()
      *
      * @param string $setting
-     *
      * @return string|int
      */
     public function __get(string $setting)
@@ -245,9 +243,6 @@ class Config
         return array_key_exists($setting, $this->config) ? $this->config[$setting] : null;
     }
 
-    /**
-     * @return array
-     */
     public function getAll(): array
     {
         return $this->config;
@@ -291,8 +286,8 @@ class Config
 
     /**
      * Danger foreseen is half avoided.
-     *
      * Set default values.
+     *
      * REQUIRED FOR USERS THAT DOES NOT UPDATE THEIR `config` TABLES.
      */
     protected function setForgottenDefaults()
@@ -300,10 +295,8 @@ class Config
         // ==== unchecked values ====
         $this->repairConfigValue('bcrypt_cost', 10);
 
-        // cookies* values
         $this->repairConfigValue('cookie_name', 'phpauth_session_cookie');
 
-        // verify* values
         $this->repairConfigValue('verify_password_min_length', 3);
 
         $this->repairConfigValue('verify_email_min_length', 5);
@@ -312,20 +305,18 @@ class Config
 
         $this->repairConfigValue('verify_email_use_banlist', 1);
 
-        // emailmessage* values
-
         $this->repairConfigValue('emailmessage_suppress_activation', 0);
 
         $this->repairConfigValue('emailmessage_suppress_reset', 0);
 
         $this->repairConfigValue('mail_charset', 'UTF-8');
 
-        // others
         $this->repairConfigValue('allow_concurrent_sessions', false);
     }
 
     /**
      * Set configuration value if it is not present.
+     *
      * @param string $setting
      * @param mixed $default_value
      */
@@ -423,5 +414,43 @@ class Config
         $lang['php_version_required'] = 'PHPAuth engine requires PHP version %s+!';
 
         return $lang;
+    }
+
+    /**
+     * Check is given table exists, depends on database driver
+     *
+     * @param string $table
+     * @return bool
+     */
+    protected function checkTableExists(string $table):bool
+    {
+        switch ($this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            case 'pgsql': {
+                $sth = $this->dbh->query("SELECT FROM pg_tables WHERE tablename = '{$table}' ;");
+                return (bool)$sth->rowCount();
+                break;
+            }
+            case 'mysql': {
+                $sth = $this->dbh->query("SELECT EXISTS(SELECT 1 FROM information_schema.TABLES WHERE TABLE_NAME = '{$table}' AND TABLE_SCHEMA in (SELECT DATABASE()));");
+                return (bool)$sth->fetchColumn();
+                break;
+            }
+            case 'sqlite': {
+                $sth = $this->dbh->query("PRAGMA table_info({$table})  ");
+                $schema = $sth->fetchAll();
+                return (!empty($schema));
+            }
+            default: {
+                // Legacy databases (MS SQL, Informix and so on)
+                try {
+                    $this->dbh->query("SELECT * FROM {$table} LIMIT 1;");
+                } catch (PDOException $e) {
+                    return false;
+                }
+                return true;
+            }
+        } // switch
+
+        return false;
     }
 }
