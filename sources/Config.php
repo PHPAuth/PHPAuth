@@ -5,6 +5,7 @@ namespace PHPAuth;
 use PDO;
 use PDOException;
 use PDOStatement;
+use RuntimeException;
 
 /**
  * PHPAuth Config class
@@ -58,18 +59,16 @@ class Config implements ConfigInterface
 
         switch ($config_type) {
             case self::CONFIG_TYPE_INI : {
-                // check valid keys
                 if (empty($config_source)) {
-                    die('PHPAuth: config type is FILE, but no source file declared!');
-                } //@todo: \Exception
+                    throw new RuntimeException('PHPAuth: config type is FILE, but no source file declared!');
+                }
 
                 // replace beginner '$' in filepath to application root directory
                 $source = preg_replace('/^\$/', getcwd(), $config_source);
 
-                // check ini-config is readable
                 if (!is_readable($source)) {
-                    die("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist");
-                } //@todo: \Exception
+                    throw new RuntimeException("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist");
+                }
 
                 // load configuration
                 $this->config = parse_ini_file($source);
@@ -77,10 +76,9 @@ class Config implements ConfigInterface
                 break;
             }
             case self::CONFIG_TYPE_ARRAY: {
-                // check data is valid
                 if (empty($config_source)) {
-                    die('PHPAuth: config type is ARRAY, but source config is EMPTY');
-                } //@todo: \Exception
+                    throw new RuntimeException('PHPAuth: config type is ARRAY, but source config is EMPTY');
+                }
 
                 // get configuration from given array
                 $this->config = $config_source;
@@ -88,36 +86,31 @@ class Config implements ConfigInterface
                 break;
             }
             case self::CONFIG_TYPE_JSON: {
-                die('PHPAuth: Config type JSON not supported now');
-                break;
+                throw new RuntimeException('PHPAuth: Config type JSON not supported now');
             }
             case self::CONFIG_TYPE_YML: {
-                die('PHPAuth: Config type YAML not supported now');
-                break;
+                throw new RuntimeException('PHPAuth: Config type YAML not supported now');
             }
             case self::CONFIG_TYPE_XML: {
-                die('PHPAuth: Config type XML not supported now');
-                break;
+                throw new RuntimeException('PHPAuth: Config type XML not supported now');
             }
             case self::CONFIG_TYPE_SQL:
             default:
             {
                 // is 'SQL' or EMPTY value
-                //
-                // determine config table
                 $this->config_table = (empty($config_source)) ? 'phpauth_config' : $config_source;
 
                 if ($this->checkTableExists($this->config_table) === false) {
-                    die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
+                    throw new RuntimeException("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database");
                 }
 
-                /*$this->config = $this
+                $this->config = $this
                     ->dbh
                     ->query("SELECT `setting`, `value` FROM {$this->config_table} ORDER BY `setting`")
-                    ->fetchAll(PDO::FETCH_KEY_PAIR);*/
+                    ->fetchAll(PDO::FETCH_KEY_PAIR);
 
                 // load configuration
-                try {
+                /*try {
                     $configQuery = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table};");
 
                     if ($configQuery instanceof PDOStatement) {
@@ -127,7 +120,7 @@ class Config implements ConfigInterface
                     }
                 } catch (PDOException $e) {
                     die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
-                }
+                }*/
 
                 break;
             }
@@ -139,19 +132,19 @@ class Config implements ConfigInterface
 
         // check table_attempts
         if ($this->checkTableExists($this->config['table_attempts']) === false) {
-            die("PHPAuth: Config table `{$this->config['table_attempts']}` NOT PRESENT in given database" . PHP_EOL);
+            throw new RuntimeException("PHPAuth: Config table `{$this->config['table_attempts']}` NOT PRESENT in given database");
         }
 
         if ($this->checkTableExists($this->config['table_requests']) === false) {
-            die("PHPAuth: Config table `{$this->config['table_requests']}` NOT PRESENT in given database" . PHP_EOL);
+            throw new RuntimeException("PHPAuth: Config table `{$this->config['table_requests']}` NOT PRESENT in given database");
         }
 
         if ($this->checkTableExists($this->config['table_sessions']) === false) {
-            die("PHPAuth: Config table `{$this->config['table_sessions']}` NOT PRESENT in given database" . PHP_EOL);
+            throw new RuntimeException("PHPAuth: Config table `{$this->config['table_sessions']}` NOT PRESENT in given database");
         }
 
         if ($this->checkTableExists($this->config['table_users']) === false) {
-            die("PHPAuth: Config table `{$this->config['table_users']}` NOT PRESENT in given database" . PHP_EOL);
+            throw new RuntimeException("PHPAuth: Config table `{$this->config['table_users']}` NOT PRESENT in given database");
         }
 
         // Determine site language
@@ -161,59 +154,33 @@ class Config implements ConfigInterface
 
         $dictionary = [];
 
-        if (isset($this->config['translation_source'])) {
-            switch ($this->config['translation_source']) {
-                case 'php': {
-                    $lang_file = __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
-
-                    if (is_readable($lang_file)) {
-                        $dictionary = include $lang_file;
-                    } else {
-                        $dictionary = $this->setForgottenDictionary();
-                    }
-
-                    break;
+        switch ($this->config['translation_source']) {
+            case 'php': {
+                $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
+                if (is_readable($lang_file)) {
+                    $dictionary = include $lang_file;
                 }
-                case 'ini': {
-                    $lang_file = __DIR__ . DIRECTORY_SEPARATOR . 'languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
+                break;
+            }
+            case 'ini': {
+                $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
 
-                    if (is_readable($lang_file)) {
-                        $dictionary = parse_ini_file($lang_file);
-                    } else {
-                        $dictionary = $this->setForgottenDictionary();
-                    }
-                    break;
+                if (is_readable($lang_file)) {
+                    $dictionary = parse_ini_file($lang_file);
                 }
-                case 'sql': {
-                    // check field `table_translations` present
-                    if (
-                        empty($this->config['table_translations'])
-                        ||
-                        ($this->checkTableExists($this->config['table_translations']) === false))
-                    {
-                        $dictionary = $this->setForgottenDictionary();
-                        break;
-                    }
-
+                break;
+            }
+            case 'sql': {
+                if ($this->config['table_translations'] && $this->checkTableExists($this->config['table_translations'])) {
                     $dictionary =
                         $this
                             ->dbh
                             ->query("SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ")
                             ->fetchAll(PDO::FETCH_KEY_PAIR);
-
-                    break;
                 }
-                case 'xml':
-                case 'json':
-                {
-                    break;
-                }
-                default:
-                {
-                    $dictionary = $this->setForgottenDictionary();
-                }
-            } // end switch
-        } else {
+            }
+        }
+        if (empty($dictionary)) {
             $dictionary = $this->setForgottenDictionary();
         }
 
@@ -419,11 +386,15 @@ class Config implements ConfigInterface
     /**
      * Check is given table exists, depends on database driver
      *
-     * @param string $table
+     * @param string|null $table
      * @return bool
      */
-    protected function checkTableExists(string $table):bool
+    protected function checkTableExists(string $table = null):bool
     {
+        if (empty($table)) {
+            return false;
+        }
+
         switch ($this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME)) {
             case 'pgsql': {
                 $sth = $this->dbh->query("SELECT FROM pg_tables WHERE tablename = '{$table}' ;");
