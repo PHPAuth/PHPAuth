@@ -14,6 +14,8 @@ use function setcookie;
 
 class Auth implements AuthInterface
 {
+    use Helpers;
+
     /**
      * @var PDO $dbh
      */
