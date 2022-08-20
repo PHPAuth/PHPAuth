@@ -152,13 +152,14 @@ class Config implements ConfigInterface
             ? $this->config['site_language'] ?? 'en_GB'
             : $config_site_language;
 
-        $dictionary = [];
+        $dictionary = $this->setForgottenDictionary();
+        $dictionary_new = [];
 
         switch ($this->config['translation_source']) {
             case 'php': {
                 $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
                 if (is_readable($lang_file)) {
-                    $dictionary = include $lang_file;
+                    $dictionary_new = include $lang_file;
                 }
                 break;
             }
@@ -166,13 +167,13 @@ class Config implements ConfigInterface
                 $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
 
                 if (is_readable($lang_file)) {
-                    $dictionary = parse_ini_file($lang_file);
+                    $dictionary_new = parse_ini_file($lang_file);
                 }
                 break;
             }
             case 'sql': {
                 if ($this->config['table_translations'] && $this->checkTableExists($this->config['table_translations'])) {
-                    $dictionary =
+                    $dictionary_new =
                         $this
                             ->dbh
                             ->query("SELECT `translation_key`, `{$site_language}` as `lang` FROM {$this->config['table_translations']} ")
@@ -180,8 +181,11 @@ class Config implements ConfigInterface
                 }
             }
         }
-        if (empty($dictionary)) {
-            $dictionary = $this->setForgottenDictionary();
+
+        foreach ($dictionary as $key => $value) {
+            if (array_key_exists($key, $dictionary_new) && !empty($dictionary_new[$key])) {
+                $dictionary[$key] = $dictionary_new[$key];
+            }
         }
 
         // set dictionary
@@ -303,80 +307,82 @@ class Config implements ConfigInterface
     {
         $lang = array();
 
-        $lang['user_blocked'] = 'You are currently locked out of the system.';
+        $lang['account_activated'] = 'Account activated.';
+        $lang['account_deleted'] = 'Account deleted successfully.';
+        $lang['account_inactive'] = 'Account has not yet been activated.';
+        $lang['email_taken'] = 'The email address is already in use.';
+        $lang['activation_exists'] = 'An activation email has already been sent.';
+        $lang['activation_sent'] = 'Activation email has been sent.';
+        $lang['already_activated'] = 'Account is already activated.';
+        $lang['activationkey_expired'] = 'Activation key has expired.';
+        $lang['activationkey_incorrect'] = 'Activation key is incorrect.';
+        $lang['activationkey_invalid'] = 'Activation key is invalid.';
+        $lang['captcha_verify_failed'] = 'Captcha Code was invalid.';
         $lang['user_verify_failed'] = 'Captcha Code was invalid.';
-
-        $lang['account_email_invalid'] = 'Email address is incorrect or banned';
-        $lang['account_password_invalid'] = 'Password is invalid';
-        $lang['account_not_found'] = 'No account found with that email address';
-
-        $lang['login_remember_me_invalid'] = 'The remember me field is invalid.';
-
-        $lang['email_password_invalid'] = 'Email address / password are invalid.';
-        $lang['email_password_incorrect'] = 'Email address / password are incorrect.';
-        $lang['remember_me_invalid'] = 'The remember me field is invalid.';
-
-        $lang['password_short'] = 'Password is too short.';
-        $lang['password_weak'] = 'Password is too weak.';
-        $lang['password_nomatch'] = 'Passwords do not match.';
-        $lang['password_changed'] = 'Password changed successfully.';
-        $lang['password_incorrect'] = 'Current password is incorrect.';
-        $lang['password_notvalid'] = 'Password is invalid.';
-
-        $lang['newpassword_short'] = 'New password is too short.';
-        $lang['newpassword_long'] = 'New password is too long.';
-        $lang['newpassword_invalid'] = 'New password must contain at least one uppercase and lowercase character, and at least one digit.';
-        $lang['newpassword_nomatch'] = 'New passwords do not match.';
-        $lang['newpassword_match'] = 'New password is the same as the old password.';
-
-        $lang['email_short'] = 'Email address is too short.';
-        $lang['email_long'] = 'Email address is too long.';
-        $lang['email_invalid'] = 'Email address is invalid.';
-        $lang['email_incorrect'] = 'Email address is incorrect.';
         $lang['email_banned'] = 'This email address is not allowed.';
         $lang['email_changed'] = 'Email address changed successfully.';
-
+        $lang['email_incorrect'] = 'Email address is incorrect.';
+        $lang['email_invalid'] = 'Email address is invalid.';
+        $lang['email_long'] = 'Email address is too long.';
+        $lang['email_short'] = 'Email address is too short.';
         $lang['newemail_match'] = 'New email matches previous email.';
+        $lang['email_activation_altbody'] = 'Hello,
 
-        $lang['account_inactive'] = 'Account has not yet been activated.';
-        $lang['account_activated'] = 'Account activated.';
+To be able to log in to your account you first need to activate your account by visiting the following link :
+%1$s/%2$s
 
+You then need to use the following activation key: %3$s
+
+If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_activation_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt; To be able to log in to your account you first need to activate your account by clicking on the following link : &lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt; You then need to use the following activation key: &lt;strong&gt;%3$s&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt; If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_activation_subject'] = '%s - Activate account';
+        $lang['email_reset_altbody'] = 'Hello,
+
+To reset your password please visiting the following link :
+%1$s/%2$s
+
+You then need to use the following password reset key: %3$s
+
+If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_reset_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt;To reset your password click the following link :&lt;br/&gt;&lt;br/&gt;&lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;You then need to use the following password reset key: &lt;strong&gt;%3$s&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_reset_subject'] = '%s - Password reset request';
         $lang['logged_in'] = 'You are now logged in.';
         $lang['logged_out'] = 'You are now logged out.';
-
-        $lang['system_error'] = 'A system error has been encountered. Please try again.';
-
+        $lang['newpassword_invalid'] = 'New password must contain at least one uppercase and lowercase character, and at least one digit.';
+        $lang['newpassword_long'] = 'New password is too long.';
+        $lang['newpassword_match'] = 'New password is the same as the old password.';
+        $lang['newpassword_nomatch'] = 'New passwords do not match.';
+        $lang['newpassword_short'] = 'New password is too short.';
+        $lang['password_changed'] = 'Password changed successfully.';
+        $lang['password_incorrect'] = 'Current password is incorrect.';
+        $lang['password_nomatch'] = 'Passwords do not match.';
+        $lang['password_notvalid'] = 'Password is invalid.';
+        $lang['password_short'] = 'Password is too short.';
+        $lang['password_weak'] = 'Password is too weak.';
         $lang['register_success'] = 'Account created. Activation email sent to email.';
         $lang['register_success_emailmessage_suppressed'] = 'Account created.';
-        $lang['email_taken'] = 'The email address is already in use.';
-
-        $lang['resetkey_invalid'] = 'Reset key is invalid.';
-        $lang['resetkey_incorrect'] = 'Reset key is incorrect.';
-        $lang['resetkey_expired'] = 'Reset key has expired.';
         $lang['password_reset'] = 'Password reset successfully.';
-
-        $lang['activationkey_invalid'] = 'Activation key is invalid.';
-        $lang['activationkey_incorrect'] = 'Activation key is incorrect.';
-        $lang['activationkey_expired'] = 'Activation key has expired.';
-
+        $lang['resetkey_expired'] = 'Reset key has expired.';
+        $lang['resetkey_incorrect'] = 'Reset key is incorrect.';
+        $lang['resetkey_invalid'] = 'Reset key is invalid.';
+        $lang['reset_exists'] = 'A reset request already exists.';
         $lang['reset_requested'] = 'Password reset request sent to email address.';
         $lang['reset_requested_emailmessage_suppressed'] = 'Password reset request is created.';
-        $lang['reset_exists'] = 'A reset request already exists. Next reset password request will available at %s';
-
-        $lang['already_activated'] = 'Account is already activated.';
-        $lang['activation_sent'] = 'Activation email has been sent.';
-        $lang['activation_exists'] = 'An activation email has already been sent. Next reactivation will available at %s';
-
-        $lang['email_activation_subject'] = '%s - Activate account';
-        $lang['email_activation_body'] = 'Hello,<br/><br/> To be able to log in to your account you first need to activate your account by clicking on the following link : <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> You then need to use the following activation key: <strong>%3$s</strong><br/><br/> If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
-        $lang['email_activation_altbody'] = 'Hello, ' . "\n\n" . 'To be able to log in to your account you first need to activate your account by visiting the following link :' . "\n" . '%1$s/%2$s' . "\n\n" . 'You then need to use the following activation key: %3$s' . "\n\n" . 'If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
-
-        $lang['email_reset_subject'] = '%s - Password reset request';
-        $lang['email_reset_body'] = 'Hello,<br/><br/>To reset your password click the following link :<br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>You then need to use the following password reset key: <strong>%3$s</strong><br/><br/>If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
-        $lang['email_reset_altbody'] = 'Hello, ' . "\n\n" . 'To reset your password please visiting the following link :' . "\n" . '%1$s/%2$s' . "\n\n" . 'You then need to use the following password reset key: %3$s' . "\n\n" . 'If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
-
-        $lang['account_deleted'] = 'Account deleted successfully.';
         $lang['function_disabled'] = 'This function has been disabled.';
+        $lang['system_error'] = 'A system error has been encountered. Please try again.';
+        $lang['user_blocked'] = 'You are currently locked out of the system.';
+        $lang['user_login_account_inactive'] = 'The account isn\'t activated yet. ';
+        $lang['user_login_incorrect_password'] = 'Incorrect Password.';
+        $lang['user_register_email_taken'] = 'E-mail already in use.';
+        $lang['user_register_success'] = 'The account has been created. Activation instructions sent to the provided e-mail.';
+        $lang['user_validate_email_incorrect'] = 'Incorrect email format.';
+        $lang['user_validate_password_incorrect'] = 'Password too short, too long or otherwise doesn\'t match the requirements.';
+        $lang['user_validate_remember_me_invalid'] = 'Unacceptable &amp;ldquo;remember user&amp;rdquo; field value.';
+        $lang['user_validate_user_not_found'] = 'This e-mail is not registered.';
+        $lang['account_not_found'] = 'Email address / password are incorrect.';
+        $lang['email_password_incorrect'] = 'Email address / password are incorrect.';
+        $lang['email_password_invalid'] = 'Email address / password are invalid.';
+        $lang['remember_me_invalid'] = 'The remember me field is invalid.';
 
         $lang['php_version_required'] = 'PHPAuth engine requires PHP version %s+!';
 
