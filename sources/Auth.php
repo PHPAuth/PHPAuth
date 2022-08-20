@@ -51,19 +51,34 @@ class Auth implements AuthInterface
      */
     protected $recaptcha_config = [];
 
+    /**
+     * Custom E-Mail validator callback
+     *
+     * @var callable
+     */
+    public $emailValidator;
+
+    /**
+     * Custom Password validator callback
+     *
+     * @var callable
+     */
+    public $passwordValidator;
+
     public function __construct(PDO $dbh, Config $config)
     {
-        if (PHP_VERSION_ID < 70200) {
-            exit($this->__lang('php_version_required', '7.1.0'));
-        }
-
         $this->dbh = $dbh;
         $this->config = $config;
 
         $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
-        date_default_timezone_set($this->config->site_timezone);
+        $this->emailValidator = $this->config->emailValidator;
+        $this->passwordValidator = $this->config->passwordValidator;
+
+        if (!empty($this->config->site_timezone)) {
+            date_default_timezone_set($this->config->site_timezone);
+        }
 
         $this->isAuthenticated = $this->isLogged();
     }
