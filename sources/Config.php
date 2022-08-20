@@ -42,6 +42,13 @@ class Config implements ConfigInterface
     public $passwordValidator;
 
     /**
+     * Custom Mailer callback
+     *
+     * @var callable
+     */
+    public $customMailer;
+
+    /**
      * Config::__construct()
      *
      * Create config class for PHPAuth\Auth.
@@ -153,9 +160,6 @@ class Config implements ConfigInterface
             ? $this->config['site_language'] ?? 'en_GB'
             : $config_site_language;
 
-        $dictionary = $this->setForgottenDictionary();
-        $dictionary_new = [];
-
         switch ($this->config['translation_source']) {
             case 'php': {
                 $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
@@ -165,7 +169,7 @@ class Config implements ConfigInterface
                 break;
             }
             case 'ini': {
-                $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.php";
+                $lang_file = __DIR__ . DIRECTORY_SEPARATOR . '../languages' . DIRECTORY_SEPARATOR . "{$site_language}.ini";
 
                 if (is_readable($lang_file)) {
                     $dictionary_new = parse_ini_file($lang_file);
@@ -183,14 +187,7 @@ class Config implements ConfigInterface
             }
         }
 
-        foreach ($dictionary as $key => $value) {
-            if (array_key_exists($key, $dictionary_new) && !empty($dictionary_new[$key])) {
-                $dictionary[$key] = $dictionary_new[$key];
-            }
-        }
-
-        // set dictionary
-        $this->config['dictionary'] = $dictionary;
+        $this->setLocalization($dictionary_new);
 
         // set reCaptcha config
         $config_recaptcha = [];
@@ -217,6 +214,35 @@ class Config implements ConfigInterface
     {
         if (!is_null($callable) && is_callable($callable)) {
             $this->passwordValidator = $callable;
+        }
+
+        return $this;
+    }
+
+    public function setLocalization(array $dictionary):Config
+    {
+        $dictionary_default = $this->getForgottenDictionary();
+
+        foreach ($dictionary_default as $key => $value) {
+            if (array_key_exists($key, $dictionary) && !empty($dictionary[$key])) {
+                $dictionary_default[$key] = $dictionary[$key];
+            }
+        }
+        $this->config['dictionary'] = $dictionary;
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param callable|null $callable
+     * @return $this
+     */
+    public function setCustomMailer(callable $callable = null):Config
+    {
+        if (!is_null($callable) && is_callable($callable)) {
+            $this->customMailer = $callable;
         }
 
         return $this;
@@ -322,7 +348,7 @@ class Config implements ConfigInterface
      *
      * @return array
      */
-    protected function setForgottenDictionary(): array
+    protected function getForgottenDictionary(): array
     {
         $lang = array();
 

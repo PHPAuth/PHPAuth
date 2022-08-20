@@ -12,12 +12,6 @@ use stdClass;
 use ZxcvbnPhp\Zxcvbn;
 use function setcookie;
 
-/**
- * PHPAuth is a secure PHP Authentication class
- * that easily integrates into any site.
- *
- * @link https://github.com/PHPAuth/PHPAuth
- */
 class Auth implements AuthInterface
 {
     /**
@@ -65,6 +59,13 @@ class Auth implements AuthInterface
      */
     public $passwordValidator;
 
+    /**
+     * Custom Mailer callback
+     *
+     * @var callable
+     */
+    public $customMailer;
+
     public function __construct(PDO $dbh, Config $config)
     {
         $this->dbh = $dbh;
@@ -75,6 +76,7 @@ class Auth implements AuthInterface
 
         $this->emailValidator = $this->config->emailValidator;
         $this->passwordValidator = $this->config->passwordValidator;
+        $this->customMailer = $this->config->customMailer;
 
         if (!empty($this->config->site_timezone)) {
             date_default_timezone_set($this->config->site_timezone);

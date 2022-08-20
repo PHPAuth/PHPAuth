@@ -58,5 +58,23 @@ interface ConfigInterface
      */
     public function setPasswordValidator(callable $callable = null):Config;
 
+    /**
+     * Update localization dictionary from PHP Array (result of `phpauth/phpauth.l10n` package)
+     *
+     * @param array $dictionary
+     * @return $this
+     * @todo: change return type to self at PHP 7.4
+     */
+    public function setLocalization(array $dictionary):Config;
+
+    /**
+     * Add custom mailer. Not implemented now.
+     *
+     * @param callable|null $callable
+     * @return $this
+     * @todo: change return type to self at PHP 7.4
+     */
+    public function setCustomMailer(callable $callable = null):Config;
+
 
 }
