@@ -987,42 +987,6 @@ class Auth implements AuthInterface
         return 'block';
     }
 
-    public static function getRandomKey(int $length = self::TOKEN_LENGTH):string
-    {
-        $dictionary = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
-        $dictionary_length = strlen($dictionary);
-        $key = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $key .= $dictionary[mt_rand(0, $dictionary_length - 1)];
-        }
-
-        return $key;
-    }
-
-    public static function getIp():string
-    {
-        if (getenv('HTTP_CLIENT_IP')) {
-            $ipAddress = getenv('HTTP_CLIENT_IP');
-        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-            $ipAddress = getenv('HTTP_X_FORWARDED_FOR');
-        } elseif (getenv('HTTP_X_FORWARDED')) {
-            $ipAddress = getenv('HTTP_X_FORWARDED');
-        } elseif (getenv('HTTP_FORWARDED_FOR')) {
-            $ipAddress = getenv('HTTP_FORWARDED_FOR');
-        } elseif (getenv('HTTP_FORWARDED')) {
-            $ipAddress = getenv('HTTP_FORWARDED');
-        } elseif (getenv('REMOTE_ADDR')) {
-            $ipAddress = getenv('REMOTE_ADDR');
-        } else {
-            $ipAddress = '127.0.0.1';
-        }
-
-        $ipAddress = explode(',', $ipAddress)[0];
-
-        return $ipAddress;
-    }
-
     public function getCurrentSessionHash():string
     {
         return $_COOKIE[$this->config->cookie_name] ?? '';

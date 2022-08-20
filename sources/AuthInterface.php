@@ -214,21 +214,6 @@ interface AuthInterface
     public function isBlocked():string;
 
     /**
-     * Returns a random string of a specified length
-     *
-     * @param int $length
-     * @return string $key
-     */
-    public static function getRandomKey(int $length = self::TOKEN_LENGTH):string;
-
-    /**
-     * Returns IP address of client
-     *
-     * @return string $ip
-     */
-    public static function getIp():string;
-
-    /**
      * Returns current session hash
      *
      * @return string
