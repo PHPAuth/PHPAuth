@@ -40,5 +40,23 @@ interface ConfigInterface
      */
     public function getAll(): array;
 
+    /**
+     * Add custom E-Mail validator
+     *
+     * @param callable|null $callable
+     * @return Config
+     * @todo: change return type to self at PHP 7.4
+     */
+    public function setEMailValidator(callable $callable = null):Config;
+
+    /**
+     * Add custom password validator
+     *
+     * @param callable|null $callable
+     * @return Config
+     * @todo: change return type to self at PHP 7.4
+     */
+    public function setPasswordValidator(callable $callable = null):Config;
+
 
 }

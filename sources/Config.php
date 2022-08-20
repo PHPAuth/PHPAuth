@@ -28,6 +28,20 @@ class Config implements ConfigInterface
     public $config_table = 'phpauth_config';
 
     /**
+     * Custom E-Mail validator callback
+     *
+     * @var callable
+     */
+    public $emailValidator;
+
+    /**
+     * Custom Password validator callback
+     *
+     * @var callable
+     */
+    public $passwordValidator;
+
+    /**
      * Config::__construct()
      *
      * Create config class for PHPAuth\Auth.
@@ -109,19 +123,6 @@ class Config implements ConfigInterface
                     ->query("SELECT `setting`, `value` FROM {$this->config_table} ORDER BY `setting`")
                     ->fetchAll(PDO::FETCH_KEY_PAIR);
 
-                // load configuration
-                /*try {
-                    $configQuery = $this->dbh->query("SELECT `setting`, `value` FROM {$this->config_table};");
-
-                    if ($configQuery instanceof PDOStatement) {
-                        $this->config = $configQuery->fetchAll(PDO::FETCH_KEY_PAIR);
-                    } else {
-                        throw new PDOException();
-                    }
-                } catch (PDOException $e) {
-                    die("PHPAuth: Config table `{$this->config_table}` NOT PRESENT in given database" . PHP_EOL);
-                }*/
-
                 break;
             }
         } // end switch
@@ -201,6 +202,24 @@ class Config implements ConfigInterface
         }
 
         $this->config['recaptcha'] = $config_recaptcha;
+    }
+
+    public function setEMailValidator(callable $callable = null):Config
+    {
+        if (!is_null($callable) && is_callable($callable)) {
+            $this->emailValidator = $callable;
+        }
+
+        return $this;
+    }
+
+    public function setPasswordValidator(callable $callable = null):Config
+    {
+        if (!is_null($callable) && is_callable($callable)) {
+            $this->passwordValidator = $callable;
+        }
+
+        return $this;
     }
 
     /**
