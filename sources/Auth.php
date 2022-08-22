@@ -97,14 +97,14 @@ class Auth implements AuthInterface
 
         if ($block_status == 'verify') {
             if (!$this->checkCaptcha($captcha_response)) {
-                $return['message'] = $this->__lang('user_verify_failed');
+                $return['message'] = $this->__lang('user_verify_failed'); //=> captcha.verify_code_invalid
 
                 return $return;
             }
         }
 
         if ($block_status == 'block') {
-            $return['message'] = $this->__lang('user_blocked');
+            $return['message'] = $this->__lang('user_blocked'); // => user.temporary_banned
             return $return;
         }
 
@@ -123,25 +123,27 @@ class Auth implements AuthInterface
             return $return;
         } elseif ($remember != 0 && $remember != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('remember_me_invalid');      //@todo => login_remember_me_invalid
+            $return['message'] = $this->__lang('remember_me_invalid');      //@todo => login.remember_me_invalid_value
 
             return $return;
         }
 
-        $uid = $this->getUID($email);
+        //@todo: объединить getUID и getBaseUser в один вызов.
+
+        $uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
 
         if (!$uid) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('account_not_found');
+            $return['message'] = $this->__lang('account_not_found'); //=> account.not_found
 
             return $return;
         }
 
-        $user = $this->getBaseUser($uid);
+        $user = $this->getBaseUser($uid); // Gets basic user data for a given UID
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('email_password_incorrect');
+            $return['message'] = $this->__lang('email_password_incorrect'); // => verify.no_pair_user_and_password
 
             return $return;
         }
@@ -180,20 +182,20 @@ class Auth implements AuthInterface
 
         if ($block_status == 'verify') {
             if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed');
+                $return['message'] = $this->__lang('user_verify_failed'); //=> captcha.verify_code_invalid
 
                 return $return;
             }
         }
 
         if ($block_status == 'block') {
-            $return['message'] = $this->__lang('user_blocked');
+            $return['message'] = $this->__lang('user_blocked'); // => user.temporary_banned
 
             return $return;
         }
 
         if ($password !== $repeat_password) {
-            $return['message'] = $this->__lang('password_nomatch');
+            $return['message'] = $this->__lang('password_nomatch'); //
 
             return $return;
         }
@@ -371,16 +373,16 @@ class Auth implements AuthInterface
         return $this->deleteExistingSessions($uid);
     }
 
-    public function getHash(string $password)
+    /*public function getHash(string $password)
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
-    }
+    }*/
 
     public function getUID(string $email):int
     {
         $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
         $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(['email' => strtolower($email)]);
+        $query_prepared->execute(['email' => mb_strtolower($email)]);
 
         $uid = $query_prepared->fetchColumn();
 
@@ -719,7 +721,7 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        $password = $this->getHash($password);
+        $password = self::getHash($password, $this->config->bcrypt_cost);
 
         $query = "UPDATE {$this->config->table_users} SET password = :password WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
@@ -871,7 +873,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $newpass = $this->getHash($newpass);
+        $newpass = self::getHash($newpass, $this->config->bcrypt_cost);
 
         $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
@@ -1043,8 +1045,8 @@ class Auth implements AuthInterface
             return false;
         }
 
-        if (password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->config->bcrypt_cost])) {
-            $hash = $this->getHash($password);
+        if (password_needs_rehash($hash, PASSWORD_DEFAULT, [ 'cost' => $this->config->bcrypt_cost ])) {
+            $hash = self::getHash($password, $this->config->bcrypt_cost);
 
             $query = "UPDATE {$this->config->table_users} SET password = ? WHERE id = ?";
             $query_prepared = $this->dbh->prepare($query);
@@ -1194,6 +1196,18 @@ class Auth implements AuthInterface
         }
 
         return $query->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function deleteExpiredData()
+    {
+        $this->deleteExpiredAttempts();
+        $this->deleteExpiredSessions();
+        $this->deleteExpiredRequests();
+    }
+
+    public function cron()
+    {
+        $this->deleteExpiredData();
     }
 
     /* ============================================================================================================= */
@@ -1361,7 +1375,7 @@ class Auth implements AuthInterface
             $isactive = 1;
         }
 
-        $password = $this->getHash($password);
+        $password = self::getHash($password, $this->config->bcrypt_cost);
 
         if (is_array($params) && count($params) > 0) {
             $customParamsQueryArray = [];
@@ -1543,31 +1557,34 @@ class Auth implements AuthInterface
 
     /**
      * Verifies that an email is valid
+     *
      * @param string $email
      *
      * @return array $return
+     *
+     * @todo: return Result instance
      */
     protected function validateEmail(string $email):array
     {
         $state['error'] = true;
 
-        if (strlen($email) < (int)$this->config->verify_email_min_length) {
-            $state['message'] = $this->__lang('email_short', (int)$this->config->verify_email_min_length);
+        if (strlen($email) < (int)$this->config->verify_email_min_length) { // min email length = 5 : `a@b.c`, is this really required check ?
+            $state['message'] = $this->__lang('email_short', (int)$this->config->verify_email_min_length); // => email.address_too_short
 
             return $state;
-        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) {
-            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length);
+        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) { // is this really required check?
+            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length); // => email.address_too_long
 
             return $state;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $state['message'] = $this->__lang('email_invalid', $email);
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { // required check
+            $state['message'] = $this->__lang('email_invalid', $email); // => email.address_incorrect, провалена проверка на то, емейл ли это
 
             return $state;
         }
 
         if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
-            $state['message'] = $this->__lang('email_banned');
+            $state['message'] = $this->__lang('email_banned'); // => email.address_in_banlist
 
             return $state;
         }
@@ -1662,7 +1679,32 @@ class Auth implements AuthInterface
         ]);
     }
 
+    /**
+     * Verifies that a password is greater than minimal length
+     *
+     * security requirements (ZxcvbnPhp\Zxcvbn) not checked now.
+     * @param string $password
+     *
+     * @return array $return ['error', 'message']
+     */
+    protected function validatePasswordLength(string $password):array
+    {
+        $state['error'] = true;
 
+        if (strlen($password) < (int)$this->config->verify_password_min_length) {
+            $state['message'] = $this->__lang('password_short');
+
+            return $state;
+        }
+
+        $state['error'] = false;
+
+        return $state;
+    }
+
+    /* ============================================================================================================= */
+    /* ============================================== PRIVATE METHIDS ============================================== */
+    /* ============================================================================================================= */
 
     /**
      * Update user session expire time using either session hash or uid
@@ -1714,36 +1756,6 @@ class Auth implements AuthInterface
         $this->dbh->exec("DELETE FROM {$this->config->table_requests} WHERE NOW() > expire");
     }
 
-    public function cron()
-    {
-        $this->deleteExpiredAttempts();
-        $this->deleteExpiredSessions();
-        $this->deleteExpiredRequests();
-    }
-
-    /**
-     * Verifies that a password is greater than minimal length
-     *
-     * security requirements (ZxcvbnPhp\Zxcvbn) not checked now.
-     * @param string $password
-     *
-     * @return array $return ['error', 'message']
-     */
-    protected function validatePasswordLength(string $password):array
-    {
-        $state['error'] = true;
-
-        if (strlen($password) < (int)$this->config->verify_password_min_length) {
-            $state['message'] = $this->__lang('password_short');
-
-            return $state;
-        }
-
-        $state['error'] = false;
-
-        return $state;
-    }
-
     /**
      * Check password strength using Zxcvbn
      *
@@ -1752,6 +1764,11 @@ class Auth implements AuthInterface
      */
     private function isPasswordStrong(string $password):bool
     {
-        return (new Zxcvbn())->passwordStrength($password)['score'] > intval($this->config->password_min_score);
+        // return (new Zxcvbn())->passwordStrength($password)['score'] > intval($this->config->password_min_score);
+        if (is_callable($this->passwordValidator)) {
+            return ($this->passwordValidator)($password, $this->config);
+        }
+
+        return true;
     }
 }

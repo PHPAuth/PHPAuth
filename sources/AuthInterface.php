@@ -79,14 +79,6 @@ interface AuthInterface
     public function logoutAll(int $uid):bool;
 
     /**
-     * Hashes provided password with BCrypt
-     *
-     * @param string $password
-     * @return string|false|null
-     */
-    public function getHash(string $password);
-
-    /**
      * Gets UID for a given email address or zero if email not found
 
      * @param string $email
@@ -299,7 +291,16 @@ interface AuthInterface
     public function getCurrentSessionUserInfo(): ?array;
 
     /**
+     * Deletes expired requests, sessions and attempts from database
+     * Alias of cron(), usable for daily cron job
+     *
+     * @return void
+     */
+    public function deleteExpiredData();
+
+    /**
      * Daily cron job to remove expired data from the database
+     * Deprecated
      *
      * @return void
      */

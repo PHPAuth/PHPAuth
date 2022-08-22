@@ -2,6 +2,8 @@
 
 namespace PHPAuth;
 
+use RuntimeException;
+
 trait Helpers
 {
     /**
@@ -140,6 +142,32 @@ If you did not request a password reset key on %1$s recently then this message w
         $ipAddress = explode(',', $ipAddress)[0];
 
         return $ipAddress;
+    }
+
+    /**
+     * Hashes provided password with BCrypt
+     *
+     * @param string $string
+     * @param int $cost
+     * @throws RuntimeException
+     *
+     * @return string
+     */
+    public static function getHash(string $string, int $cost):string
+    {
+        $hash = password_hash($string, PASSWORD_BCRYPT, [
+            'cost' => $cost
+        ]);
+
+        if ($hash === null) {
+            throw new RuntimeException("[PHPAuth] Hashing algorithm is invalid. Blowfish not supported? ");
+        }
+
+        if ($hash === false) {
+            throw new RuntimeException("[PHPAuth] Generate blowfish hash failed");
+        }
+
+        return $hash;
     }
 
 

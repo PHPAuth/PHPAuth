@@ -12,6 +12,7 @@
     "require": {
         "php": ">=7.2.0",
         "ext-pdo": "*",
+        "ext-mbstring": "*",
         "bjeavons/zxcvbn-php": "^1.0",
         "phpmailer/phpmailer": "^6.0",
         "google/recaptcha": "^1.2"
