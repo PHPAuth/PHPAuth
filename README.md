@@ -325,9 +325,6 @@ $auth   = new \PHPAuth\Auth($dbh, $config);
 ```
 
 
-
-
-
 Documentation
 ---------------
 

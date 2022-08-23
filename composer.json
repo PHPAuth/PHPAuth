@@ -7,7 +7,7 @@
         "class",
         "secure"
     ],
-    "homepage": "http://phpauth.github.io/PHPAuth/",
+    "homepage": "https://phpauth.github.io/PHPAuth/",
     "license": "MIT",
     "require": {
         "php": ">=7.2.0",
@@ -18,7 +18,8 @@
         "google/recaptcha": "^1.2"
     },
     "suggest": {
-        "phpauth/phpauth.l10n": "^0.1.0"
+        "phpauth/phpauth.l10n": "^0.1.0",
+        "phpauth/phpauth.email-validator": "^0.1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "6.*"
