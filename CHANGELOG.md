@@ -1,3 +1,27 @@
+## 1.3.5
+
+- [!] recommended version for composer is `latest`, NOT `dev-master`
+- [!] minimal PHP required 7.2.*
+- [!] added mb-string dependency, because using mb_strtolower instead of strtolower (email can have non-english domain)
+- [!] All dies replaced with RuntimeException
+
+- [+] added "phpauth/phpauth.l10n" to composer.json suggests
+- [+] added custom password and email validator
+- [+] add `Config::setLocalization()` method that update config's internal dictionary from given array.
+- [+] add `Config::setCustomMailer()` method - future custom closure for sendMail method
+- [+] please, use `deleteExpiredData()` instead of `cron()`
+- [+] export script from SQL dictionary to PHP file
+
+- [*] Added ConfigInterface and AuthInterface
+- [*] refactored `checkTableExists()` method. Uses different detection methods for separate drivers
+- [*] Source files moved to sources/ directory. Updated autoload/psr-4 section at composer.json
+- [*] Zxcvbn moved to separate method (isPasswordStrong)
+- [*] configuration types declared as ConfigInterface public constants
+- [*] documentation fixes
+- [*] Updated localization dictionary generation: if message not found in custom dictionary - used message from en_GB dictionary.
+- [*] Updated getForgottenDictionary() method
+- [*] Moved methods to Helper class: `getForgottenDictionary()`, `getIP`, `getRandomKey()`, `getHash()`
+
 ## 1.3.4
 
 - Update composer.json

@@ -2,6 +2,7 @@
 
 // phpunit backward compatibility
 use PHPUnit\Framework\TestCase;
+use ZxcvbnPhp\Zxcvbn;
 
 if (!class_exists('\PHPUnit\Framework\TestCase') && class_exists('\PHPUnit_Framework_TestCase')) {
     class_alias('\PHPUnit_Framework_TestCase', '\PHPUnit\Framework\TestCase');
@@ -29,7 +30,13 @@ class AuthTest extends TestCase
         require_once __DIR__ . '/../vendor/autoload.php';
 
         self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_database", "phpauth_test_user", "");
-        self::$config = new \PHPAuth\Config(self::$dbh);
+        $config = new \PHPAuth\Config(self::$dbh, null, \PHPAuth\Config::CONFIG_TYPE_SQL);
+        $config = $config->setPasswordValidator(static function($password) use ($config){
+            return (bool)((new Zxcvbn())->passwordStrength($password)['score'] >= intval($config->password_min_score));
+        });
+
+        self::$config = $config;
+
         self::$auth   = new \PHPAuth\Auth(self::$dbh, self::$config);
 
         // Clean up the database
@@ -354,6 +361,7 @@ class AuthTest extends TestCase
 
         foreach($languageFiles as $languageFile) {
             $languageFile = basename($languageFile);
+            echo "Testing {$languageFile} ... " . PHP_EOL;
 
             include __DIR__ . "/../languages/{$languageFile}";
             $this->assertEquals(0, count(array_diff_key($baseLang, $lang)));

@@ -267,8 +267,6 @@ new Config($dbh, $CONFIG_ARRAY, 'array'); // configuration must be defined in $C
 new Config($dbh, null, '', 'ru_RU'); // load configuration from default SQL table and use ru_RU locale
 ```
 
-
-
 Message languages
 ---------------------
 
@@ -280,7 +278,7 @@ Example:
 
 ```php
 $config = new \PHPAuth\Config($dbh, null, 'sql', 'fr_FR');
-$auth   = new \PHPAuth\Auth($dbh, $config);`
+$auth   = new \PHPAuth\Auth($dbh, $config);
 ```
 
 Available languages:
@@ -316,6 +314,19 @@ Available languages:
 * `vi_VN`
 * `zh_CN`
 * `zh_TW`
+
+NB: Since 1.3.5 the recommended way to connect another language is this:
+`composer require phpauth/phpauth.l10n`, then call before Auth instantiation:
+
+```php
+$config = new \PHPAuth\Config($dbh, null, \PHPAuth\Config::CONFIG_TYPE_SQL);
+$config = $config->setLocalization( (new \PHPAuth\PHPAuthLocalization('fr_FR'))->use() );
+$auth   = new \PHPAuth\Auth($dbh, $config);
+```
+
+
+
+
 
 Documentation
 ---------------
