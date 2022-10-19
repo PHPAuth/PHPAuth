@@ -296,6 +296,7 @@ Available languages:
 * `hu_HU`
 * `id_ID`
 * `it_IT`
+* `ja_JP`
 * `nl_BE`
 * `nl_NL`
 * `no_NB`
