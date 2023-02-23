@@ -515,11 +515,11 @@ class Auth implements AuthInterface
         ];
         $query_prepared->execute($query_params);
 
-        if ($query_prepared->rowCount() == 0) {
+        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$row) {
             return false;
         }
-
-        $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
 
         $uid = $row['uid'];
         $expire_date = strtotime($row['expiredate']);
@@ -563,12 +563,14 @@ class Auth implements AuthInterface
             'hash' => $hash
         ];
         $query_prepared->execute($query_params);
-
-        if ($query_prepared->rowCount() == 0) {
+        
+        $uid = $query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
+        
+        if (!$uid) {
             return 0;
         }
 
-        return (int)$query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
+        return (int)$uid;
     }
 
     public function isEmailTaken(string $email):bool
