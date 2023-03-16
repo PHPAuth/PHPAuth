@@ -103,7 +103,7 @@ If you did not request a password reset key on %1$s recently then this message w
      * @param int $length
      * @return string $key
      */
-    public static function getRandomKey(int $length = self::TOKEN_LENGTH):string
+    public static function getRandomKey(int $length = AuthInterface::TOKEN_LENGTH):string
     {
         $dictionary = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
         $dictionary_length = strlen($dictionary);
