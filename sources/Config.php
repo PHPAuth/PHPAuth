@@ -93,7 +93,7 @@ class Config implements ConfigInterface
                 }
 
                 // load configuration
-                $this->config = parse_ini_file($source);
+		$this->config = parse_ini_file($source);
 
                 break;
             }

@@ -15,7 +15,8 @@ interface AuthInterface
      * @param PDO $dbh
      * @param Config $config
      */
-    public function __construct(PDO $dbh, Config $config);
+    public function __construct(PDO $dbh, Config $config, $callbacklogin = 'loginFunction');
+
 
     /**
      * Logs a user in

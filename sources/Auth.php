@@ -68,17 +68,26 @@ class Auth implements AuthInterface
      */
     public $customMailer;
 
-    public function __construct(PDO $dbh, Config $config)
+     /**
+     * Custom Mailer callback
+     *
+     * @var callable
+     */
+    public $callbacklogin;
+
+    public function __construct(PDO $dbh, Config $config, $callbacklogin = 'loginFunction')
     {
         $this->dbh = $dbh;
-        $this->config = $config;
+	$this->config = $config;
+	$this->callbacklogin = $callbacklogin;
 
         $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
         $this->emailValidator = $this->config->emailValidator;
         $this->passwordValidator = $this->config->passwordValidator;
-        $this->customMailer = $this->config->customMailer;
+	$this->customMailer = $this->config->customMailer;
+
 
         if (!empty($this->config->site_timezone)) {
             date_default_timezone_set($this->config->site_timezone);
@@ -128,7 +137,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        //@todo: объединить getUID и getBaseUser в один вызов.
+	//@todo: объединить getUID и getBaseUser в один вызов.
 
         $uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
 
@@ -142,7 +151,7 @@ class Auth implements AuthInterface
         $user = $this->getBaseUser($uid); // Gets basic user data for a given UID
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
-            $this->addAttempt();
+		$this->addAttempt();
             $return['message'] = $this->__lang('email_password_incorrect'); // => verify.no_pair_user_and_password
 
             return $return;
@@ -322,7 +331,7 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        $query = "SELECT id, email FROM {$this->config->table_users} WHERE email = :email";
+        $query = "SELECT id, {$this->config->table_users_username_field} FROM {$this->config->table_users} WHERE {$this->config->table_users_username_field} = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
@@ -380,13 +389,12 @@ class Auth implements AuthInterface
 
     public function getUID(string $email):int
     {
-        $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
-        $query_prepared = $this->dbh->prepare($query);
-        $query_prepared->execute(['email' => mb_strtolower($email)]);
-
-        $uid = $query_prepared->fetchColumn();
-
-        return $uid === false ? 0 : $uid;
+	    $query = "SELECT id FROM {$this->config->table_users} WHERE {$this->config->table_users_username_field} = :email";
+	    echo $query;
+	    $query_prepared = $this->dbh->prepare($query);
+	    $query_prepared->execute(['email' => mb_strtolower($email)]);  
+	    $uid = $query_prepared->fetchColumn();
+	    return $uid === false ? 0 : $uid;
     }
 
     public function getUser(int $uid, bool $withpassword = false):?array
@@ -575,7 +583,7 @@ class Auth implements AuthInterface
 
     public function isEmailTaken(string $email):bool
     {
-        $query = "SELECT count(*) FROM {$this->config->table_users} WHERE email = :email";
+        $query = "SELECT count(*) FROM {$this->config->table_users} WHERE {$this->config->table_users_username_field} = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
@@ -771,7 +779,7 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        $query = "SELECT id, isactive, email FROM {$this->config->table_users} WHERE email = :email";
+        $query = "SELECT id, isactive, {$this->config->table_users_username_field} FROM {$this->config->table_users} WHERE {$this->config->table_users_username_field} = :email";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['email' => $email]);
 
@@ -1000,8 +1008,11 @@ class Auth implements AuthInterface
     {
         if ($this->isAuthenticated === false) {
             $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
-        }
-
+	}
+	if(!$this->isAuthenticated && $_REQUEST['password']=="") 
+	{
+		call_user_func_array($this->callbacklogin, array($this->isAuthenticated,&$this));
+	}
         return $this->isAuthenticated;
     }
 
@@ -1340,7 +1351,7 @@ class Auth implements AuthInterface
      * @param boolean $use_email_activation -- activate email confirm or not
      * @return array
      */
-    protected function addUser(string $email, string $password, array $params = [], bool $use_email_activation = false):array
+    public function addUser(string $email, string $password, array $params = [], bool $use_email_activation = false):array
     {
         $return['error'] = true;
 
