@@ -75,7 +75,9 @@ class Auth implements AuthInterface
      */
     public $callbacklogin;
 
-    public function __construct(PDO $dbh, Config $config, $callbacklogin = 'loginFunction')
+    public $showlogin;
+
+    public function __construct(PDO $dbh, Config $config, string $callbacklogin = 'loginFunction', bool $showlogin = true)
     {
         $this->dbh = $dbh;
 	$this->config = $config;
@@ -88,21 +90,24 @@ class Auth implements AuthInterface
         $this->passwordValidator = $this->config->passwordValidator;
 	$this->customMailer = $this->config->customMailer;
 
+	$this->showlogin = $showlogin;
 
         if (!empty($this->config->site_timezone)) {
             date_default_timezone_set($this->config->site_timezone);
-        }
+	}
 
-        $this->isAuthenticated = $this->isLogged();
+	$this->isAuthenticated = $this->isLogged();
+
     }
 
     public function login(string $email, string $password, int $remember = 0, string $captcha_response = ''):array
     {
+ 
         $return          = [];
         $return['error'] = true;
         $return['hash']  = '';
 
-        $block_status = $this->isBlocked();
+	$block_status = $this->isBlocked();
 
         if ($block_status == 'verify') {
             if (!$this->checkCaptcha($captcha_response)) {
@@ -117,8 +122,9 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $validateEmail = $this->validateEmail($email);
-        $validatePassword = $this->validatePasswordLength($password);
+	$validateEmail = $this->validateEmail($email);
+	$validatePassword = $this->validatePasswordLength($password);
+
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
@@ -139,7 +145,8 @@ class Auth implements AuthInterface
 
 	//@todo: объединить getUID и getBaseUser в один вызов.
 
-        $uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
+	$uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
+
 
         if (!$uid) {
             $this->addAttempt();
@@ -164,7 +171,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $sessiondata = $this->addSession($user['uid'], $remember);
+	$sessiondata = $this->addSession($user['uid'], $remember);
 
         if (!$sessiondata) {
             $return['message'] = $this->__lang('system_error') . ' #01';
@@ -178,7 +185,9 @@ class Auth implements AuthInterface
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
 
-        $return['cookie_name'] = $this->config->cookie_name;
+	$return['cookie_name'] = $this->config->cookie_name;
+
+//	$this->isAuthenticated = true;
 
         return $return;
     }
@@ -390,7 +399,6 @@ class Auth implements AuthInterface
     public function getUID(string $email):int
     {
 	    $query = "SELECT id FROM {$this->config->table_users} WHERE {$this->config->table_users_username_field} = :email";
-	    echo $query;
 	    $query_prepared = $this->dbh->prepare($query);
 	    $query_prepared->execute(['email' => mb_strtolower($email)]);  
 	    $uid = $query_prepared->fetchColumn();
@@ -504,7 +512,7 @@ class Auth implements AuthInterface
     public function checkSession(string $hash, ?string $device_id = null):bool
     {
         $ip = self::getIp();
-        $block_status = $this->isBlocked();
+	$block_status = $this->isBlocked();
 
         if ($block_status == 'block') {
             $return['message'] = $this->__lang('user_blocked');
@@ -513,7 +521,7 @@ class Auth implements AuthInterface
 
         if (strlen($hash) != self::HASH_LENGTH) {
             return false;
-        }
+	}
 
         // INET_NTOA(ip)
         $query = "SELECT id, uid, expiredate, ip, agent, cookie_crc, device_id FROM {$this->config->table_sessions} WHERE hash = :hash";
@@ -550,7 +558,7 @@ class Auth implements AuthInterface
             if ($ip !== $db_ip) {
                 return false;
             }
-        }
+	}
 
         if ($db_cookie == sha1($hash . $this->config->site_key)) {
             if ($expire_date - $current_date < strtotime($this->config->cookie_renew) - $current_date) {
@@ -565,14 +573,15 @@ class Auth implements AuthInterface
 
     public function getSessionUID(string $hash):int
     {
-        $query = "SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash";
+	$query = "SELECT uid FROM {$this->config->table_sessions} WHERE hash = :hash";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'hash' => $hash
         ];
-        $query_prepared->execute($query_params);
+	$query_prepared->execute($query_params);
         
-        $uid = $query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
+	$row = $query_prepared->fetch(PDO::FETCH_ASSOC);
+	$uid = $row['uid'];
         
         if (!$uid) {
             return 0;
@@ -961,7 +970,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $query = "UPDATE {$this->config->table_users} SET email = ? WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET {$this->config->table_users_username_field} = ? WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute([$email, $uid]);
 
@@ -1007,9 +1016,9 @@ class Auth implements AuthInterface
     public function isLogged():bool
     {
         if ($this->isAuthenticated === false) {
-            $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
+		$this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
 	}
-	if(!$this->isAuthenticated && $_REQUEST['password']=="") 
+	if($this->isAuthenticated === false && $this->showlogin===true)
 	{
 		call_user_func_array($this->callbacklogin, array($this->isAuthenticated,&$this));
 	}
@@ -1018,17 +1027,17 @@ class Auth implements AuthInterface
 
     public function getCurrentUser(bool $updateSession = false):?array
     {
-        $hash = $this->getCurrentSessionHash();
+	    $hash = $this->getCurrentSessionHash();
 
         if ($this->currentuser === null) {
-            $uid = $this->getSessionUID($hash);
+		$uid = $this->getSessionUID($hash);
 
             if ($uid === 0) {
                 return null;
             }
 
             $this->currentuser = $this->getUser($uid);
-        }
+	}
 
         if ($updateSession) {
             $this->renewUserSession($hash);
@@ -1241,9 +1250,10 @@ class Auth implements AuthInterface
 
         if (!$user) {
             return false;
-        }
+	}
 
-        $data['hash'] = sha1($this->config->site_key . microtime());
+
+	$data['hash'] = sha1($this->config->site_key . microtime());
         $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
         if (!$this->config->allow_concurrent_sessions) {
@@ -1262,7 +1272,7 @@ class Auth implements AuthInterface
             INSERT INTO {$this->config->table_sessions}
             (uid, hash, expiredate, ip, agent, cookie_crc)
             VALUES (:uid, :hash, :expiredate, :ip, :agent, :cookie_crc)
-            ";
+";
         $query_prepared = $this->dbh->prepare($query);
         $query_params = [
             'uid'           =>  $uid,
@@ -1404,7 +1414,7 @@ class Auth implements AuthInterface
             $setParams = '';
         }
 
-        $query = "UPDATE {$this->config->table_users} SET email = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
+        $query = "UPDATE {$this->config->table_users} SET {$this->config->table_users_username_field} = ?, password = ?, isactive = ? {$setParams} WHERE id = ?";
         $query_prepared = $this->dbh->prepare($query);
 
         $bindParams = array_values(array_merge([$email, $password, $isactive], $params, [$uid]));
@@ -1433,7 +1443,7 @@ class Auth implements AuthInterface
      */
     protected function getBaseUser(int $uid)
     {
-        $query = "SELECT email, password, isactive FROM {$this->config->table_users} WHERE id = :id";
+        $query = "SELECT {$this->config->table_users_username_field} , password, isactive FROM {$this->config->table_users} WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['id' => $uid]);
 
