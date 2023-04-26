@@ -80,23 +80,23 @@ class Auth implements AuthInterface
     public function __construct(PDO $dbh, Config $config, string $callbacklogin = 'loginFunction', bool $showlogin = true)
     {
         $this->dbh = $dbh;
-	$this->config = $config;
-	$this->callbacklogin = $callbacklogin;
+	    $this->config = $config;
+	    $this->callbacklogin = $callbacklogin;
 
         $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
         $this->emailValidator = $this->config->emailValidator;
         $this->passwordValidator = $this->config->passwordValidator;
-	$this->customMailer = $this->config->customMailer;
+	    $this->customMailer = $this->config->customMailer;
 
-	$this->showlogin = $showlogin;
+	    $this->showlogin = $showlogin;
 
         if (!empty($this->config->site_timezone)) {
             date_default_timezone_set($this->config->site_timezone);
-	}
+	    }
 
-	$this->isAuthenticated = $this->isLogged();
+	    $this->isAuthenticated = $this->isLogged();
 
     }
 
@@ -107,7 +107,9 @@ class Auth implements AuthInterface
         $return['error'] = true;
         $return['hash']  = '';
 
-	$block_status = $this->isBlocked();
+	    $block_status = $this->isBlocked();
+
+        
 
         if ($block_status == 'verify') {
             if (!$this->checkCaptcha($captcha_response)) {
@@ -122,8 +124,9 @@ class Auth implements AuthInterface
             return $return;
         }
 
-	$validateEmail = $this->validateEmail($email);
-	$validatePassword = $this->validatePasswordLength($password);
+
+	    $validateEmail = $this->validateEmail($email);
+	    $validatePassword = $this->validatePasswordLength($password);
 
 
         if ($validateEmail['error'] == 1) {
@@ -143,10 +146,9 @@ class Auth implements AuthInterface
             return $return;
         }
 
-	//@todo: объединить getUID и getBaseUser в один вызов.
+	    //@todo: объединить getUID и getBaseUser в один вызов.
 
-	$uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
-
+	    $uid = $this->getUID($email); // Gets UID for a given email address or zero if email not found
 
         if (!$uid) {
             $this->addAttempt();
@@ -154,6 +156,7 @@ class Auth implements AuthInterface
 
             return $return;
         }
+
 
         $user = $this->getBaseUser($uid); // Gets basic user data for a given UID
 
@@ -164,14 +167,16 @@ class Auth implements AuthInterface
             return $return;
         }
 
+
         if ($user['isactive'] != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('account_inactive');
+            $return['message'] = $this->__lang('account_inactive');           
 
             return $return;
         }
 
-	$sessiondata = $this->addSession($user['uid'], $remember);
+
+	    $sessiondata = $this->addSession($user['uid'], $remember);
 
         if (!$sessiondata) {
             $return['message'] = $this->__lang('system_error') . ' #01';
@@ -185,9 +190,7 @@ class Auth implements AuthInterface
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
 
-	$return['cookie_name'] = $this->config->cookie_name;
-
-//	$this->isAuthenticated = true;
+	    $return['cookie_name'] = $this->config->cookie_name;
 
         return $return;
     }
@@ -1016,12 +1019,12 @@ class Auth implements AuthInterface
     public function isLogged():bool
     {
         if ($this->isAuthenticated === false) {
-		$this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
-	}
-	if($this->isAuthenticated === false && $this->showlogin===true)
-	{
-		call_user_func_array($this->callbacklogin, array($this->isAuthenticated,&$this));
-	}
+		    $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
+	    }
+	    if($this->isAuthenticated === false && $this->showlogin===true)
+	    {
+		    call_user_func_array($this->callbacklogin, array($this->isAuthenticated,&$this));
+	    }
         return $this->isAuthenticated;
     }
 
