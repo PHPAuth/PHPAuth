@@ -1,5 +1,7 @@
 <?php
 
+namespace PHPAuth;
+
 use PHPAuth\Auth;
 
 /**
