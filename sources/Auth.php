@@ -190,7 +190,7 @@ class Auth implements AuthInterface
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
 
-	    $return['cookie_name'] = $this->config->cookie_name;
+	$return['cookie_name'] = $this->config->cookie_name;
 
         return $return;
     }
@@ -584,7 +584,11 @@ class Auth implements AuthInterface
 	$query_prepared->execute($query_params);
         
 	$row = $query_prepared->fetch(PDO::FETCH_ASSOC);
-	$uid = $row['uid'];
+	if($row) {
+		$uid = $row['uid'];
+	} else {
+		return 0;
+	}
         
         if (!$uid) {
             return 0;
@@ -1018,13 +1022,13 @@ class Auth implements AuthInterface
 
     public function isLogged():bool
     {
-        if ($this->isAuthenticated === false) {
-		    $this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
-	    }
-	    if($this->isAuthenticated === false && $this->showlogin===true)
-	    {
+        if ($this->isAuthenticated === false ) {
+		$this->isAuthenticated = $this->checkSession($this->getCurrentSessionHash());
+        }
+        if($this->isAuthenticated === false && $this->showlogin===true)
+	{
 		    call_user_func_array($this->callbacklogin, array($this->isAuthenticated,&$this));
-	    }
+	}
         return $this->isAuthenticated;
     }
 
@@ -1301,7 +1305,9 @@ class Auth implements AuthInterface
 
         if (!setcookie($this->config->cookie_name, $data['hash'], $cookie_options)) {
             return false;
-        }
+	}
+
+	$_COOKIE[$this->config->cookie_name] = $data['hash'];
 
         return $data;
     }
