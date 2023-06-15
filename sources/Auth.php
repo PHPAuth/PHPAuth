@@ -993,6 +993,16 @@ class Auth implements AuthInterface
 
     public function getCurrentSessionHash():string
     {
+        if( $this->config->uses_session ) {
+            $expire = $_SESSION[$this->config->cookie_name . '_expire'] ?? 0;
+            if( $expire > 0 && $expire < time() ) {
+                // Session expired, unset the session hash
+                unset( $_SESSION[$this->config->cookie_name] );
+                unset( $_SESSION[$this->config->cookie_name.'_expire'] );
+                return '';
+            }
+            return $_SESSION[$this->config->cookie_name] ?? '';
+        }
         return $_COOKIE[$this->config->cookie_name] ?? '';
     }
 
@@ -1275,8 +1285,14 @@ class Auth implements AuthInterface
             'samesite'  =>  $this->config->cookie_samesite ?? 'Lax' // None || Lax  || Strict
         ];
 
-        if (!setcookie($this->config->cookie_name, $data['hash'], $cookie_options)) {
-            return false;
+        // When config uses session
+        if( $this->config->uses_session ) {
+            $_SESSION[$this->config->cookie_name] = $data['hash'];
+            $_SESSION[$this->config->cookie_name . '_expire'] = $data['expire'];
+        } else {
+            if (!setcookie($this->config->cookie_name, $data['hash'], $cookie_options)) {
+                return false;
+            }
         }
 
         return $data;
@@ -1320,12 +1336,20 @@ class Auth implements AuthInterface
      */
     protected function removeCookie():bool
     {
-        if(isset($_COOKIE[$this->config->cookie_name])) {
-            unset($_COOKIE[$this->config->cookie_name]);
-        }
-
-        if (!setcookie($this->config->cookie_name, '', -1, '/')) {
-            return false;
+        // Execute this if config uses session
+        if( $this->config->uses_session ) {
+            // Unset session
+            if( isset( $_SESSION[$this->config->cookie_name] ) ) {
+                unset($_SESSION[$this->config->cookie_name]);
+            }
+        } else {
+             // Remove cookie
+             if(isset($_COOKIE[$this->config->cookie_name])) {
+                unset($_COOKIE[$this->config->cookie_name]);
+            }
+            if (!setcookie($this->config->cookie_name, '', -1, '/')) {
+                return false;
+            }
         }
 
         return true;

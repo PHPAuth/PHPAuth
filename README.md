@@ -149,6 +149,7 @@ The database table `config` contains multiple parameters allowing you to configu
 * `recaptcha_enabled`: 1 for Google reCaptcha enabled, 0 - disabled (default)
 * `recaptcha_site_key`: string, contains public reCaptcha key (for javascripts)
 * `recaptcha_secret_key`: string, contains secret reCaptcha key
+* `uses_session` : 1 to use Session, 0 - disabled (default) to use cookies
 
 The rest of the parameters generally do not need changing.
 
