@@ -184,12 +184,16 @@ class Auth implements AuthInterface
             if ($this->checkCaptcha($captcha_response) == false) {
                 $return['message'] = $this->__lang('user_verify_failed'); //=> captcha.verify_code_invalid
 
+                // return new Result(false, '', $this->__lang('captcha.verify_code_invalid'));
+
                 return $return;
             }
         }
 
         if ($block_status == 'block') {
             $return['message'] = $this->__lang('user_blocked'); // => user.temporary_banned
+
+            // return new Result(false, '', $this->__lang('user.temporary_banned'));
 
             return $return;
         }
@@ -346,7 +350,7 @@ class Auth implements AuthInterface
 
         $state['uid'] = $row['id'];
         $state['error'] = false;
-        $state['message'] = ($use_email_activation == true ? $this->__lang('reset_requested') : $this->__lang('reset_requested_emailmessage_suppressed'));
+        $state['message'] = ($use_email_activation ? $this->__lang('reset_requested') : $this->__lang('reset_requested_emailmessage_suppressed'));
         $state['token'] = $addRequest['token'];
         $state['expire'] = $addRequest['expire'];
 
@@ -516,7 +520,7 @@ class Auth implements AuthInterface
         $query_prepared->execute($query_params);
 
         $row = $query_prepared->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$row) {
             return false;
         }
@@ -563,9 +567,9 @@ class Auth implements AuthInterface
             'hash' => $hash
         ];
         $query_prepared->execute($query_params);
-        
+
         $uid = $query_prepared->fetch(PDO::FETCH_ASSOC)['uid'];
-        
+
         if (!$uid) {
             return 0;
         }
@@ -1068,11 +1072,11 @@ class Auth implements AuthInterface
         return true;
     }
 
-    public function __lang(string $key, ...$args): string
+    /*public function __lang(string $key, ...$args): string
     {
         $string = array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
         return (func_num_args() > 1) ? vsprintf($string, $args) : $string;
-    }
+    }*/
 
     public function do_SendMail(string $email, string $type, string $key)
     {

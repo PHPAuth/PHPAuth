@@ -76,5 +76,14 @@ interface ConfigInterface
      */
     public function setCustomMailer(callable $callable = null):Config;
 
+    /**
+     * set Captcha Validator
+     *
+     * @param callable|null $callable
+     * @return $this
+     * @todo: change return type to self at PHP 7.4
+     */
+    public function setCaptchaValidator(callable $callable = null):Config;
+
 
 }

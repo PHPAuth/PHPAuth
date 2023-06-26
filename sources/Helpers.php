@@ -7,7 +7,9 @@ use RuntimeException;
 trait Helpers
 {
     /**
-     * Returns forgotten translation dictionary
+     * Returns default (EN) dictionary
+     *
+     * This method must return default messages for all cases.
      *
      * @return array
      */
@@ -123,8 +125,8 @@ If you did not request a password reset key on %1$s recently then this message w
      */
     public static function getIp():string
     {
-        if (getenv('REMOTE_ADDR')) { 
-            $ipAddress = getenv('REMOTE_ADDR');  
+        if (getenv('REMOTE_ADDR')) {
+            $ipAddress = getenv('REMOTE_ADDR');
         } elseif (getenv('HTTP_CLIENT_IP')) {
             $ipAddress = getenv('HTTP_CLIENT_IP');
         } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
@@ -147,17 +149,19 @@ If you did not request a password reset key on %1$s recently then this message w
     /**
      * Hashes provided password with BCrypt
      *
+     * With zero cost will be used default cost value (10)
+     *
      * @param string $string
      * @param int $cost
      * @throws RuntimeException
      *
      * @return string
      */
-    public static function getHash(string $string, int $cost):string
+    public static function getHash(string $string, int $cost = 0):string
     {
-        $hash = password_hash($string, PASSWORD_BCRYPT, [
-            'cost' => $cost
-        ]);
+        $hash_options = ($cost > 0) ? [ 'cost' => $cost ] : [];
+
+        $hash = password_hash($string, PASSWORD_BCRYPT, $hash_options);
 
         if ($hash === null) {
             throw new RuntimeException("[PHPAuth] Hashing algorithm is invalid. Blowfish not supported? ");
@@ -170,5 +174,26 @@ If you did not request a password reset key on %1$s recently then this message w
         return $hash;
     }
 
+    public function __lang(string $key, ...$args): string
+    {
+        /**
+         * NEW lang => LEGACY lang by key
+         */
+        $lang_new_to_legacy = [
+            'captcha.verify_code_invalid'       =>  'user_verify_failed',
+            'user.temporary_banned'             =>  'user_blocked',
+            'login.remember_me_invalid_value'   =>  'remember_me_invalid',
+            'account.no_pair_user_and_password' =>  'email_password_incorrect',
+            'account.not_activated'             =>  'account_inactive',
+            'account.not_found'                 =>  'account_not_found'
+        ];
+
+        if (array_key_exists($key, $lang_new_to_legacy)) {
+            $key = $lang_new_to_legacy[ $key ];
+        }
+
+        $string = array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
+        return (func_num_args() > 1) ? vsprintf($string, $args) : $string;
+    }
 
 }

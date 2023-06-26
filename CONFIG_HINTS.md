@@ -7,7 +7,7 @@ Validate E-Mail values:
 
 Zero value (0) means ignore each check.
 
-- `verify_email_use_banlist` - use Built-in E-Mail validator using `table_emails_banned` SQL table.
+- `verify_email_use_banlist` - legacy name. Must be: `verify_email_use_custom_validator`. Means: call custom validator.
 
 
 ### Localization

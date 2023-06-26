@@ -396,4 +396,12 @@ class Config implements ConfigInterface
 
         return false;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function setCaptchaValidator(callable $callable = null): Config
+    {
+        // TODO: Implement setCaptchaValidator() method.
+    }
 }
