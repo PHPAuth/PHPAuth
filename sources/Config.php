@@ -228,7 +228,7 @@ class Config implements ConfigInterface
         $this->config['recaptcha'] = $config_recaptcha;
     }
 
-    public function setLocalization(array $dictionary):Config
+    public function setLocalization(array $dictionary = []):Config
     {
         $dictionary_default = self::getForgottenDictionary();
 
