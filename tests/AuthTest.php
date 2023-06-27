@@ -46,10 +46,14 @@ class AuthTest extends TestCase
         self::$dbh->exec("DELETE FROM phpauth_requests;");
     }
 
+    /**
+     * @runInSeparateProcess
+     */
     public function testRegister()
     {
         // Successful registration
-        $this->assertFalse(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
+        $condition = self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$');
+        $this->assertFalse($condition['error']);
 
         // Failed registration: same email
         $this->assertTrue(self::$auth->register('test@email.com', 'T3H-1337-P@$$', 'T3H-1337-P@$$')['error']);
@@ -63,6 +67,7 @@ class AuthTest extends TestCase
 
     /**
      * @depends testRegister
+     * @runInSeparateProcess
      */
     public function testLogin()
     {
@@ -70,7 +75,8 @@ class AuthTest extends TestCase
         self::$dbh->exec("DELETE FROM phpauth_attempts;");
 
         // Successful login
-        $this->assertFalse(self::$auth->login("test@email.com", 'T3H-1337-P@$$')['error']);
+        $login = self::$auth->login("test@email.com", 'T3H-1337-P@$$');
+        $this->assertFalse($login['error']);
 
         // Failed login: incorrect email
         $this->assertTrue(self::$auth->login("incorrect@email.com", "IncorrectPassword1")['error']);
@@ -262,7 +268,8 @@ class AuthTest extends TestCase
     public function testLogout()
     {
         // Get the user's (created and logged in as earlier) session hash
-        $hash = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch()['hash'];
+        $req = self::$dbh->query("SELECT hash FROM phpauth_sessions WHERE uid = (SELECT id FROM phpauth_users WHERE email = 'test2@email.com');", PDO::FETCH_ASSOC)->fetch();
+        $hash = $req['hash'];
 
         // Successful logout
         $this->assertTrue(self::$auth->logout($hash));
