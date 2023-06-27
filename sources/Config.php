@@ -50,6 +50,16 @@ class Config implements ConfigInterface
     public $customMailer;
 
     /**
+     * @var callable
+     */
+    public $customCaptchaValidator;
+
+    /**
+     * @var array
+     */
+    public $customCaptchaConfig;
+
+    /**
      * Config::__construct()
      *
      * Create config class for PHPAuth\Auth.
@@ -67,7 +77,7 @@ class Config implements ConfigInterface
      * @param string $config_type -- default empty (means config in SQL table phpauth_config), possible values: 'sql', 'ini', 'array'
      * @param string $config_site_language -- declare site language, empty value means 'en_GB'
      */
-    public function __construct(PDO $dbh, $config_source = null, string $config_type = self::CONFIG_TYPE_SQL, string $config_site_language = '')
+    public function __construct($dbh, $config_source = null, string $config_type = self::CONFIG_TYPE_SQL, string $config_site_language = '')
     {
         $config_type = strtolower($config_type);
 
@@ -213,24 +223,6 @@ class Config implements ConfigInterface
         $this->config['recaptcha'] = $config_recaptcha;
     }
 
-    public function setEMailValidator(callable $callable = null):Config
-    {
-        if (!is_null($callable) && is_callable($callable)) {
-            $this->emailValidator = $callable;
-        }
-
-        return $this;
-    }
-
-    public function setPasswordValidator(callable $callable = null):Config
-    {
-        if (!is_null($callable) && is_callable($callable)) {
-            $this->passwordValidator = $callable;
-        }
-
-        return $this;
-    }
-
     public function setLocalization(array $dictionary):Config
     {
         $dictionary_default = self::getForgottenDictionary();
@@ -245,20 +237,6 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    /**
-     *
-     *
-     * @param callable|null $callable
-     * @return $this
-     */
-    public function setCustomMailer(callable $callable = null):Config
-    {
-        if (!is_null($callable) && is_callable($callable)) {
-            $this->customMailer = $callable;
-        }
-
-        return $this;
-    }
 
     /**
      * Config::__get()
@@ -340,6 +318,10 @@ class Config implements ConfigInterface
         $this->repairConfigValue('mail_charset', 'UTF-8');
 
         $this->repairConfigValue('allow_concurrent_sessions', false);
+
+        // new V 1.4.6
+        $this->repairConfigValue('verify_email_valid', true); // use FILTER_VALIDATE_EMAIL for email validation, @todo: add to config ?
+        $this->repairConfigValue('verify_email_use_banlist', true);
     }
 
     /**
@@ -397,11 +379,57 @@ class Config implements ConfigInterface
         return false;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setCaptchaValidator(callable $callable = null): Config
+    /* ============================= */
+    /* ==== Set custom handlers ==== */
+    /* ============================= */
+
+    public function setEMailValidator(callable $callable = null):Config
     {
-        // TODO: Implement setCaptchaValidator() method.
+        if (is_callable($callable)) {
+            $this->emailValidator = $callable;
+        }
+
+        return $this;
+    }
+
+    public function setPasswordValidator(callable $callable = null):Config
+    {
+        if (is_callable($callable)) {
+            $this->passwordValidator = $callable;
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     *
+     * @param callable|null $callable
+     * @return $this
+     */
+    public function setCustomMailer(callable $callable = null):Config
+    {
+        if (is_callable($callable)) {
+            $this->customMailer = $callable;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set captcha validator handler
+     *
+     * @param callable|null $callable
+     * @param array $captcha_config
+     * @return $this
+     */
+    public function setCaptchaValidator(callable $callable = null, array $captcha_config = []):Config
+    {
+        if (is_callable($callable)) {
+            $this->customCaptchaValidator = $callable;
+            $this->customCaptchaConfig = $captcha_config;
+        }
+
+        return $this;
     }
 }

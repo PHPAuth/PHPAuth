@@ -3,6 +3,7 @@
 namespace PHPAuth;
 
 use PDO;
+use PHPAuth\Core\Result;
 
 interface AuthInterface
 {
@@ -15,7 +16,7 @@ interface AuthInterface
      * @param PDO $dbh
      * @param Config $config
      */
-    public function __construct(PDO $dbh, Config $config);
+    public function __construct($dbh, Config $config);
 
     /**
      * Logs a user in
@@ -25,7 +26,7 @@ interface AuthInterface
      * @param int $remember
      * @param string $captcha_response
      *
-     * @return array $return
+     * @return array|Result $return
      * @todo: => loginUser
      */
     public function login(string $email, string $password, int $remember = 0, string $captcha_response = ''):array;
@@ -34,7 +35,7 @@ interface AuthInterface
      * Creates a new user, adds them to database
      * @param string $email
      * @param string $password
-     * @param string $repeatpassword
+     * @param string $repeat_password
      * @param array $params
      * @param string $captcha_response = ""
      * @param boolean $use_email_activation = false
@@ -42,7 +43,7 @@ interface AuthInterface
      *
      * //@todo: => registerUserAccount
      */
-    public function register(string $email, string $password, string $repeatpassword, array $params = [], string $captcha_response = '', bool $use_email_activation = false):array;
+    public function register(string $email, string $password, string $repeat_password, array $params = [], string $captcha_response = '', bool $use_email_activation = false):array;
 
     /**
      * Activates a user's account
@@ -123,10 +124,10 @@ interface AuthInterface
      * Gets public user data for a given UID and returns an array, password will be returned if param $withpassword is TRUE
      *
      * @param int $uid
-     * @param boolean|false $withpassword
+     * @param bool $with_password
      * @return array|null $data
      */
-    public function getUser(int $uid, bool $withpassword = false):?array;
+    public function getUser(int $uid, bool $with_password = false):?array;
 
     /**
      * Allows a user to delete their account

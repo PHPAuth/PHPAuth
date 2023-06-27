@@ -5,6 +5,7 @@ namespace PHPAuth;
 use Exception;
 use PDO;
 use PDOException;
+use PHPAuth\Core\Result;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
 use RuntimeException;
@@ -68,7 +69,7 @@ class Auth implements AuthInterface
      */
     public $customMailer;
 
-    public function __construct(PDO $dbh, Config $config)
+    public function __construct($dbh, Config $config)
     {
         $this->dbh = $dbh;
         $this->config = $config;
@@ -96,15 +97,15 @@ class Auth implements AuthInterface
         $block_status = $this->isBlocked();
 
         if ($block_status == 'verify') {
+            // checkCaptcha always return true!
             if (!$this->checkCaptcha($captcha_response)) {
-                $return['message'] = $this->__lang('user_verify_failed'); //=> captcha.verify_code_invalid
-
+                $return['message'] = $this->__lang('captcha.verify_code_invalid');
                 return $return;
             }
         }
 
         if ($block_status == 'block') {
-            $return['message'] = $this->__lang('user_blocked'); // => user.temporary_banned
+            $return['message'] = $this->__lang('user.temporary_banned');
             return $return;
         }
 
@@ -113,6 +114,7 @@ class Auth implements AuthInterface
 
         if ($validateEmail['error'] == 1) {
             $this->addAttempt();
+
             $return['message'] = $validateEmail['message']; // ?? $this->__lang("account_email_invalid");
 
             return $return;
@@ -134,7 +136,7 @@ class Auth implements AuthInterface
 
         if (!$uid) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('account_not_found'); //=> account.not_found
+            $return['message'] = $this->__lang('account.not_found');
 
             return $return;
         }
@@ -143,14 +145,13 @@ class Auth implements AuthInterface
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('email_password_incorrect'); // => verify.no_pair_user_and_password
-
+            $return['message'] = $this->__lang('verify.no_pair_user_and_password');
             return $return;
         }
 
         if ($user['isactive'] != 1) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('account_inactive');
+            $return['message'] = $this->__lang('account.not_activated');
 
             return $return;
         }
@@ -158,13 +159,13 @@ class Auth implements AuthInterface
         $sessiondata = $this->addSession($user['uid'], $remember);
 
         if (!$sessiondata) {
-            $return['message'] = $this->__lang('system_error') . ' #01';
+            $return['message'] = $this->__lang('system.error') . ' #01';
 
             return $return;
         }
 
         $return['error'] = false;
-        $return['message'] = $this->__lang('logged_in');
+        $return['message'] = $this->__lang('logged_in'); // => user.logged_in
 
         $return['hash'] = $sessiondata['hash'];
         $return['expire'] = $sessiondata['expire'];
@@ -181,8 +182,8 @@ class Auth implements AuthInterface
         $block_status = $this->isBlocked();
 
         if ($block_status == 'verify') {
-            if ($this->checkCaptcha($captcha_response) == false) {
-                $return['message'] = $this->__lang('user_verify_failed'); //=> captcha.verify_code_invalid
+            if (!$this->checkCaptcha($captcha_response)) {
+                $return['message'] = $this->__lang('captcha.verify_code_invalid');
 
                 // return new Result(false, '', $this->__lang('captcha.verify_code_invalid'));
 
@@ -191,7 +192,7 @@ class Auth implements AuthInterface
         }
 
         if ($block_status == 'block') {
-            $return['message'] = $this->__lang('user_blocked'); // => user.temporary_banned
+            $return['message'] = $this->__lang('user.temporary_banned');
 
             // return new Result(false, '', $this->__lang('user.temporary_banned'));
 
@@ -199,7 +200,7 @@ class Auth implements AuthInterface
         }
 
         if ($password !== $repeat_password) {
-            $return['message'] = $this->__lang('password_nomatch'); //
+            $return['message'] = $this->__lang('password_nomatch'); // => password.not_equal
 
             return $return;
         }
@@ -223,11 +224,12 @@ class Auth implements AuthInterface
         }
 
         if (!$this->isPasswordStrong($password)) {
-            $return['message'] = $this->__lang('password_weak');
+            $return['message'] = $this->__lang('password.too_weak');
 
             return $return;
         }
 
+        // before all password checks
         if ($this->isEmailTaken($email)) {
             $this->addAttempt();
             $return['message'] = $this->__lang('email_taken');
@@ -283,6 +285,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
+        //@todo: extract value (we will be able to use user email after)
         if ($this->getBaseUser($request_result['uid'])['isactive'] == 1) {
             $this->addAttempt();
             $this->deleteRequest($request_result['id']);
@@ -302,7 +305,7 @@ class Auth implements AuthInterface
         $this->deleteRequest($request_result['id']);
 
         $return['error'] = false;
-        $return['message'] = $this->__lang('account_activated');
+        $return['message'] = $this->__lang('account_activated'); // => account.activated
 
         return $return;
     }
@@ -393,7 +396,7 @@ class Auth implements AuthInterface
         return $uid === false ? 0 : $uid;
     }
 
-    public function getUser(int $uid, bool $withpassword = false):?array
+    public function getUser(int $uid, bool $with_password = false):?array
     {
         $query = "SELECT * FROM {$this->config->table_users} WHERE id = :id";
         $query_prepared = $this->dbh->prepare($query);
@@ -407,7 +410,7 @@ class Auth implements AuthInterface
 
         $data['uid'] = $uid;
 
-        if ($withpassword !== true) {
+        if ($with_password !== true) {
             unset($data['password']);
         }
 
@@ -435,6 +438,8 @@ class Auth implements AuthInterface
         }
 
         // check password
+
+        // password length? not required!
         $validatePassword = $this->validatePasswordLength($password);
 
         if ($validatePassword['error'] == 1) {
@@ -448,7 +453,7 @@ class Auth implements AuthInterface
 
         if (!password_verify($password, $user['password'])) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('password_incorrect');
+            $return['message'] = $this->__lang('password.incorrect');
 
             return $return;
         }
@@ -492,7 +497,7 @@ class Auth implements AuthInterface
         }
 
         $return['error'] = false;
-        $return['message'] = $this->__lang('account_deleted');
+        $return['message'] = $this->__lang('account_deleted'); // => account.deleted_successfully
 
         return $return;
     }
@@ -590,6 +595,7 @@ class Auth implements AuthInterface
         return true;
     }
 
+    //@todo: use custom validator instead
     public function isEmailBanned(string $email):bool
     {
         try {
@@ -694,13 +700,20 @@ class Auth implements AuthInterface
             return $state;
         }
 
+        //@todo: use custom Password validator
         $zxcvbn = new Zxcvbn();
-
         if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
             $state['message'] = $this->__lang('password_weak');
-
             return $state;
         }
+
+        /*
+       //@we must use this
+       if (is_callable($this->passwordValidator) && !call_user_func_array($this->passwordValidator, [ $newpass ])) {
+           $return['message'] = $this->__lang('password_weak');
+           return $return;
+       }
+       */
 
         $data = $this->getRequest($key, 'reset');
 
@@ -799,9 +812,6 @@ class Auth implements AuthInterface
         // Create an activation entry and sends email to user
         $addRequest = $this->addRequest($found_user['id'], $email, 'activation', $use_email_activation);
 
-        // $addRequest = $this->addRequestOptimized($found_user, "activation", $use_email_activation);
-
-
         if ($addRequest['error'] == 1) {
             $this->addAttempt();
             $state['message'] = $addRequest['message'];
@@ -855,13 +865,20 @@ class Auth implements AuthInterface
             return $return;
         }
 
+        //@todo: use custom validator
         $zxcvbn = new Zxcvbn();
-
         if ($zxcvbn->passwordStrength($newpass)['score'] < intval($this->config->password_min_score)) {
             $return['message'] = $this->__lang('password_weak');
-
             return $return;
         }
+
+        /*
+        //@we must use this
+        if (is_callable($this->passwordValidator) && !call_user_func_array($this->passwordValidator, [ $newpass ])) {
+            $return['message'] = $this->__lang('password_weak');
+            return $return;
+        }
+        */
 
         $user = $this->getBaseUser($uid);
 
@@ -984,11 +1001,11 @@ class Auth implements AuthInterface
         $query_prepared->execute(['ip' => $ip]);
         $attempts = $query_prepared->fetchColumn();
 
-        if ($attempts < (int)$this->config->attempts_before_verify) {
+        if ((int)$this->config->attempts_before_verify > 0 && $attempts < (int)$this->config->attempts_before_verify) {
             return 'allow';
         }
 
-        if ($attempts < (int)$this->config->attempts_before_ban) {
+        if ((int)$this->config->attempts_before_ban > 0 && $attempts < (int)$this->config->attempts_before_ban) {
             return 'verify';
         }
 
@@ -1072,12 +1089,7 @@ class Auth implements AuthInterface
         return true;
     }
 
-    /*public function __lang(string $key, ...$args): string
-    {
-        $string = array_key_exists($key, $this->messages_dictionary) ? $this->messages_dictionary[$key] : $key;
-        return (func_num_args() > 1) ? vsprintf($string, $args) : $string;
-    }*/
-
+    //@todo: split to two separate methods (needed for custom handler)
     public function do_SendMail(string $email, string $type, string $key)
     {
         $return = [
@@ -1159,6 +1171,8 @@ class Auth implements AuthInterface
     public function updateUser(int $uid, array $params)
     {
         $setParams = '';
+
+        //@todo: check, is email present at database
 
         //unset uid which is set in getUser(). array generated in getUser() is now usable as parameter for updateUser()
         unset($params['uid']);
@@ -1247,7 +1261,7 @@ class Auth implements AuthInterface
         }
 
         $data['hash'] = sha1($this->config->site_key . microtime());
-        $agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         if (!$this->config->allow_concurrent_sessions) {
             $this->deleteExistingSessions($uid);
@@ -1598,23 +1612,35 @@ class Auth implements AuthInterface
     {
         $state['error'] = true;
 
-        if (strlen($email) < (int)$this->config->verify_email_min_length) { // min email length = 5 : `a@b.c`, is this really required check ?
-            $state['message'] = $this->__lang('email_short', (int)$this->config->verify_email_min_length); // => email.address_too_short
+        if ((int)$this->config->verify_email_min_length > 0 && strlen($email) < (int)$this->config->verify_email_min_length) {
+            // min email length = 5 : `a@b.c`, is this really required check ?
+            $state['message'] = $this->__lang('email.address_too_short', (int)$this->config->verify_email_min_length);
 
             return $state;
-        } elseif (strlen($email) > (int)$this->config->verify_email_max_length) { // is this really required check?
-            $state['message'] = $this->__lang('email_long', (int)$this->config->verify_email_max_length); // => email.address_too_long
+        } elseif ((int)$this->config->verify_email_max_length > 0 && strlen($email) > (int)$this->config->verify_email_max_length) {
+            // is this really required check?
+            $state['message'] = $this->__lang('email.address_too_long', (int)$this->config->verify_email_max_length);
 
             return $state;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) { // required check
-            $state['message'] = $this->__lang('email_invalid', $email); // => email.address_incorrect, провалена проверка на то, емейл ли это
+        } elseif ($this->config->verify_email_valid && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $state['message'] = $this->__lang('email.address_incorrect', $email);
 
             return $state;
         }
 
+        /*
+        //@todo: use it
+        if (is_callable($this->emailValidator) && call_user_func_array($this->emailValidator, [ $email ])) {
+            $this->addAttempt();
+            $state['message'] = $this->__lang('email.address_in_banlist');
+
+            return $state;
+        }
+        */
+
         if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
-            $state['message'] = $this->__lang('email_banned'); // => email.address_in_banlist
+            $state['message'] = $this->__lang('email.address_in_banlist');
 
             return $state;
         }
@@ -1721,8 +1747,10 @@ class Auth implements AuthInterface
     {
         $state['error'] = true;
 
-        if (strlen($password) < (int)$this->config->verify_password_min_length) {
-            $state['message'] = $this->__lang('password_short');
+        $password_length = strlen($password);
+
+        if ((int)$this->config->verify_password_min_length > 0 && $password_length < (int)$this->config->verify_password_min_length) {
+            $state['message'] = $this->__lang('password.too_short', $password_length);
 
             return $state;
         }

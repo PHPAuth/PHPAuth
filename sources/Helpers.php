@@ -180,12 +180,28 @@ If you did not request a password reset key on %1$s recently then this message w
          * NEW lang => LEGACY lang by key
          */
         $lang_new_to_legacy = [
+            'system.error'                      =>  'system_error',
+
             'captcha.verify_code_invalid'       =>  'user_verify_failed',
+
             'user.temporary_banned'             =>  'user_blocked',
+
             'login.remember_me_invalid_value'   =>  'remember_me_invalid',
+
             'account.no_pair_user_and_password' =>  'email_password_incorrect',
             'account.not_activated'             =>  'account_inactive',
-            'account.not_found'                 =>  'account_not_found'
+            'account.not_found'                 =>  'account_not_found',
+
+            'email.address_too_short'           =>  'email_short',
+            'email.address_too_long'            =>  'email_long',
+            'email.address_incorrect'           =>  'email_invalid',
+            'email.address_in_banlist'          =>  'email_banned',
+
+            'password.too_short'                =>  'password_short',
+            'password.not_equal'                =>  'password_nomatch',
+            'password.too_weak'                 =>  'password_weak',
+            'password.incorrect'                =>  'password_incorrect'
+
         ];
 
         if (array_key_exists($key, $lang_new_to_legacy)) {
