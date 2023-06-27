@@ -29,6 +29,11 @@ class Config implements ConfigInterface
     public $config_table = 'phpauth_config';
 
     /**
+     * @var string
+     */
+    public $config_type;
+
+    /**
      * Custom E-Mail validator callback
      *
      * @var callable
@@ -59,6 +64,8 @@ class Config implements ConfigInterface
      */
     public $customCaptchaConfig;
 
+
+
     /**
      * Config::__construct()
      *
@@ -79,7 +86,7 @@ class Config implements ConfigInterface
      */
     public function __construct($dbh, $config_source = null, string $config_type = self::CONFIG_TYPE_SQL, string $config_site_language = '')
     {
-        $config_type = strtolower($config_type);
+        $this->config_type = $config_type = strtolower($config_type);
 
         if (PHP_VERSION_ID < 70200) {
             die('PHPAuth: PHP 7.2.0+ required for PHPAuth engine!');
@@ -138,7 +145,7 @@ class Config implements ConfigInterface
 
                 $this->config = $this
                     ->dbh
-                    ->query("SELECT `setting`, `value` FROM {$this->config_table} ORDER BY `setting`")
+                    ->query("SELECT setting, value FROM {$this->config_table} ORDER BY setting")
                     ->fetchAll(PDO::FETCH_KEY_PAIR);
 
                 break;
@@ -167,9 +174,7 @@ class Config implements ConfigInterface
         }
 
         // Determine site language
-        $site_language = (empty($config_site_language))
-            ? $this->config['site_language'] ?? 'en_GB'
-            : $config_site_language;
+        $site_language = (empty($config_site_language)) ? $this->config['site_language'] ?? 'en_GB' : $config_site_language;
 
         // set default 'en_GB' dictionary
         $this->config['dictionary'] = self::getForgottenDictionary();
@@ -232,7 +237,7 @@ class Config implements ConfigInterface
                 $dictionary_default[$key] = $dictionary[$key];
             }
         }
-        $this->config['dictionary'] = $dictionary;
+        $this->config['dictionary'] = $dictionary_default;
 
         return $this;
     }
@@ -246,7 +251,7 @@ class Config implements ConfigInterface
      */
     public function __get(string $setting)
     {
-        return array_key_exists($setting, $this->config) ? $this->config[$setting] : null;
+        return array_key_exists($setting, $this->config) ? $this->config[ $setting ] : null;
     }
 
     public function getAll(): array
@@ -264,12 +269,16 @@ class Config implements ConfigInterface
      */
     public function __set(string $setting, $value)
     {
-        $query_prepared = $this->dbh->prepare("UPDATE {$this->config_table} SET value = :value WHERE setting = :setting");
+        if ($this->config_type === self::CONFIG_TYPE_SQL /* && $this->config['update_config_to_db'] */) {
+            $query_prepared = $this->dbh->prepare("UPDATE {$this->config_table} SET value = :value WHERE setting = :setting");
 
-        if ($query_prepared->execute(['value' => $value, 'setting' => $setting])) {
-            $this->config[$setting] = $value;
+            if ($query_prepared->execute(['value' => $value, 'setting' => $setting])) {
+                $this->config[ $setting ] = $value;
 
-            return true;
+                return true;
+            }
+        } else {
+            $this->config[ $setting ] = $value;
         }
 
         return false;
@@ -322,6 +331,9 @@ class Config implements ConfigInterface
         // new V 1.4.6
         $this->repairConfigValue('verify_email_valid', true); // use FILTER_VALIDATE_EMAIL for email validation, @todo: add to config ?
         $this->repairConfigValue('verify_email_use_banlist', true);
+
+        // 1.5.0+
+        $this->repairConfigValue('verify_email_with_custom', 0); // instead of [verify_email_use_banlist]
     }
 
     /**

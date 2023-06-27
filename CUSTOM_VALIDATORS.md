@@ -109,7 +109,8 @@ $config = $config->setCaptchaValidator(static function() use ($reCaptcha_config)
 
 
 
-# Other
+
+# --- Other ---
 
 ## stymiee/email-validator
 
