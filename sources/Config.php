@@ -4,6 +4,7 @@ namespace PHPAuth;
 
 use PDO;
 use PDOException;
+use PHPAuth\Exceptions\PHPAuthException;
 use RuntimeException;
 
 /**
@@ -64,8 +65,6 @@ class Config implements ConfigInterface
      */
     public $customCaptchaConfig;
 
-
-
     /**
      * Config::__construct()
      *
@@ -88,6 +87,7 @@ class Config implements ConfigInterface
     {
         $this->config_type = $config_type = strtolower($config_type);
 
+        // This check is left in case the library was included manually, and not through the composer
         if (PHP_VERSION_ID < 70200) {
             die('PHPAuth: PHP 7.2.0+ required for PHPAuth engine!');
         }
@@ -103,7 +103,7 @@ class Config implements ConfigInterface
                 }
 
                 // replace beginner '$' in filepath to application root directory
-                $source = preg_replace('/^\$/', getcwd(), $config_source);
+                $source = self::resolveAppRootPath($config_source);
 
                 if (!is_readable($source)) {
                     throw new RuntimeException("PHPAuth: config type is FILE, declared as {$source}, but file not readable or not exist");
@@ -363,7 +363,7 @@ class Config implements ConfigInterface
 
         switch ($this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME)) {
             case 'pgsql': {
-                $sth = $this->dbh->query("SELECT FROM pg_tables WHERE tablename = '{$table}' ;");
+                $sth = $this->dbh->query("SELECT * FROM pg_tables WHERE tablename = '{$table}' ;");
                 return (bool)$sth->rowCount();
                 break;
             }
@@ -389,6 +389,17 @@ class Config implements ConfigInterface
         } // switch
 
         return false;
+    }
+
+    /**
+     * Converts `$` at beginning of filename to Application Root Path
+     *
+     * @param $filename
+     * @return string|string[]|null
+     */
+    protected static function resolveAppRootPath($filename)
+    {
+        return preg_replace('/^\$/', getcwd(), $filename);
     }
 
     /* ============================= */
@@ -444,4 +455,59 @@ class Config implements ConfigInterface
 
         return $this;
     }
+
+    /* ============================== */
+    /* ======= Config loaders ======= */
+    /* ============================== */
+
+    /**
+     * Load PHPAuth config from array structure
+     *
+     * @param array $dataset
+     * @return $this
+     * @throws PHPAuthException
+     */
+    /*public function loadArray(array $dataset):self
+    {
+        if (empty($dataset)) {
+            throw new PHPAuthException( 'PHPAuth Config: given EMPTY config array data' );
+        }
+
+        $this->config->set($dataset);
+        $this->config_type = self::CONFIG_TYPE_ARRAY;
+
+        return $this;
+    }*/
+
+    /**
+     * @param $dbh
+     * @param string $table
+     * @return $this
+     * @throws PHPAuthException
+     * @throws PDOException
+     */
+    /*public function loadDB($dbh = null, string $table = 'phpauth_config'):self
+    {
+        if (is_null($dbh)) {
+            $dbh = $this->dbh;
+        }
+
+        $this->db_config_table = $table;
+
+        if (empty($this->db_config_table)) {
+            throw new PHPAuthException( 'PHPAuth Config: Empty config table name given' );
+        }
+
+        if (!$this->checkTableExists($table)) {
+            throw new PHPAuthException("PHPAuth Config: SQL Config table {$table} does not exist");
+        }
+
+        $sth = $dbh->query("SELECT setting, value FROM {$this->db_config_table} ORDER BY setting");
+        $config = $sth->fetchAll(\PDO::FETCH_KEY_PAIR);
+
+        $this->config->set($config);
+
+        return $this;
+    }*/
+
 }

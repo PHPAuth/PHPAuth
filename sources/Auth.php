@@ -380,11 +380,6 @@ class Auth implements AuthInterface
         return $this->deleteExistingSessions($uid);
     }
 
-    /*public function getHash(string $password)
-    {
-        return password_hash($password, PASSWORD_BCRYPT, ['cost' => $this->config->bcrypt_cost]);
-    }*/
-
     public function getUID(string $email):int
     {
         $query = "SELECT id FROM {$this->config->table_users} WHERE email = :email";
@@ -1128,7 +1123,7 @@ class Auth implements AuthInterface
             $mail->setFrom($this->config->site_email, $this->config->site_name);
             $mail->addAddress($email);
 
-            $mail->CharSet = $this->config->mail_charset;
+            $mail->CharSet = $this->config->mail_charset;       //@todo: must be ALWAYS 'UTF-8'
 
             //Content
             $mail->isHTML(true);
@@ -1708,7 +1703,7 @@ class Auth implements AuthInterface
         $attempt_expiredate = date('Y-m-d H:i:s', strtotime($this->config->attack_mitigation_time));
 
         $query = "INSERT INTO {$this->config->table_attempts} (ip, expiredate) VALUES (:ip, :expiredate)";
-        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
+        $query_prepared = $this->dbh->prepare($query);
         return $query_prepared->execute([
             'ip' => $ip,
             'expiredate' => $attempt_expiredate
@@ -1724,7 +1719,6 @@ class Auth implements AuthInterface
      */
     protected function deleteAttempts(string $ip, bool $all = false):bool
     {
-        // NEXT : 'ip = INET_ATON(:ip)'
         $query = ($all)
             ? "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip"
             : "DELETE FROM {$this->config->table_attempts} WHERE ip = :ip AND NOW() > expiredate ";
