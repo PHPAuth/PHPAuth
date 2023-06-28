@@ -145,7 +145,7 @@ class Auth implements AuthInterface
 
         if (!$this->password_verify_with_rehash($password, $user['password'], $uid)) {
             $this->addAttempt();
-            $return['message'] = $this->__lang('verify.no_pair_user_and_password');
+            $return['message'] = $this->__lang('account.no_pair_user_and_password');
             return $return;
         }
 
