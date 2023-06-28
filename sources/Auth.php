@@ -10,7 +10,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use ReCaptcha\ReCaptcha;
 use RuntimeException;
 use stdClass;
-use ZxcvbnPhp\Zxcvbn;
 use function setcookie;
 
 class Auth implements AuthInterface
@@ -680,11 +679,9 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        $zxcvbn = new Zxcvbn();
-
-        if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
+        // check password strength using custom validator
+        if (!$this->isPasswordStrong($password)) {
             $state['message'] = $this->__lang('password_weak');
-
             return $state;
         }
 
@@ -694,21 +691,6 @@ class Auth implements AuthInterface
 
             return $state;
         }
-
-        //@todo: use custom Password validator
-        $zxcvbn = new Zxcvbn();
-        if ($zxcvbn->passwordStrength($password)['score'] < intval($this->config->password_min_score)) {
-            $state['message'] = $this->__lang('password_weak');
-            return $state;
-        }
-
-        /*
-       //@we must use this
-       if (is_callable($this->passwordValidator) && !call_user_func_array($this->passwordValidator, [ $newpass ])) {
-           $return['message'] = $this->__lang('password_weak');
-           return $return;
-       }
-       */
 
         $data = $this->getRequest($key, 'reset');
 
@@ -860,20 +842,11 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        //@todo: use custom validator
-        $zxcvbn = new Zxcvbn();
-        if ($zxcvbn->passwordStrength($newpass)['score'] < intval($this->config->password_min_score)) {
+        // check password strength using custom validator
+        if (!$this->isPasswordStrong($newpass)) {
             $return['message'] = $this->__lang('password_weak');
             return $return;
         }
-
-        /*
-        //@we must use this
-        if (is_callable($this->passwordValidator) && !call_user_func_array($this->passwordValidator, [ $newpass ])) {
-            $return['message'] = $this->__lang('password_weak');
-            return $return;
-        }
-        */
 
         $user = $this->getBaseUser($uid);
 
@@ -938,7 +911,7 @@ class Auth implements AuthInterface
             return $return;
         }
 
-        $validatePassword = $this->validatePasswordLength($password);
+        $validatePassword = $this->validatePasswordLength($password); //@todo: WTF???
 
         if ($validatePassword['error'] == 1) {
             $return['message'] = $this->__lang('password_notvalid');
@@ -990,9 +963,8 @@ class Auth implements AuthInterface
         $ip = self::getIp();
         $this->deleteAttempts($ip, false);
 
-        // INET_ATON
         $query = "SELECT count(*) FROM {$this->config->table_attempts} WHERE ip = :ip";
-        $query_prepared = $this->dbh->prepare($query); // INET_ATON(:ip)
+        $query_prepared = $this->dbh->prepare($query);
         $query_prepared->execute(['ip' => $ip]);
         $attempts = $query_prepared->fetchColumn();
 
@@ -1623,8 +1595,8 @@ class Auth implements AuthInterface
             return $state;
         }
 
+        //@todo: use custom validator
         /*
-        //@todo: use it
         if (is_callable($this->emailValidator) && call_user_func_array($this->emailValidator, [ $email ])) {
             $this->addAttempt();
             $state['message'] = $this->__lang('email.address_in_banlist');
@@ -1632,6 +1604,7 @@ class Auth implements AuthInterface
             return $state;
         }
         */
+        // instead of:
 
         if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
@@ -1730,9 +1703,8 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Verifies that a password is greater than minimal length
+     * Verifies that a password lenght is greater than minimal length
      *
-     * security requirements (ZxcvbnPhp\Zxcvbn) not checked now.
      * @param string $password
      *
      * @return array $return ['error', 'message']
@@ -1809,17 +1781,18 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Check password strength using Zxcvbn
+     * Check password strength using custom validator callback function
      *
      * @param string $password
      * @return bool
      */
     private function isPasswordStrong(string $password):bool
     {
-        // return (new Zxcvbn())->passwordStrength($password)['score'] > intval($this->config->password_min_score);
         if (is_callable($this->passwordValidator)) {
             return ($this->passwordValidator)($password, $this->config);
         }
+
+        // call_user_func_array($this->passwordValidator, [ $password, $this->config ])
 
         return true;
     }

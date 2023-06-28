@@ -1,4 +1,4 @@
-# since 1.5.0
+# Future changes
 
 ## EMail Validator
 
@@ -22,7 +22,7 @@ Minimum PHP Version required 7.4
 
 ## Custom translations
 
-Will be removed at 1.5.0 from PHPAuth "Core"
+Will be removed at from PHPAuth "Core"
 
 Use https://github.com/PHPAuth/PHPAuth.l10n package instead:
 

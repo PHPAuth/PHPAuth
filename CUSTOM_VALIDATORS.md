@@ -27,9 +27,34 @@ use ZxcvbnPhp\Zxcvbn;
 $config = $config->setPasswordValidator(static function($password) use ($config) {
     return (bool)((new Zxcvbn())->passwordStrength($password)['score'] >= intval($config->password_min_score));
 });
-
-
 ```
+used as:
+
+```php
+private function isPasswordStrong(string $password):bool
+{
+    if (is_callable($this->passwordValidator)) {
+        return ($this->passwordValidator)($password, $this->config);
+    }
+
+    return true;
+}
+```
+
+Custom validator MUST return **TRUE** if the password is strong enough and **FALSE** otherwise.
+
+Without a defined validator, the password is always considered strong enough.
+
+Developer can use other validator implementations, such as:
+
+- https://packagist.org/packages/rollerworks/password-strength-validator
+- https://packagist.org/packages/valorin/pwned-validator
+- https://packagist.org/packages/schuppo/password-strength
+- https://packagist.org/packages/jbafford/password-strength-bundle
+- https://packagist.org/packages/garybell/password-validator (Password validation determined by password entropy)
+- https://packagist.org/packages/rollerworks/password-common-list
+- and so on...
+
 # E-Mail custom validators
 
 Initialized with `setEmailValidator()` method.
