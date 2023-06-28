@@ -10,8 +10,8 @@ $lang['account_not_found'] = "Account with given email not found.";
 
 $lang['login_remember_me_invalid'] = "The remember me field is invalid.";
 
-$lang['email_password_invalid'] = "Email address / password are invalid.";
-$lang['email_password_incorrect'] = "Email address / password are incorrect.";
+$lang['email_password_invalid'] = "Email address / password is invalid.";
+$lang['email_password_incorrect'] = "Email address / password is incorrect.";
 $lang['remember_me_invalid'] = "The remember me field is invalid.";
 
 $lang['password_short'] = "Password is too short.";
