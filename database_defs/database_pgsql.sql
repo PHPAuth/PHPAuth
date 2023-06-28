@@ -54,9 +54,6 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('verify_password_min_length',  '3'),
 ('request_key_expiration', '+10 minutes'),
 ('translation_source', 'php'),
-('recaptcha_enabled', 0),
-('recaptcha_site_key', ''),
-('recaptcha_secret_key', ''),
 ('custom_datetime_format', 'Y-m-d H:i'),
 ('uses_session', 0);
 

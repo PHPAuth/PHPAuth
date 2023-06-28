@@ -43,20 +43,20 @@ interface ConfigInterface
     /**
      * Add custom E-Mail validator
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @return Config
      * @todo: change return type to self at PHP 7.4
      */
-    public function setEMailValidator(callable $callable = null):Config;
+    public function setEMailValidator(callable $handler = null):Config;
 
     /**
      * Add custom password validator
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @return Config
      * @todo: change return type to self at PHP 7.4
      */
-    public function setPasswordValidator(callable $callable = null):Config;
+    public function setPasswordValidator(callable $handler = null):Config;
 
     /**
      * Update localization dictionary from PHP Array (result of `phpauth/phpauth.l10n` package)
@@ -70,20 +70,20 @@ interface ConfigInterface
     /**
      * Add custom mailer. Not implemented now.
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @return $this
      * @todo: change return type to self at PHP 7.4
      */
-    public function setCustomMailer(callable $callable = null):Config;
+    public function setCustomMailer(callable $handler = null):Config;
 
     /**
      * set Captcha Validator
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @return $this
      * @todo: change return type to self at PHP 7.4
      */
-    public function setCaptchaValidator(callable $callable = null):Config;
+    public function setCaptchaValidator(callable $handler = null):Config;
 
 
 }

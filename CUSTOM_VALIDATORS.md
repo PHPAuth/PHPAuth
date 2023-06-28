@@ -106,45 +106,40 @@ $config = $config->setEMailValidator(static function ($email) {
 
 # Captcha validators
 
-## Google reCaptcha
+## Google reCaptcha (google/recaptcha)
+
+https://packagist.org/packages/google/recaptcha
 
 ```php
-$config = $config->setCaptchaValidator(static function() use ($reCaptcha_config) {
+$captcha_response = $_POST['g-recaptcha-response'];
+
+$config = $config->setCaptchaValidator(static function($captcha_response) use ($reCaptcha_config) {
     if (empty($reCaptcha_config)) {
         return true;
     }
 
-    if ($reCaptcha_config['recaptcha_enabled']) {
-        if (empty($reCaptcha_config['recaptcha_secret_key'])) {
-            throw new RuntimeException('No secret provided');
-        }
+    if ($reCaptcha_config['recaptcha_enabled'] == false) {
+        return true;
+    }
 
-        if (!is_string($reCaptcha_config['recaptcha_secret_key'])) {
-            throw new RuntimeException('The provided secret must be a string');
-        }
+    if (empty($reCaptcha_config['recaptcha_secret_key'])) {
+        throw new RuntimeException('No secret provided');
+    }
 
-        $recaptcha = new ReCaptcha($reCaptcha_config['recaptcha_secret_key']);
-        $checkout = $recaptcha->verify($captcha_response, \PHPAuth\Helpers::getIp());
+    if (!is_string($reCaptcha_config['recaptcha_secret_key'])) {
+        throw new RuntimeException('The provided secret must be a string');
+    }
 
-        if (!$checkout->isSuccess()) {
-            return false;
-        }
+    $recaptcha = new ReCaptcha($reCaptcha_config['recaptcha_secret_key']);
+    $checkout = $recaptcha->verify($captcha_response, \PHPAuth\Helpers::getIp());
+
+    if (!$checkout->isSuccess()) {
+        return false;
     }
 
     return true;
 }, $reCaptcha_config);
 ```
-
-
-
-
-
-# --- Other ---
-
-## stymiee/email-validator
-
-`composer require stymiee/email-validator`
-
 
 
 

@@ -7,8 +7,6 @@ use PDO;
 use PDOException;
 use PHPAuth\Core\Result;
 use PHPMailer\PHPMailer\PHPMailer;
-use ReCaptcha\ReCaptcha;
-use RuntimeException;
 use stdClass;
 use function setcookie;
 
@@ -43,11 +41,6 @@ class Auth implements AuthInterface
     protected $messages_dictionary = [];
 
     /**
-     * @var stdClass $recaptcha_config
-     */
-    protected $recaptcha_config = [];
-
-    /**
      * Custom E-Mail validator callback
      *
      * @var callable
@@ -68,17 +61,31 @@ class Auth implements AuthInterface
      */
     public $customMailer;
 
+    /**
+     * @var callable|null
+     */
+    public $captchaHandler;
+
+    /**
+     * @var array
+     */
+    public $captchaConfig;
+
     public function __construct($dbh, Config $config)
     {
         $this->dbh = $dbh;
         $this->config = $config;
 
-        $this->recaptcha_config = $this->config->recaptcha;
         $this->messages_dictionary = $this->config->dictionary;
 
+        // custom handlers
         $this->emailValidator = $this->config->emailValidator;
         $this->passwordValidator = $this->config->passwordValidator;
         $this->customMailer = $this->config->customMailer;
+
+        // captcha handler
+        $this->captchaHandler = $this->config->captchaHandler;
+        $this->captchaConfig = $this->config->captchaConfig;
 
         if (!empty($this->config->site_timezone)) {
             date_default_timezone_set($this->config->site_timezone);
@@ -96,7 +103,6 @@ class Auth implements AuthInterface
         $block_status = $this->isBlocked();
 
         if ($block_status == 'verify') {
-            // checkCaptcha always return true!
             if (!$this->checkCaptcha($captcha_response)) {
                 $return['message'] = $this->__lang('captcha.verify_code_invalid');
                 return $return;
@@ -1619,51 +1625,20 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Verifies a captcha code
-     *
-     * @param string $captcha
-     *
-     * @return boolean
-     */
-    protected function checkCaptcha(string $captcha):bool
-    {
-        return true;
-    }
-
-
-    /**
-     * Check Google Recaptcha code.
-     * If reCaptcha disabled in config or config not defined - return TRUE (captcha passed)
+     * Verifies a captcha answer. Return true if captcha is correct, false otherwise.
      *
      * @param string $captcha_response
      *
      * @return boolean
      */
-    protected function checkReCaptcha(string $captcha_response):bool
+    protected function checkCaptcha(string $captcha_response):bool
     {
-        if (empty($this->recaptcha_config)) {
-            return true;
-        }
-
-        if ($this->recaptcha_config['recaptcha_enabled']) {
-            if (empty($this->recaptcha_config['recaptcha_secret_key'])) {
-                throw new RuntimeException('No secret provided');
-            }
-            if (!is_string($this->recaptcha_config['recaptcha_secret_key'])) {
-                throw new RuntimeException('The provided secret must be a string');
-            }
-
-            $recaptcha = new ReCaptcha($this->recaptcha_config['recaptcha_secret_key']);
-            $checkout = $recaptcha->verify($captcha_response, self::getIp());
-
-            if (!$checkout->isSuccess()) {
-                return false;
-            }
+        if (is_callable($this->captchaHandler)) {
+            return call_user_func_array($this->captchaHandler, [ $captcha_response ] );
         }
 
         return true;
     }
-
 
     /**
      * Adds an attempt to database

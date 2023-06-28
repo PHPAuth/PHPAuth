@@ -58,12 +58,12 @@ class Config implements ConfigInterface
     /**
      * @var callable
      */
-    public $customCaptchaValidator;
+    public $captchaHandler = null;
 
     /**
      * @var array
      */
-    public $customCaptchaConfig;
+    public $captchaConfig = [];
 
     /**
      * Config::__construct()
@@ -212,20 +212,6 @@ class Config implements ConfigInterface
         /*
          * ENDIF
          */
-        /**
-         * SO, AT VERSION 2.0 REMOVE/COMMENT BLOCK '<2.0'
-         */
-
-        // set reCaptcha config
-        $config_recaptcha = [];
-
-        if (array_key_exists('recaptcha_enabled', $this->config)) {
-            $config_recaptcha['recaptcha_enabled'] = $this->config['recaptcha_enabled'];
-            $config_recaptcha['recaptcha_site_key'] = $this->config['recaptcha_site_key'];
-            $config_recaptcha['recaptcha_secret_key'] = $this->config['recaptcha_secret_key'];
-        }
-
-        $this->config['recaptcha'] = $config_recaptcha;
     }
 
     public function setLocalization(array $dictionary = []):Config
@@ -406,19 +392,19 @@ class Config implements ConfigInterface
     /* ==== Set custom handlers ==== */
     /* ============================= */
 
-    public function setEMailValidator(callable $callable = null):Config
+    public function setEMailValidator(callable $handler = null):Config
     {
-        if (is_callable($callable)) {
-            $this->emailValidator = $callable;
+        if (is_callable($handler)) {
+            $this->emailValidator = $handler;
         }
 
         return $this;
     }
 
-    public function setPasswordValidator(callable $callable = null):Config
+    public function setPasswordValidator(callable $handler = null):Config
     {
-        if (is_callable($callable)) {
-            $this->passwordValidator = $callable;
+        if (is_callable($handler)) {
+            $this->passwordValidator = $handler;
         }
 
         return $this;
@@ -427,13 +413,13 @@ class Config implements ConfigInterface
     /**
      *
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @return $this
      */
-    public function setCustomMailer(callable $callable = null):Config
+    public function setCustomMailer(callable $handler = null):Config
     {
-        if (is_callable($callable)) {
-            $this->customMailer = $callable;
+        if (is_callable($handler)) {
+            $this->customMailer = $handler;
         }
 
         return $this;
@@ -442,15 +428,15 @@ class Config implements ConfigInterface
     /**
      * Set captcha validator handler
      *
-     * @param callable|null $callable
+     * @param callable|null $handler
      * @param array $captcha_config
      * @return $this
      */
-    public function setCaptchaValidator(callable $callable = null, array $captcha_config = []):Config
+    public function setCaptchaValidator(callable $handler = null, array $captcha_config = []):Config
     {
-        if (is_callable($callable)) {
-            $this->customCaptchaValidator = $callable;
-            $this->customCaptchaConfig = $captcha_config;
+        if (is_callable($handler)) {
+            $this->captchaHandler = $handler;
+            $this->captchaConfig = $captcha_config;
         }
 
         return $this;

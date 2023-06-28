@@ -29,7 +29,7 @@ class AuthTest extends TestCase
     {
         require_once __DIR__ . '/../vendor/autoload.php';
 
-        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_database", "phpauth_test_user", "");
+        self::$dbh = new PDO("mysql:host=127.0.0.1;dbname=phpauth_test_database", "phpauth_test_user", "password");
         $config = new \PHPAuth\Config(self::$dbh, null, \PHPAuth\Config::CONFIG_TYPE_SQL);
         $config = $config->setPasswordValidator(static function($password) use ($config){
             return (bool)((new Zxcvbn())->passwordStrength($password)['score'] >= intval($config->password_min_score));
