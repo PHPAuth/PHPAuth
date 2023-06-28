@@ -61,7 +61,7 @@ $lang['activation_exists'] = "Um email de ativação já foi enviado.";
 
 $lang['email_activation_subject'] = '%s - Ativação da conta';
 $lang['email_activation_body'] = 'Olá,<br/><br/> Para logar-se em sua conta é necessaria ativa-la primeiro no seguinte link: <strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/> Em seguida você deve utilizar a seguinte chave de ativação: <strong>%3$s</strong><br/><br/> Se você não se cadastrou em %1$s recentemente, por favor ignore este email.';
-$lang['email_activation_altbody'] = 'Olá, ' . "\n\n" . 'Para logar-se em sua conta é necessaria ativa-la primeiro no seguinte link:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Em seguida você deve ultilizar a seguinte chave de ativação: %3$s' . "\n\n" . 'Se você não se cadastrou em %1$s recentemente, por favor ignore este email.';
+$lang['email_activation_altbody'] = 'Olá, ' . "\n\n" . 'Para logar-se em sua conta é necessaria ativa-la primeiro no seguinte link:' . "\n" . '%1$s/%2$s' . "\n\n" . 'Em seguida você deve utilizar a seguinte chave de ativação: %3$s' . "\n\n" . 'Se você não se cadastrou em %1$s recentemente, por favor ignore este email.';
 
 $lang['email_reset_subject'] = '%s - Requisição de redefinição da senha';
 $lang['email_reset_body'] = 'Olá,<br/><br/>Para você redefinir sua senha você primeiro precisa entrar no seguinte link:<br/><br/><strong><a href="%1$s/%2$s">%1$s/%2$s</a></strong><br/><br/>Logo depois você precisa utilizar a seguinte chave de redefinição: <strong>%3$s</strong><br/><br/> Caso você não solicitou a redefinição da senha em %1$s recentemente, por favor ignore este email.';
