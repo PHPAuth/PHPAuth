@@ -24,17 +24,21 @@ Called at:
 ```php
 use ZxcvbnPhp\Zxcvbn;
 
-$config = $config->setPasswordValidator(static function($password) use ($config) {
-    return (bool)((new Zxcvbn())->passwordStrength($password)['score'] >= intval($config->password_min_score));
+$config = $config->setPasswordValidator(static function($password) {
+    // explicitly declare minimum password strength, see below
+    $password_min_score = 3;
+    return (bool)((new Zxcvbn())->passwordStrength($password)['score'] >= $password_min_score));
 });
 ```
+NB: it is better not to take the minimum password strength from the config, but to specify it explicitly - because this parameter may be different for different handlers.
+
 used as:
 
 ```php
 private function isPasswordStrong(string $password):bool
 {
     if (is_callable($this->passwordValidator)) {
-        return ($this->passwordValidator)($password, $this->config);
+        return ($this->passwordValidator)($password);
     }
 
     return true;

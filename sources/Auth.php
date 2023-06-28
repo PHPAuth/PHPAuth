@@ -1095,7 +1095,7 @@ class Auth implements AuthInterface
             $mail->setFrom($this->config->site_email, $this->config->site_name);
             $mail->addAddress($email);
 
-            $mail->CharSet = $this->config->mail_charset;       //@todo: must be ALWAYS 'UTF-8'
+            $mail->CharSet = 'UTF-8';       //@todo: must be ALWAYS 'UTF-8'
 
             //Content
             $mail->isHTML(true);
@@ -1789,10 +1789,10 @@ class Auth implements AuthInterface
     private function isPasswordStrong(string $password):bool
     {
         if (is_callable($this->passwordValidator)) {
-            return ($this->passwordValidator)($password, $this->config);
+            return ($this->passwordValidator)($password);
         }
 
-        // call_user_func_array($this->passwordValidator, [ $password, $this->config ])
+        // call_user_func_array($this->passwordValidator, [ $password ])
 
         return true;
     }

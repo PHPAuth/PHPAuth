@@ -24,8 +24,6 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('allow_concurrent_sessions', FALSE),
 ('emailmessage_suppress_activation',  '0'),
 ('emailmessage_suppress_reset', '0'),
-('mail_charset','UTF-8'),
-('password_min_score',  '3'),
 ('site_activation_page',  'activate'),
 ('site_activation_page_append_code', '0'),
 ('site_email',  'no-reply@phpauth.cuonic.com'),
