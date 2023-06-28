@@ -89,9 +89,9 @@ If you did not request a password reset key on %1$s recently then this message w
         $lang['user_validate_password_incorrect'] = 'Password too short, too long or otherwise doesn\'t match the requirements.';
         $lang['user_validate_remember_me_invalid'] = 'Unacceptable &amp;ldquo;remember user&amp;rdquo; field value.';
         $lang['user_validate_user_not_found'] = 'This e-mail is not registered.';
-        $lang['account_not_found'] = 'Email address / password are incorrect.';
-        $lang['email_password_incorrect'] = 'Email address / password are incorrect.';
-        $lang['email_password_invalid'] = 'Email address / password are invalid.';
+        $lang['account_not_found'] = 'Email address / password is incorrect.';
+        $lang['email_password_incorrect'] = 'Email address / password is incorrect.';
+        $lang['email_password_invalid'] = 'Email address / password is invalid.';
         $lang['remember_me_invalid'] = 'The remember me field is invalid.';
 
         $lang['php_version_required'] = 'PHPAuth engine requires PHP version %s+!';
