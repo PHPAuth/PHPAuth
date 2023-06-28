@@ -59,7 +59,6 @@ class Result implements \ArrayAccess, \Serializable
 
     public function offsetExists($offset)
     {
-        var_dump(__METHOD__);
         return property_exists($this, $offset);
     }
 
