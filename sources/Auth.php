@@ -596,7 +596,7 @@ class Auth implements AuthInterface
     }
 
     //@todo: use custom validator instead
-    public function isEmailBanned(string $email):bool
+    /*public function isEmailBanned(string $email):bool
     {
         try {
             $this->dbh->query("SELECT * FROM {$this->config->table_emails_banned} LIMIT 1;");
@@ -615,7 +615,7 @@ class Auth implements AuthInterface
         }
 
         return true;
-    }
+    }*/
 
     public function getRequest(string $key, string $type):array
     {
@@ -1601,23 +1601,19 @@ class Auth implements AuthInterface
             return $state;
         }
 
-        //@todo: use custom validator
-        /*
-        if (is_callable($this->emailValidator) && call_user_func_array($this->emailValidator, [ $email ])) {
+        if (/*$this->config->verify_email_with_custom && */ is_callable($this->emailValidator) && !call_user_func_array($this->emailValidator, [ $email ])) {
             $this->addAttempt();
             $state['message'] = $this->__lang('email.address_in_banlist');
 
             return $state;
         }
-        */
-        // instead of:
 
-        if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
+        /*if ((int)$this->config->verify_email_use_banlist && $this->isEmailBanned($email)) {
             $this->addAttempt();
             $state['message'] = $this->__lang('email.address_in_banlist');
 
             return $state;
-        }
+        }*/
 
         $state['error'] = false;
 

@@ -304,8 +304,6 @@ class Config implements ConfigInterface
 
         $this->repairConfigValue('verify_email_max_length', 100);
 
-        $this->repairConfigValue('verify_email_use_banlist', 1);
-
         $this->repairConfigValue('emailmessage_suppress_activation', 0);
 
         $this->repairConfigValue('emailmessage_suppress_reset', 0);
@@ -316,10 +314,10 @@ class Config implements ConfigInterface
 
         // new V 1.4.6
         $this->repairConfigValue('verify_email_valid', true); // use FILTER_VALIDATE_EMAIL for email validation, @todo: add to config ?
-        $this->repairConfigValue('verify_email_use_banlist', true);
 
         // 1.5.0+
-        $this->repairConfigValue('verify_email_with_custom', 0); // instead of [verify_email_use_banlist]
+        // $this->repairConfigValue('verify_email_with_custom', 0); // instead of [verify_email_use_banlist]
+        //@todo: not sure if this option is needed. Can a situation arise when banlist validation is not required, but its handler is added?
     }
 
     /**

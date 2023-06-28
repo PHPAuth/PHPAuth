@@ -118,7 +118,7 @@ interface AuthInterface
      * @param string $email
      * @return boolean
      */
-    public function isEmailBanned(string $email):bool;
+    /*public function isEmailBanned(string $email):bool;*/
 
     /**
      * Gets public user data for a given UID and returns an array, password will be returned if param $withpassword is TRUE

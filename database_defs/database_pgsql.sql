@@ -50,7 +50,6 @@ INSERT INTO phpauth_config (setting, value) VALUES
 ('table_translations', 'phpauth_translation_dictionary'),
 ('verify_email_max_length', '100'),
 ('verify_email_min_length', '5'),
-('verify_email_use_banlist',  '1'),
 ('verify_password_min_length',  '3'),
 ('request_key_expiration', '+10 minutes'),
 ('translation_source', 'php'),

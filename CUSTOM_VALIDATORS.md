@@ -63,9 +63,18 @@ Developer can use other validator implementations, such as:
 
 Initialized with `setEmailValidator()` method.
 
-Called at:
-- register
--
+EMail validator MUST return **true** if email is valid (for example, not in banlist), **false** otherwise.
+
+Used as:
+```php
+
+if (is_callable($this->emailValidator) && !call_user_func_array($this->emailValidator, [ $email ])) {
+    $this->addAttempt();
+    $state['message'] = $this->__lang('email.address_in_banlist');
+
+    return $state;
+}
+```
 
 ## phpauth/phpauth.email-validator (recommended)
 
