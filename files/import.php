@@ -38,7 +38,7 @@ function importDomains($dbh, $domains)
 }
 
 /**
- * Veryfies the file path entered are not pointing to any parent foler
+ * Verifies the file path entered isn't pointing to any parent folder
  * @param $file_path
  * @return array $return
  */

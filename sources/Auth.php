@@ -1674,7 +1674,7 @@ class Auth implements AuthInterface
     }
 
     /**
-     * Verifies that a password lenght is greater than minimal length
+     * Verifies that a password length is greater than minimal length
      *
      * @param string $password
      *
@@ -1698,7 +1698,7 @@ class Auth implements AuthInterface
     }
 
     /* ============================================================================================================= */
-    /* ============================================== PRIVATE METHIDS ============================================== */
+    /* ============================================== PRIVATE METHODS ============================================== */
     /* ============================================================================================================= */
 
     /**
