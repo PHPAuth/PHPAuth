@@ -6,7 +6,7 @@
  * @param array $domains
  * @return array $return
  */
-function importDomains($dbh, $domains)
+function importDomains($dbh, array $domains): array
 {
     $return['error'] = true;
     $return['message'] = "";
@@ -26,7 +26,7 @@ function importDomains($dbh, $domains)
 
         $query = $dbh->prepare("INSERT INTO phpauth_emails_banned (`domain`) VALUES (?)");
                 
-        if(!$query->execute(array($domain)))
+        if(!$query->execute([$domain]))
         {
             $return['message'] .= "Failed to import domain: " . $domain . "\n";
         }
@@ -39,10 +39,10 @@ function importDomains($dbh, $domains)
 
 /**
  * Verifies the file path entered isn't pointing to any parent folder
- * @param $file_path
+ * @param string $file_path
  * @return array $return
  */
-function validateFilePath($file_path)
+function validateFilePath(string $file_path): array
 {
     $return['error'] = true;
 
