@@ -1426,7 +1426,7 @@ class Auth implements AuthInterface
                 return false;
             }
         }
-
+$_COOKIE[$this->config->cookie_name] = $data['hash'];
         return $data;
     }
 
