@@ -41,20 +41,20 @@ trait Helpers
 To be able to log in to your account you first need to activate your account by visiting the following link :
 %1$s/%2$s
 
-You then need to use the following activation key: %3$s
+/* You then need to use the following activation key: %3$s */
 
 If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
-        $lang['email_activation_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt; To be able to log in to your account you first need to activate your account by clicking on the following link : &lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt; You then need to use the following activation key: &lt;strong&gt;%3$s&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt; If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_activation_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt; To be able to log in to your account you first need to activate your account by clicking on the following link : &lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt; If you did not sign up on %1$s recently then this message was sent in error, please ignore it.';
         $lang['email_activation_subject'] = '%s - Activate account';
         $lang['email_reset_altbody'] = 'Hello,
 
 To reset your password please visiting the following link :
 %1$s/%2$s
 
-You then need to use the following password reset key: %3$s
+/* You then need to use the following password reset key: %3$s */
 
 If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
-        $lang['email_reset_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt;To reset your password click the following link :&lt;br/&gt;&lt;br/&gt;&lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;You then need to use the following password reset key: &lt;strong&gt;%3$s&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
+        $lang['email_reset_body'] = 'Hello,&lt;br/&gt;&lt;br/&gt;To reset your password click the following link :&lt;br/&gt;&lt;br/&gt;&lt;strong&gt;&lt;a href="%1$s/%2$s"&gt;%1$s/%2$s&lt;/a&gt;&lt;/strong&gt;&lt;br/&gt;&lt;br/&gt;If you did not request a password reset key on %1$s recently then this message was sent in error, please ignore it.';
         $lang['email_reset_subject'] = '%s - Password reset request';
         $lang['logged_in'] = 'You are now logged in.';
         $lang['logged_out'] = 'You are now logged out.';
