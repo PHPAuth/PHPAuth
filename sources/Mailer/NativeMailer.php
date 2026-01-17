@@ -1,11 +1,11 @@
 <?php
 
-namespace PHPAuth\Driver;
+namespace PHPAuth\Mailer;
 
 /**
  * Internal mailer driver for mail()
  */
-class NativeMailDriver implements MailerDriverInterface
+class NativeMailer implements MailerInterface
 {
     private string $defaultFrom;
     private string $defaultFromName;

@@ -1,8 +1,8 @@
 <?php
 
-namespace PHPAuth\Driver;
+namespace PHPAuth\Mailer;
 
-interface MailerDriverInterface
+interface MailerInterface
 {
     /**
      * Отправка email

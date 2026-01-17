@@ -1,3 +1,13 @@
+# 1.6.1
+
+- [*] MailerDriverInterface renamed to MailerInterface
+- [*] NativeMailDriver renamed to NativeMailer
+
+# 1.6.0
+
+- [+] MailerDriverInterface for future releases
+- [+] NativeMailDriver stub
+
 ## 1.3.5
 
 - [!] recommended version for composer is `latest`, NOT `dev-master`
