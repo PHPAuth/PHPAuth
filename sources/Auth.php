@@ -1231,7 +1231,6 @@ class Auth implements AuthInterface
             $mail->isHTML(true);
 
             if ($type == 'activation') {
-                $mail->Subject = $this->__lang('email_activation_subject', $this->config->site_name);
                 if ($this->config->site_activation_page_append_code) {
                     $url = $this->config->site_activation_page . '/' . $key;
                 } else {
