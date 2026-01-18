@@ -85,12 +85,12 @@ User actions
 
 Requirements
 ---------------
-* PHP 7.1+
+* PHP 7.4+
 * MySQL / MariaDB database or PostGreSQL database
 
 Composer Support
 ---------------
-PHPAuth can now be installed with the following command:
+PHPAuth can be installed with the following command:
 
 `composer require phpauth/phpauth`
 
@@ -153,46 +153,6 @@ The database table `config` contains multiple parameters allowing you to configu
 
 The rest of the parameters generally do not need changing.
 
-CAPTCHA Implementation
----------------
-
-If `isBlocked()` returns `verify`, then a CAPTCHA code should be displayed.
-The method `checkCaptcha($captcha)` is called to verify a CAPTCHA code. By default, this method returns `true` but should be overridden to verify a CAPTCHA.
-
-For example, if you are using Google's ReCaptcha NoCaptcha, use the following code:
-
-```php
-    private function checkCaptcha($captcha)
-    {
- try {
-
-        $url = 'https://www.google.com/recaptcha/api/siteverify';
-        $data = ['secret'   => 'your_secret_here',
-            'response' => $captcha,
-            'remoteip' => $this->getIp()];
-
-        $options = [
-            'http' => [
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($data)
-            ]
-        ];
-
-        $context  = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        return json_decode($result)->success;
-    }
-    catch (\Exception $e) {
-        return false;
-    }
-}
-```
-
-If a CAPTCHA is not to be used, please ensure to set `attempt_before_block` to the same value as `attempts_before_verify`.
-
-Also, `Auth::checkReCaptcha()` method can be called.
-
 How to secure a page
 ---------------
 
@@ -222,7 +182,8 @@ if (!$auth->isLogged()) {
 Validate user password in front-end
 -----------------------------------
 
-PHPAuth evaluates the strength of a password on user registration and manually added Users via `addUser()` function. The minimum score of accepted passwords is controlled via the `password_min_score` config-parameter.
+PHPAuth evaluates the strength of a password on user registration and manually added Users via `addUser()` function.
+The minimum score of accepted passwords is controlled via the `password_min_score` config-parameter.
 
 In this example, the front-end is based on html, generated via php. The score is passed as a javascript variable like
 
@@ -230,7 +191,7 @@ In this example, the front-end is based on html, generated via php. The score is
 <?php echo 'let minimum_score =' . $config->password_min_score; ?>
 ```
 
-A full example can be found in the source: /examples/html-frontend-password-strength-gui-feedback/index.php
+See: https://github.com/PHPAuth/PHPAuth.Examples/html-frontend-password-strength-gui-feedback/index.php
 
 **NB:** requires a database with phpauth tables from database_defs
 

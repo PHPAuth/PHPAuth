@@ -1,3 +1,10 @@
+# 1.7.0
+
+- [!] minimum PHP version is 7.4 NOW
+- [+] added some README files
+- [*] `Auth->do_SendMail()` uses custom mailer
+- [*] Please, use `Config->setMailer()` for set custom mailer
+
 # 1.6.1
 
 - [*] MailerDriverInterface renamed to MailerInterface
