@@ -4,8 +4,10 @@ namespace PHPAuth;
 
 use PDO;
 use PDOException;
-use PHPAuth\Exceptions\PHPAuthException;
 use RuntimeException;
+use PHPAuth\Exceptions\PHPAuthException;
+use PHPAuth\Mailer\MailerInterface;
+use PHPAuth\Mailer\NativeMailer;
 
 /**
  * PHPAuth Config class
@@ -64,6 +66,13 @@ class Config implements ConfigInterface
      * @var array
      */
     public $captchaConfig = [];
+
+    public bool $mailerEnabled;
+
+    /**
+     * @var MailerInterface|null
+     */
+    public ?MailerInterface $mailerDriver;
 
     /**
      * Config::__construct()
@@ -216,16 +225,38 @@ class Config implements ConfigInterface
 
     public function setLocalization(array $dictionary = []):Config
     {
-        $dictionary_default = self::getForgottenDictionary();
+        $current_dictionary = self::getForgottenDictionary();
 
-        foreach ($dictionary_default as $key => $value) {
+        foreach ($current_dictionary as $key => $value) {
             if (array_key_exists($key, $dictionary) && !empty($dictionary[$key])) {
-                $dictionary_default[$key] = $dictionary[$key];
+                $current_dictionary[$key] = $dictionary[$key];
             }
         }
-        $this->config['dictionary'] = $dictionary_default;
+        $this->config['dictionary'] = $current_dictionary;
 
         return $this;
+    }
+
+    /**
+     * Set mailer
+     *
+     * @param $driver
+     * @return void
+     */
+    public function setMailer($driver): void
+    {
+        if ($driver === false) {
+            $this->mailerEnabled = false;
+            $this->mailerDriver = null;
+        } elseif ($driver === null) {
+            $this->mailerEnabled = true;
+            $this->mailerDriver = new NativeMailer();
+        } elseif ($driver instanceof MailerInterface) {
+            $this->mailerEnabled = true;
+            $this->mailerDriver = $driver;
+        } else {
+            throw new \InvalidArgumentException('Mail driver MUST implement \PHPAuth\Mailer\MailerInterface or be NULL');
+        }
     }
 
 
@@ -403,21 +434,6 @@ class Config implements ConfigInterface
     {
         if (is_callable($handler)) {
             $this->passwordValidator = $handler;
-        }
-
-        return $this;
-    }
-
-    /**
-     *
-     *
-     * @param callable|null $handler
-     * @return $this
-     */
-    public function setCustomMailer(callable $handler = null):Config
-    {
-        if (is_callable($handler)) {
-            $this->customMailer = $handler;
         }
 
         return $this;

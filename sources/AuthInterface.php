@@ -261,12 +261,12 @@ interface AuthInterface
     /**
      * Send E-Mail using PHPMailer
      *
-     * @param string $email
+     * @param string $target_email
      * @param string $type
      * @param string $key
      * @return array|false $return (contains error code and error message)
      */
-    public function do_SendMail(string $email, string $type, string $key);
+    public function do_SendMail(string $target_email, string $type, string $key);
 
     /**
      * Update userinfo for user with given id = $uid

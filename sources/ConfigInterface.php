@@ -68,15 +68,6 @@ interface ConfigInterface
     public function setLocalization(array $dictionary):Config;
 
     /**
-     * Add custom mailer. Not implemented now.
-     *
-     * @param callable|null $handler
-     * @return $this
-     * @todo: change return type to self at PHP 7.4
-     */
-    public function setCustomMailer(callable $handler = null):Config;
-
-    /**
      * set Captcha Validator
      *
      * @param callable|null $handler

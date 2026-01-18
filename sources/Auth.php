@@ -4,9 +4,6 @@ namespace PHPAuth;
 
 use Exception;
 use PDO;
-use PDOException;
-use PHPAuth\Core\Result;
-use PHPMailer\PHPMailer\PHPMailer;
 use stdClass;
 use function setcookie;
 
@@ -1186,79 +1183,52 @@ class Auth implements AuthInterface
         return true;
     }
 
-    //@todo: split to two separate methods (needed for custom handler)
-    public function do_SendMail(string $email, string $type, string $key)
+    public function do_SendMail(string $target_email, string $type, string $key)
     {
-        $return = [
-            'error' => true
-        ];
-        $mail = new PHPMailer();
+        $return = [ 'error' => true ];
 
-        // Check configuration for custom SMTP parameters
-        try {
-            // Server settings
-            if ($this->config->smtp) {
-                if ($this->config->smtp_debug) {
-                    $mail->SMTPDebug = $this->config->smtp_debug;
-                }
+        if (!$this->config->mailerEnabled) {
+            return $return;
+        }
 
-                $mail->isSMTP();
-
-                $mail->Host = $this->config->smtp_host;
-                $mail->SMTPAuth = $this->config->smtp_auth;
-
-                // set SMTP auth username/password
-                if (!is_null($this->config->smtp_auth)) {
-                    $mail->Username = $this->config->smtp_username;
-                    $mail->Password = $this->config->smtp_password;
-                }
-
-                // set SMTPSecure (tls|ssl)
-                if (!is_null($this->config->smtp_security)) {
-                    $mail->SMTPSecure = $this->config->smtp_security;
-                }
-
-                $mail->Port = $this->config->smtp_port;
-            } //without this params internal mailer will be used.
-
-            //Recipients
-            $mail->setFrom($this->config->site_email, $this->config->site_name);
-            $mail->addAddress($email);
-
-            $mail->CharSet = 'UTF-8';       //@todo: must be ALWAYS 'UTF-8'
-
-            //Content
-            $mail->isHTML(true);
-
-            if ($type == 'activation') {
-                if ($this->config->site_activation_page_append_code) {
-                    $url = $this->config->site_activation_page . '/' . $key;
-                } else {
-                    $url = $this->config->site_activation_page;
-                }
-                $mail->Subject = $this->__lang('email_activation_subject', $this->config->site_name);
-                $mail->Body = $this->__lang('email_activation_body', $this->config->site_url, $url, $key);
-                $mail->AltBody = $this->__lang('email_activation_altbody', $this->config->site_url, $url, $key);
-            } elseif ($type == 'reset') {
-                if ($this->config->site_password_reset_page_append_code) {
-                    $url = $this->config->site_password_reset_page . '/' . $key;
-                } else {
-                    $url = $this->config->site_password_reset_page;
-                }
-                $mail->Subject = $this->__lang('email_reset_subject', $this->config->site_name);
-                $mail->Body = $this->__lang('email_reset_body', $this->config->site_url, $url, $key);
-                $mail->AltBody = $this->__lang('email_reset_altbody', $this->config->site_url, $url, $key);
+        if ($type == 'activation') {
+            if ($this->config->site_activation_page_append_code) {
+                $url = $this->config->site_activation_page . '/' . $key;
             } else {
-                return false;
+                $url = $this->config->site_activation_page;
             }
+            $Subject = $this->__lang('email_activation_subject', $this->config->site_name);
+            $Body = $this->__lang('email_activation_body', $this->config->site_url, $url, $key);
+            $AltBody = $this->__lang('email_activation_altbody', $this->config->site_url, $url, $key);
+        } elseif ($type == 'reset') {
+            if ($this->config->site_password_reset_page_append_code) {
+                $url = $this->config->site_password_reset_page . '/' . $key;
+            } else {
+                $url = $this->config->site_password_reset_page;
+            }
+            $Subject = $this->__lang('email_reset_subject', $this->config->site_name);
+            $Body = $this->__lang('email_reset_body', $this->config->site_url, $url, $key);
+            $AltBody = $this->__lang('email_reset_altbody', $this->config->site_url, $url, $key);
+        } else {
+            return false;
+        }
 
-            if (!$mail->send()) {
-                throw new Exception($mail->ErrorInfo);
+        try {
+            $send_status = $this->config->mailerDriver->send(
+                $target_email,
+                $Subject,
+                $Body,
+                $AltBody
+            );
+
+            if ($send_status === false) {
+                throw new Exception($this->config->mailerDriver->ErrorInfo);
             }
 
             $return['error'] = false;
+
         } catch (Exception $e) {
-            $return['message'] = $mail->ErrorInfo;
+            $return['message'] = $this->config->mailerDriver->ErrorInfo;
         }
 
         return $return;
